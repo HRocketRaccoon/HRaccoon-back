@@ -8,9 +8,9 @@ spring:
 #   DB 설정(local)
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/todolist?characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: 3301
+    url: jdbc:mariadb://{url}/{databaseName}?characterEncoding=UTF-8&serverTimezone=UTC
+    username: { userName }
+    password: { userPassword }
     hikari:
       connection-test-query: SELECT NOW() FROM DUAL
 

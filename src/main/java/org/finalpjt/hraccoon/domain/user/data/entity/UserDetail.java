@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,30 @@ public class UserDetail {
 	@Column(name="user_leaving_reason")
 	private String userLeavingReason;
 
-	@Column(name="user_remain_vacation")
+	@Column(name="user_remain_vacation", columnDefinition = "integer default 15")
 	private Integer userRemainVacation;
+
+	@Builder
+	public UserDetail(LocalDateTime userJoinDate, LocalDateTime userLeavingDate, String userLeavingReason, Integer userRemainVacation) {
+		this.userJoinDate = userJoinDate;
+		this.userLeavingDate = userLeavingDate;
+		this.userLeavingReason = userLeavingReason;
+		this.userRemainVacation = userRemainVacation;
+	}
+
+	public void updateJoinDate(LocalDateTime userJoinDate) {
+		this.userJoinDate = userJoinDate;
+	}
+
+	public void updateRemainVacation(Integer userRemainVacation) {
+		this.userRemainVacation = userRemainVacation;
+	}
+
+	public void updateLeavingDate(LocalDateTime userLeavingDate) {
+		this.userLeavingDate = userLeavingDate;
+	}
+
+	public void updateLeavingReason(String userLeavingReason) {
+		this.userLeavingReason = userLeavingReason;
+	}
 }

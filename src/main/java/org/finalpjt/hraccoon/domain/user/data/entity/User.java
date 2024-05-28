@@ -1,13 +1,9 @@
 package org.finalpjt.hraccoon.domain.user.data.entity;
 
-import java.time.LocalDateTime;
-
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

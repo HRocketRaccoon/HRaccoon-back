@@ -23,5 +23,4 @@ public class Ability {
 	@Column(name = "ability_name", nullable = false)
 	private String abilityName;
 
-
 }

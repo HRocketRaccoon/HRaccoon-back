@@ -57,12 +57,23 @@ public class ResponseExceptionHandler {
 
 	/**
 	 * SignatureException 예외 처리
-	 * @param e 예외
+	 * @param exception 예외
 	 * @return ApiResponse<?>
 	 */
 	@ExceptionHandler(ResponseStatusException.class)
-	public ResponseEntity<ApiResponse<?>> handleResponseStatusException(ResponseStatusException e) {
-		return ResponseEntity.status(e.getStatusCode()).body(ApiResponse.createError(e.getReason()));
+	public ResponseEntity<ApiResponse<?>> handleResponseStatusException(ResponseStatusException exception) {
+		return ResponseEntity.status(exception.getStatusCode()).body(ApiResponse.createError(exception.getReason()));
+	}
+
+	/**
+	 * RuntimeException 예외 처리
+	 * @param exception 예외
+	 * @return ApiResponse<?>
+	 */
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<ApiResponse<?>> handleException(RuntimeException exception) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.body(ApiResponse.createError(exception.getMessage()));
 	}
 }
 

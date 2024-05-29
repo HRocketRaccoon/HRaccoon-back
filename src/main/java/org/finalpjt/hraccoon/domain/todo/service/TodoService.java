@@ -11,6 +11,7 @@ import org.finalpjt.hraccoon.domain.todo.repository.TodoRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,12 +40,15 @@ public class TodoService {
         return responseList;
     }
 
-
     @Transactional
     public TodoResponseDTO saveTodo(TodoRequestDTO data) {
         User user = userRepository.findByUserNo(data.getUserNo());
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 아이디를 가진 유저를 찾지 못했습니다 : " + data.getUserNo());
+		} 
+		// (확인필요) 할 일 기입x, 생성버튼 클릭 시 경고창 
+		else if(data.getTodoContent() == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "할 일을 기입해주세요");
 		}
 
 		Todo todo = data.toEntity(data, user);
@@ -58,10 +62,11 @@ public class TodoService {
 
         TodoResponseDTO responseDTO = new TodoResponseDTO(response);
 		responseDTO.setUserInfo(user);
+
         return responseDTO;
     }
 
-
+	@Transactional
 	public void completeTodo(Long todoNo) {
 		Todo todo = todoRepository.findByTodoNo(todoNo);
 
@@ -73,6 +78,16 @@ public class TodoService {
 		todoRepository.save(todo);
 	}
 
+	@Transactional
+	public void deleteByTodoNo(Long todoNo) {
+		Todo todo = todoRepository.findByTodoNo(todoNo);
+		if (todo == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 아이디를 가진 할 일을 찾지 못했습니다 : " + todoNo);
+		}
+
+		todo.updateTodoDeleteYn();
+		todoRepository.save(todo);
+	}
 
 }
 

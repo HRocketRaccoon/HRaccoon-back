@@ -1,13 +1,15 @@
-package org.finalpjt.hraccoon.domain.attendance.data.dto;
+package org.finalpjt.hraccoon.domain.attendance.data.dto.request;
 
 import jakarta.persistence.Column;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.sql.Date;
 import java.sql.Time;
 
 @Getter
-public class AttendanceDetailRequestDTO {
+@Builder
+public class AttendanceRequestDTO {
 
     private Long attendanceDetailNo;
 	

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor
 public class TodoController {
+    
     private final TodoService todoService;
 
     //등록창에 값을 입력 후 생성 버튼을 클릭 시, 할 일 목록에 새로 생성한 항목이 나타난다.
@@ -51,6 +52,11 @@ public class TodoController {
 		return ApiResponse.createSuccessWithNoContent();
 	}
     
+    @PostMapping("/todo/delete/{todoNo}")
+    public ApiResponse<?> deleteTodo(@PathVariable Long todoNo){
+        todoService.deleteByTodoNo(todoNo);
 
+        return ApiResponse.createSuccessWithNoContent();
+    }
     
 }

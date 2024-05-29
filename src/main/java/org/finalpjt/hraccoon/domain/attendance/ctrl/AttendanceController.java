@@ -1,6 +1,6 @@
 package org.finalpjt.hraccoon.domain.attendance.ctrl;
 
-import org.finalpjt.hraccoon.domain.attendance.data.dto.AttendanceDetailRequestDTO;
+import org.finalpjt.hraccoon.domain.attendance.data.dto.request.AttendanceRequestDTO;
 import org.finalpjt.hraccoon.domain.attendance.data.entity.AttendanceDetail;
 import org.finalpjt.hraccoon.domain.attendance.service.AttendanceService;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
@@ -50,7 +50,7 @@ public class AttendanceController {
         return null;
     }
     
-
+    // erd 다시 얘기해봐야함
     // 사용자는 캘린더를 통해 특정 날짜의 출퇴근 시간을 확인할 수 있다.
     // 2024-05-24
     @GetMapping("/attendance/startend/{user_no}/{attendanceDetailDate}")

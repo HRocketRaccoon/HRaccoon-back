@@ -3,7 +3,6 @@ package org.finalpjt.hraccoon.domain.attendance.repository;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.finalpjt.hraccoon.domain.attendance.data.entity.Attendance;
 import org.finalpjt.hraccoon.domain.attendance.data.entity.AttendanceDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AttendanceRepository extends JpaRepository<AttendanceDetail, Long>{
 
-    public Attendance findByUserNo(Long userNo);
+    public AttendanceDetail findByUserNo(Long userNo);
 
     @Modifying
     @Query("SELECT a FROM AttendanceDetail a WHERE a.attendanceDetailDate = :attendanceDetailDate   ")

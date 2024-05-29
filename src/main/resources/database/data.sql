@@ -27,7 +27,7 @@ INSERT INTO code (code_no, code_name) VALUES
 ('TM007', 'IOT개발팀'),
 ('TM008', '경영지원팀'),
 ('TM009', '외주관리팀'),
-('TM010', '인사지원팀'),
+('TM010', '인사팀'),
 ('TM011', '총무팀');
 
 

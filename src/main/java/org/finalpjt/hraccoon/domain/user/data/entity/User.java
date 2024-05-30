@@ -72,10 +72,6 @@ public class User extends BaseTimeEntity {
 	@Column(name = "user_rank", nullable = false)
 	private String userRank;
 
-	// @UpdateTimestamp
-	// @Column(name = "user_update_date", nullable = false)
-	// private LocalDateTime userUpdateDate;
-
 	@Column(name = "user_role", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role userRole;

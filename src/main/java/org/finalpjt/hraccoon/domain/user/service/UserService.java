@@ -10,6 +10,7 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
 import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserService {
 
+	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
-
 	private final UserDetailRepository userDetailRepository;
 
 	@Transactional
 	public void createUser(UserRequest params) {
-		User entity = params.toEntity();
+		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
+		User entity = params.toEntity(encryptedPassword);
 
 		try {
 			UserDetail userDetail = createUserDetail(params.getUserJoinDate());
@@ -82,4 +84,6 @@ public class UserService {
 
 		return response;
 	}
+
+	// TODO: 비밀번호 변경
 }

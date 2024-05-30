@@ -6,6 +6,7 @@ import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.service.UserService;
@@ -72,5 +73,13 @@ public class UserController {
 		Page<UserSearchResponse> users = userService.searchUser(keyword,ability, department, pageNumber,pageable);
 
 		return ApiResponse.createSuccess(users);
+	}
+
+	@GetMapping("/user/team/{userTeam}")
+	public ApiResponse<List<ApprovalResponse>> getTeamApprovalInfo(@PathVariable String userTeam) {
+
+		List<ApprovalResponse> responses = userService.getTeamApprovalInfo(userTeam);
+
+		return ApiResponse.createSuccess(responses);
 	}
 }

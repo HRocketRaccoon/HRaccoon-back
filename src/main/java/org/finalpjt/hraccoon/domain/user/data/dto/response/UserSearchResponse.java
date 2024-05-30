@@ -18,13 +18,9 @@ public class UserSearchResponse {
 	private String userRank;
 	private String userRole;
 
-	/* 변경 가능한 값 */
 	private String userMobile;
 	private String userAddress;
 	private String userEmail;
-
-	/* UserDetail */
-	private Integer userRemainVacation;
 
 	public UserSearchResponse(User user) {
 		this.userId = user.getUserId();

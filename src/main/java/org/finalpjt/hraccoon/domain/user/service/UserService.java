@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
+import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
@@ -43,6 +46,8 @@ public class UserService {
 	private final CodeRepository codeRepository;
 
 	private final AbilityRepository abilityRepository;
+
+	private final ApprovalRepository approvalRepository;
 
 	@Transactional
 	public void createUser(UserRequest params) {
@@ -118,15 +123,10 @@ public class UserService {
 
 		if(!department.equals("")){
 
-			// String dept_code = codeRepository.findCodeNoByCodeName(department);
-
 			spec = spec.and(UserSpecification.findByDepartment(department));
 		}
 		if(!ability.equals("")){
 
-			// String ability_code = codeRepository.findCodeNoByCodeName(ability);
-
-			// 검색된 역량을 갖는 users
 			List<User> users= abilityRepository.findUserByAbilityName(ability);
 			List<Long> userNos = users.stream().map(User::getUserNo).collect(Collectors.toList());
 
@@ -136,5 +136,13 @@ public class UserService {
 		Page<User> users = userRepository.findAll(spec, PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
 
 		return users.map(UserSearchResponse::new);
+	}
+
+	@Transactional
+	public List<ApprovalResponse> getTeamApprovalInfo(String userTeam) {
+
+		List<Approval> approvals= approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam);
+
+		return approvals.stream().map(ApprovalResponse::new).toList();
 	}
 }

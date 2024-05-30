@@ -15,7 +15,6 @@ public interface AbilityRepository extends JpaRepository<Ability,Long> {
 	@Query("select a from Ability a where a.user.userId = :userId")
 	List<Ability> findByUserId(String userId);
 
-	//안 쓸듯
 	@Query("select a.user from Ability a where a.abilityName = :abilityName")
 	List<User> findUserByAbilityName(String abilityName);
 }

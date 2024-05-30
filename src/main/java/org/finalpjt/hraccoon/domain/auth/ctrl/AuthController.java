@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.auth.ctrl;
 
+import org.finalpjt.hraccoon.domain.auth.constant.AuthMessageConstants;
 import org.finalpjt.hraccoon.domain.auth.data.request.SignInRequest;
 import org.finalpjt.hraccoon.domain.auth.data.response.SignInResponse;
 import org.finalpjt.hraccoon.domain.auth.service.AuthService;
@@ -22,6 +23,6 @@ public class AuthController {
 	public ApiResponse<SignInResponse> signIn(@RequestBody SignInRequest params) {
 		SignInResponse response = authService.signIn(params);
 
-		return ApiResponse.createSuccessWithMessage(response, "로그인에 성공했습니다.");
+		return ApiResponse.createSuccessWithMessage(response, AuthMessageConstants.AUTH_SUCCESS);
 	}
 }

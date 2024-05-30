@@ -55,7 +55,7 @@ public class SecurityConfig {
 					return config;
 				}
 			}))
-			// .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint)) // spring security 에서 인증 실패시 예외처리
+			.exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint)) // spring security 에서 인증 실패시 예외처리
 			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), BasicAuthenticationFilter.class)
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers(allowUrls).permitAll()

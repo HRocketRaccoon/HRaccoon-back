@@ -8,6 +8,7 @@ import org.finalpjt.hraccoon.domain.todo.data.dto.TodoRequestDTO;
 import org.finalpjt.hraccoon.domain.todo.data.dto.TodoResponseDTO;
 import org.finalpjt.hraccoon.domain.todo.data.entity.Todo;
 import org.finalpjt.hraccoon.domain.todo.repository.TodoRepository;
+import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,8 @@ public class TodoService {
     private final UserRepository userRepository;
 
     public List<TodoResponseDTO> findByUserNo(Long userNo) {
-        User user = userRepository.findByUserNo(userNo);
+        User user = userRepository.findByUserNo(userNo)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
         if (user == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 아이디를 가진 유저를 찾지 못했습니다 : " + userNo);
 		}
@@ -42,7 +44,8 @@ public class TodoService {
 
     @Transactional
     public TodoResponseDTO saveTodo(TodoRequestDTO data) {
-        User user = userRepository.findByUserNo(data.getUserNo());
+        User user = userRepository.findByUserNo(data.getUserNo())
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 아이디를 가진 유저를 찾지 못했습니다 : " + data.getUserNo());
 		} 

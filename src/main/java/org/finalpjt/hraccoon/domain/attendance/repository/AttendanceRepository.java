@@ -19,19 +19,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     // public List<Attendance> getAttendanceByDate(LocalDate date);
 
     @Modifying
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user_no = :user_no ")
-    public Attendance startend(String attendanceDate, String user_no);
+    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo ")
+    public Attendance startend(String attendanceDate, String userNo);
     
 
-    
+
 
     @Query("SELECT a FROM Attendance a WHERE a.user.userNo = :userNo")
     Optional<Attendance> findByUserNo(Long userNo);
 
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDetailDate BETWEEN :startDate AND :endDate AND a.user.userNo = :userNo")
+    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate BETWEEN :startDate AND :endDate AND a.user.userNo = :userNo")
     List<Attendance> findByUserNoAndDateBetween(Long userNo, LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDetailDate = :attendanceDate AND a.user.userNo = :userNo")
+    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo")
     Optional<Attendance> findByUserNoAndDate(Long userNo, LocalDate attendanceDate);
 
 

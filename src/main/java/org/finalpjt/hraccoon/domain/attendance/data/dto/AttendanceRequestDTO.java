@@ -1,4 +1,4 @@
-package org.finalpjt.hraccoon.domain.attendance.data.dto.request;
+package org.finalpjt.hraccoon.domain.attendance.data.dto;
 
 import jakarta.persistence.Column;
 import lombok.Builder;
@@ -13,8 +13,8 @@ public class AttendanceRequestDTO {
 
     private Long attendanceDetailNo;
 	
-	private Time attendanceDetailStartTime;
-	private Time attendanceDetailEndTime;
-	private Time attendanceDetailTotalTime;
+	private Time attendanceStartTime;
+	private Time attendanceEndTime;
+	private Time attendanceTotalTime;
     
 }

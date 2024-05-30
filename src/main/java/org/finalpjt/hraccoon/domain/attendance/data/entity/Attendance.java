@@ -25,22 +25,23 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AttendanceDetail extends BaseTimeEntity{
-
+public class Attendance extends BaseTimeEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "attendance_detail_date", nullable = false)
-	private LocalDateTime attendanceDetailDate;
+	private Long attendanceNo;
+	
+	@Column(name = "attendance_date", nullable = false)
+	private LocalDateTime attendanceDate;
 
-	@Column(name = "attendance_detail_start_time", nullable = false)
-	private LocalDateTime attendanceDetailStartTime;
+	@Column(name = "attendance_start_time", nullable = false)
+	private LocalDateTime attendanceStartTime;
 
-	@Column(name = "attendance_detail_end_time")
-	private LocalDateTime attendanceDetailEndTime;
+	@Column(name = "attendance_end_time")
+	private LocalDateTime attendanceEndTime;
 
-	@Column(name = "attendance_detail_total_time")
-	private LocalDateTime attendanceDetailTotalTime;
+	@Column(name = "attendance_total_time")
+	private LocalDateTime attendanceTotalTime;
 
 	@Column(name = "attendance_status", nullable = false)
 	private String attendanceStatus;

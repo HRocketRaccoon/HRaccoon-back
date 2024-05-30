@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+
 @RestControllerAdvice(basePackages = "org.finalpjt.hraccoon")
 public class ResponseExceptionHandler {
 
@@ -74,6 +78,21 @@ public class ResponseExceptionHandler {
 	public ResponseEntity<ApiResponse<?>> handleException(RuntimeException exception) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ApiResponse.createError(exception.getMessage()));
+	}
+
+	@ExceptionHandler(SignatureException.class)
+	public ResponseEntity<ApiResponse<?>> handleSignatureException() {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.createError("토큰이 유효하지 않습니다."));
+	}
+
+	@ExceptionHandler(MalformedJwtException.class)
+	public ResponseEntity<ApiResponse<?>> handleMalformedJwtException() {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.createError("올바르지 않은 토큰입니다."));
+	}
+
+	@ExceptionHandler(ExpiredJwtException.class)
+	public ResponseEntity<ApiResponse<?>> handleExpiredJwtException() {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.createError("토큰이 만료되었습니다. 다시 로그인해주세요."));
 	}
 }
 

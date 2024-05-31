@@ -1,11 +1,14 @@
 package org.finalpjt.hraccoon.domain.approval.ctrl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
 import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.service.ApprovalService;
+import org.finalpjt.hraccoon.domain.user.data.entity.User;
+import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +26,14 @@ import lombok.RequiredArgsConstructor;
 public class ApprovalController {
 
 	private final ApprovalService approvalService;
+	private final UserRepository userRepository;
 
 	@PostMapping("/approval/submit/{userNo}")
 	@ResponseBody
 	public ApiResponse<Void> postSubmitApproval(@PathVariable Long userNo, @RequestBody ApprovalRequest params) {
-		params.setUserNo(userNo);
-		approvalService.submitApproval(userNo, params);
+		Optional<User> userOptional = userRepository.findById(userNo);
+		User user = userOptional.get();
+		approvalService.submitApproval(user, params);
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_SUBMIT_SUCCESS);
 	}
 
@@ -40,25 +45,17 @@ public class ApprovalController {
 	}
 
 	@GetMapping("/approval/submittedapprovallist/{userNo}/{approvalNo}")
-	public ApiResponse<ApprovalResponse> getSubmittedApprovalListDetail(@PathVariable Long approvalNo) {
-		ApprovalResponse approvalResponse = approvalService.submittedApprovalListDetail(approvalNo);
+	public ApiResponse<ApprovalResponse> getSubmittedApprovalListDetail(@PathVariable Long userNo,
+		@PathVariable Long approvalNo) {
+		ApprovalResponse approvalResponse = approvalService.submittedApprovalListDetail(userNo, approvalNo);
 
 		return ApiResponse.createSuccess(approvalResponse);
 	}
 
 	@PostMapping("/approval/submittedapprovallist/{userNo}/{approvalNo}/cancel")
-	public ApiResponse<Void> postCancelApproval(@PathVariable Long approvalNo) {
-		approvalService.cancelApproval(approvalNo);
+	public ApiResponse<Void> postCancelApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
+		approvalService.cancelApproval(userNo, approvalNo);
 
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_CANCEL_SUCCESS);
 	}
-
-	// @GetMapping("/approval/requestedapprovallist/{userNo}")
-	// @ResponseBody
-	// public ApiResponse<List<Approval>> getRequestedApprovalList(@PathVariable Long userNo) {
-	// 	List<Approval> approvals = approvalService.requestedApprovalList(userNo);
-	//
-	// 	return ApiResponse.createSuccess(approvals);
-	// }
-
 }

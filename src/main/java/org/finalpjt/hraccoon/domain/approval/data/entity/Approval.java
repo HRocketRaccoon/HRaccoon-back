@@ -2,11 +2,6 @@ package org.finalpjt.hraccoon.domain.approval.data.entity;
 
 import java.time.LocalDateTime;
 
-import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
-import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
-import org.finalpjt.hraccoon.domain.user.data.entity.User;
-import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,17 +14,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
+import org.finalpjt.hraccoon.domain.user.data.entity.User;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Approval {
 
@@ -62,7 +60,7 @@ public class Approval {
 
 	@Builder
 	public Approval(ApprovalType approvalType, LocalDateTime approvalSubmitDate, ApprovalStatus approvalStatus,
-			String approvalAuthority, User user, ApprovalDetail approvalDetail) {
+		String approvalAuthority, User user, ApprovalDetail approvalDetail) {
 		this.approvalType = approvalType;
 		this.approvalSubmitDate = approvalSubmitDate;
 		this.approvalStatus = approvalStatus;

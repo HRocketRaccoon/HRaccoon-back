@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
 import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
@@ -24,32 +25,30 @@ public class ApprovalService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public void submitApproval(Long userNo, ApprovalRequest params) {
-		Optional<User> userOptional = userRepository.findById(userNo);
+	public void submitApproval(User user, ApprovalRequest params) {
+		Optional<User> userOptional = userRepository.findById(user.getUserNo());
 		if (userOptional.isPresent()) {
-			User user = userOptional.get();
-
 			if (params.getApprovalDetailStartDate() == null || params.getApprovalDetailEndDate() == null) {
-				throw new IllegalArgumentException("시작일과 종료일을 입력해 주세요.");
+				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_DATE_MISSING);
 			}
 
 			if (params.getApprovalDetailContent().isEmpty()) {
-				throw new IllegalArgumentException("내용을 입력해 주세요.");
+				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
-			Approval approval = params.toEntity(user);
+			String approvalAuthority = getApprovalAuthority(user.getUserPosition());
+			Approval approval = params.toEntity(user, approvalAuthority);
 			approvalRepository.save(approval);
 		}
 	}
 
 	@Transactional
-	public void cancelApproval(Long approvalNo) {
+	public void cancelApproval(Long userNo, Long approvalNo) {
 		Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
 
 		Approval approval = approvalOptional.get();
 
-		if (approval.getApprovalStatus() == ApprovalStatus.PENDING) {
-			approval.setApprovalStatus(ApprovalStatus.CANCELLED);
+		if (approval.getUser().getUserNo().equals(userNo) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
 			approvalRepository.delete(approval);
 		}
 	}
@@ -83,50 +82,33 @@ public class ApprovalService {
 	}
 
 	@Transactional
-	public ApprovalResponse submittedApprovalListDetail(Long approvalNo) {
-		Approval approval = approvalRepository.findByApprovalNo(approvalNo);
-		ApprovalResponse approvalResponse = ApprovalResponse.builder()
-			.approvalNo(approval.getApprovalNo())
-			.userTeam(approval.getUser().getUserTeam())
-			.userId(approval.getUser().getUserId())
-			.userName(approval.getUser().getUserName())
-			.approvalType(approval.getApprovalType())
-			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
-			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
-			.approvalAuthority(approval.getApprovalAuthority())
-			.approvalSubmitDate(approval.getApprovalSubmitDate())
-			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
-			.approvalStatus(approval.getApprovalStatus())
-			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
-			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
-			.build();
+	public ApprovalResponse submittedApprovalListDetail(Long userNo, Long approvalNo) {
+		Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
 
-		return approvalResponse;
+		Approval approval = approvalOptional.get();
+
+		if (approval.getUser().getUserNo().equals(userNo)) {
+			return ApprovalResponse.builder()
+				.approvalNo(approval.getApprovalNo())
+				.userTeam(approval.getUser().getUserTeam())
+				.userId(approval.getUser().getUserId())
+				.userName(approval.getUser().getUserName())
+				.approvalType(approval.getApprovalType())
+				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
+				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
+				.approvalAuthority(approval.getApprovalAuthority())
+				.approvalSubmitDate(approval.getApprovalSubmitDate())
+				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
+				.approvalStatus(approval.getApprovalStatus())
+				.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
+				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
+				.build();
+		} else {
+			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
+		}
 	}
 
-	// @Transactional
-	// public List<Approval> requestedApprovalList(Long userNo) {
-	// 	Optional<User> userOptional = userRepository.findById(userNo);
-	// 	if (userOptional.isPresent()) {
-	// 		User user = userOptional.get();
-	// 		String userPosition = user.getUserPosition();
-	// 		String userTeam = user.getUserTeam();
-	//
-	// 		return approvalRepository.findByApprovalAuthorityAndUserTeam(userTeam, userPosition);
-	// 	} else {
-	// 		throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-	// 	}
-	// }
-
-	@Transactional
-	public List<Approval> requestedApprovalList(User currentUser) {
-		String userTeam = currentUser.getUserTeam();
-		String approvalAuthority = getApprovalAuthority(currentUser.getUserPosition());
-
-		return approvalRepository.findByApprovalAuthorityAndUserTeam(userTeam, approvalAuthority);
-	}
-
-	private String getApprovalAuthority(String userPosition) {
+	public String getApprovalAuthority(String userPosition) {
 		if (userPosition.equals("PS000")) {
 			return "PS001";
 		} else if (userPosition.equals("PS001")) {

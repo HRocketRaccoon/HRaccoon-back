@@ -7,7 +7,6 @@ import org.finalpjt.hraccoon.global.security.JwtAuthenticationFilter;
 import org.finalpjt.hraccoon.global.security.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -34,7 +33,7 @@ public class SecurityConfig {
 	/* 허용 URL. 인증과 인가를 거치지 않을 경우 사용*/
 	private final String[] allowUrls = {
 		"/api/v1/user/create",
-		"/api/v1/auth/sign-in"
+		"/api/v1/auth/sign-in",
 	};
 
 	@Bean
@@ -55,8 +54,9 @@ public class SecurityConfig {
 					return config;
 				}
 			}))
-			.exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint)) // spring security 에서 인증 실패시 예외처리
 			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), BasicAuthenticationFilter.class)
+			.exceptionHandling(
+				handler -> handler.authenticationEntryPoint(entryPoint)) // spring security 에서 인증 실패시 예외처리
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers(allowUrls).permitAll()
 				// .requestMatchers(PathRequest.toH2Console()).permitAll() // H2 Console 접속은 모두에게 허용
@@ -64,9 +64,9 @@ public class SecurityConfig {
 
 		// http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // H2 Console 사용을 위한 설정
 		http.formLogin(AbstractHttpConfigurer::disable); // form login 비활성화
-		http.httpBasic(Customizer.withDefaults()); // http basic 인증 사용
+		// http.httpBasic(Customizer.withDefaults()); // http basic 인증 사용
 
-		return (SecurityFilterChain) http.build();
+		return (SecurityFilterChain)http.build();
 	}
 
 	@Bean

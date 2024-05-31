@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,5 +43,15 @@ public class ApprovalDetail {
 
 	@OneToOne(mappedBy = "approvalDetail")
 	private Approval approval;
+
+
+	@Builder
+	public ApprovalDetail(String approvalDetailContent, LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
+		this.approvalDetailContent = approvalDetailContent;
+		this.approvalDetailStartDate = approvalDetailStartDate;
+		this.approvalDetailEndDate = approvalDetailEndDate;
+		this.approvalDetailResponseDate = approvalDetailResponseDate;
+		this.approvalDetailResponseContent = approvalDetailResponseContent;
+	}
 }
 

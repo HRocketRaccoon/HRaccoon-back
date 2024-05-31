@@ -2,6 +2,8 @@ package org.finalpjt.hraccoon.domain.user.ctrl;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
@@ -19,16 +21,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Valid
 @RestController
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -50,10 +53,11 @@ public class UserController {
 	}
 
 	@PostMapping("/user/update")
-	public ApiResponse<UserResponse> updateUserInfo(@RequestBody UserInfoRequest params)  {
+	public ApiResponse<UserResponse> updateUserInfo(@RequestBody UserInfoRequest params) {
 		log.info("updateUserInfo params = {}", params);
 
-		return ApiResponse.createSuccessWithMessage(userService.updateUserInfo(params), UserMessageConstants.USER_UPDATE_SUCCESS);
+		return ApiResponse.createSuccessWithMessage(userService.updateUserInfo(params),
+			UserMessageConstants.USER_UPDATE_SUCCESS);
 	}
 
 	@GetMapping("/user/ability/{userId}")
@@ -68,9 +72,9 @@ public class UserController {
 		@RequestParam(value = "ability", defaultValue = "") String ability,
 		@RequestParam(value = "department", defaultValue = "") String department,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-		@PageableDefault(size = 10,  direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
 
-		Page<UserSearchResponse> users = userService.searchUser(keyword,ability, department, pageNumber,pageable);
+		Page<UserSearchResponse> users = userService.searchUser(keyword, ability, department, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);
 	}

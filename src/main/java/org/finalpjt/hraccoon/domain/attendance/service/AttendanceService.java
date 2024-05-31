@@ -34,24 +34,35 @@ public class AttendanceService {
     //     return attendanceRepository.getAttendanceByDate(date);
     // }
 
-    public Attendance startend(String attendanceDate, String user_no) {
-        Attendance start = attendanceRepository.startend(attendanceDate, user_no);
+
+    public Attendance startend(String attendanceDate, String userNo) {
+        System.out.println("debug >>> ");
+        LocalDate date = LocalDate.parse(attendanceDate);
+        Attendance start = attendanceRepository.startend(date, userNo);
+        System.out.println("debug result :: "+start); 
         return start;
     }
-
+    
+    // 금주의 총 근무 시간을 계산하는 로직
     public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
-        // 금주의 총 근무 시간을 계산하는 로직
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
+        System.out.println("service debug >>>> "+startOfWeek+"\t"+endOfWeek);
 
-        List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
+        List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
+        System.out.println();
+        attendances.forEach(System.out::print);
+        System.out.println(); 
+
         int totalHours = attendances.stream()
-                .mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
+                //.mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
+                .mapToInt(a -> a.getAttendanceTotalTime().getHour())
                 .sum();
+        System.out.println("service debug >>> totalHours : "+totalHours);
 
         int workedDaysCount = attendances.size();
-        double percent = (double) totalHours / (8*workedDaysCount) * 100;
+        double percent = (double) totalHours / 40 * 100;
 
         AttendacneWeekPercentResponseDTO response = new AttendacneWeekPercentResponseDTO();
         response.of(totalHours, percent);
@@ -71,9 +82,10 @@ public class AttendanceService {
         LocalDate startOfMonth = date.withDayOfMonth(1);
         LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
 
-        List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth, endOfMonth);
+        List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth , endOfMonth);
         int totalHours = attendances.stream()
-                .mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
+                // .mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
+                .mapToInt(a -> a.getAttendanceTotalTime().getHour())
                 .sum();
         double percent = (double) totalHours / 176 * 100; 
         // 30일(근무일 22일) 기준, 변경 필요함
@@ -95,8 +107,12 @@ public class AttendanceService {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
-
-        List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
+        System.out.println("debug >>>>> ");
+        System.out.println("debug >>>>> "+userNo);
+        System.out.println("debug >>>>> "+String.valueOf(startOfWeek));
+        System.out.println("debug >>>>> "+String.valueOf(endOfWeek));
+        
+        List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
         
         return response;
     }

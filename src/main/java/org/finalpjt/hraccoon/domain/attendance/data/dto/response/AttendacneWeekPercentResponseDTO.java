@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AttendacneWeekPercentResponseDTO {
     
-    private double formattedPercent;
     private int totalWorkHours;
+    private double formattedPercent;
 
     public void of(int totalWorkHours, double formattedPercent) {
         this.totalWorkHours = totalWorkHours;

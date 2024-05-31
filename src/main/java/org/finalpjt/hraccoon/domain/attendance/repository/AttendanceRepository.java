@@ -14,15 +14,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 
-    // @Modifying
-    // @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate   ")
-    // public List<Attendance> getAttendanceByDate(LocalDate date);
-
-    @Modifying
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo ")
-    public Attendance startend(String attendanceDate, String userNo);
     
-
+    
+    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo ")
+    public Attendance startend(LocalDate attendanceDate, String userNo);
+    
 
 
     @Query("SELECT a FROM Attendance a WHERE a.user.userNo = :userNo")

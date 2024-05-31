@@ -3,17 +3,21 @@ package org.finalpjt.hraccoon.domain.auth.service;
 import org.finalpjt.hraccoon.domain.auth.constant.AuthMessageConstants;
 import org.finalpjt.hraccoon.domain.auth.data.PayLoad;
 import org.finalpjt.hraccoon.domain.auth.data.request.SignInRequest;
-import org.finalpjt.hraccoon.domain.auth.data.response.SignInResponse;
-import org.finalpjt.hraccoon.global.security.JwtProvider;
+import org.finalpjt.hraccoon.domain.auth.data.response.TokenResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
+import org.finalpjt.hraccoon.global.security.JwtProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -25,7 +29,7 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public SignInResponse signIn(SignInRequest params) {
+	public TokenResponse signIn(SignInRequest params) {
 		User user = userRepository.findByUserId(params.getUserId())
 			.orElseThrow(() -> new BadCredentialsException(AuthMessageConstants.AUTH_FAIL_USER_NOT_FOUND));
 
@@ -47,12 +51,30 @@ public class AuthService {
 			.authority(user.getUserRole().toString())
 			.build();
 
-		String atkToken = jwtProvider.createToken(accessTokenPayLoad);
-		String rtkToken = jwtProvider.createToken(refreshTokenPayLoad);
+		try {
+			String atkToken = jwtProvider.createToken(accessTokenPayLoad);
+			String rtkToken = jwtProvider.createToken(refreshTokenPayLoad);
 
-		return SignInResponse.builder()
-			.accessToken(atkToken)
-			.refreshToken(rtkToken)
-			.build();
+			return TokenResponse.builder()
+				.accessToken(atkToken)
+				.refreshToken(rtkToken)
+				.build();
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(AuthMessageConstants.AUTH_FAIL_TOKEN_CREATE);
+		}
+	}
+
+	@Transactional
+	public TokenResponse reIssuance(String refreshToken) {
+		try {
+			return jwtProvider.reIssuanceTokens(refreshToken);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(AuthMessageConstants.AUTH_TOKEN_REFRESH_FAIL);
+		}
+	}
+
+	@Transactional
+	public void signOut(String refreshToken) {
+		jwtProvider.deleteToken(refreshToken);
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.finalpjt.hraccoon.domain.auth.data.PayLoad;
+import org.finalpjt.hraccoon.domain.auth.data.response.TokenResponse;
 import org.finalpjt.hraccoon.global.redis.RedisDao;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,11 +41,24 @@ public class JwtProvider {
 	private String issuer;
 
 	/**
+	 * JWT 토큰을 추출하는 함수
+	 * @param request HttpServletRequest
+	 * @return JWT || null
+	 */
+	public String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return null;
+	}
+
+	/**
 	 * JWT 생성 함수
 	 * @param payLoad JWT에 담을 정보
 	 * @return JWT
 	 */
-	public String createToken(PayLoad payLoad) {
+	public String createToken(PayLoad payLoad) throws JsonProcessingException {
 
 		SecretKey secretKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8)); // UTF-8로 인코딩
 		Long lifeTime = payLoad.getType().equals("ATK") ? atkLife : rtkLife;
@@ -80,7 +95,6 @@ public class JwtProvider {
 			.getBody();
 
 		log.info("JWT claims = {}", claims);
-		System.out.println("JWT claims = " + claims);
 
 		PayLoad payLoad = PayLoad.builder()
 			.userNo(Long.valueOf((Integer) claims.get("userNo")))
@@ -90,5 +104,48 @@ public class JwtProvider {
 			.build();
 
 		return payLoad;
+	}
+
+	/**
+	 * JWT 재발급 함수
+	 * @param refreshToken 리프레시 JWT
+	 * @return TokenResponse
+	 */
+	public TokenResponse reIssuanceTokens(String refreshToken) throws JsonProcessingException {
+		PayLoad refreshTokenPayLoad = getPayLoad(refreshToken);
+
+		log.info("refreshTokenPayLoad = {}", refreshTokenPayLoad);
+
+		if (!refreshTokenPayLoad.getType().equals("RTK")) {
+			throw new IllegalArgumentException(SecurityMessageConstants.WRONG_TOKEN_TYPE);
+		}
+
+		String storedRefreshToken = redisDao.getValues(refreshTokenPayLoad.getUserId());
+		log.info("storedRefreshToken = {}", storedRefreshToken);
+
+		if (!refreshToken.equals(storedRefreshToken)) {
+			throw new IllegalArgumentException(SecurityMessageConstants.WRONG_TOKEN);
+		}
+
+		PayLoad accessTokenPayLoad = PayLoad.builder()
+			.userNo(refreshTokenPayLoad.getUserNo())
+			.userId(refreshTokenPayLoad.getUserId())
+			.type("ATK")
+			.authority(refreshTokenPayLoad.getAuthority())
+			.build();
+
+		String newAccessToken = createToken(accessTokenPayLoad);
+		String newRefreshToken = createToken(refreshTokenPayLoad);
+
+		redisDao.setValues(refreshTokenPayLoad.getUserId(), newRefreshToken, Duration.ofMillis(rtkLife));
+
+		return TokenResponse.builder()
+			.accessToken(newAccessToken)
+			.refreshToken(newRefreshToken)
+			.build();
+	}
+
+	public void deleteToken(String userId) {
+		redisDao.deleteValues(userId);
 	}
 }

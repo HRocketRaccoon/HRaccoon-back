@@ -11,9 +11,13 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -34,7 +38,6 @@ public class AttendanceService {
     //     return attendanceRepository.getAttendanceByDate(date);
     // }
 
-
     public Attendance startend(String attendanceDate, String userNo) {
         System.out.println("debug >>> ");
         LocalDate date = LocalDate.parse(attendanceDate);
@@ -42,27 +45,53 @@ public class AttendanceService {
         System.out.println("debug result :: "+start); 
         return start;
     }
+
+    // 특정 주의 근무 일수를 구하는 로직
+    public int calculateWorkedDays(List<Attendance> attendances) {
+        int workedDaysCount = 0;
+        Set<LocalDate> workedDays = new HashSet<>();
+    
+        for (Attendance attendance : attendances) {
+            if ("출근".equals(attendance.getAttendanceStatus()) || "퇴근".equals(attendance.getAttendanceStatus())) {
+                workedDays.add(attendance.getAttendanceDate());
+                System.out.println("출퇴근 debug >>> " + attendance.getAttendanceStatus());
+            }
+        }
+    
+        workedDaysCount = workedDays.size();
+        return workedDaysCount;
+    }
     
     // 금주의 총 근무 시간을 계산하는 로직
     public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
+        // 평일 구하는 로직
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
         System.out.println("service debug >>>> "+startOfWeek+"\t"+endOfWeek);
 
         List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
-        System.out.println();
-        attendances.forEach(System.out::print);
-        System.out.println(); 
+        attendances.forEach(System.out::print); 
 
-        int totalHours = attendances.stream()
-                //.mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
-                .mapToInt(a -> a.getAttendanceTotalTime().getHour())
-                .sum();
+        int workedDaysCount = calculateWorkedDays(attendances);
+
+        int totalHours = 0;
+        for (Attendance attendance : attendances) {
+            if ( "출근".equals(attendance.getAttendanceStatus()) || "퇴근".equals(attendance.getAttendanceStatus()) ) {
+                Duration duration = Duration.between(attendance.getAttendanceStartTime(), attendance.getAttendanceEndTime());
+                totalHours += duration.toHours();
+            }
+        }
+        // 1. int totalHours = attendances.stream()
+        //         //.mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
+        //         .mapToInt(a -> a.getAttendanceTotalTime().getHour())
+        //         .sum();
         System.out.println("service debug >>> totalHours : "+totalHours);
 
-        int workedDaysCount = attendances.size();
-        double percent = (double) totalHours / 40 * 100;
+        double percent = workedDaysCount > 0 ? ((double) totalHours / (8 * workedDaysCount)) * 100 : 0;
+        // 2. System.out.println("service debug >>> workedDaysCount : " + workedDaysCount);
+        // double percent = (double) (totalHours / 8 * workedDaysCount) * 100;
+        // 1. double percent = (double) totalHours / 40 * 100;
 
         AttendacneWeekPercentResponseDTO response = new AttendacneWeekPercentResponseDTO();
         response.of(totalHours, percent);
@@ -87,9 +116,11 @@ public class AttendanceService {
                 // .mapToInt(a -> a.getAttendanceTotalTime().toLocalTime().getHour())
                 .mapToInt(a -> a.getAttendanceTotalTime().getHour())
                 .sum();
-        double percent = (double) totalHours / 176 * 100; 
-        // 30일(근무일 22일) 기준, 변경 필요함
 
+        int workedDaysCount = calculateWorkedDays(attendances);
+        double percent = workedDaysCount > 0 ? ((double) totalHours / (8 * workedDaysCount)) * 100 : 0;
+        // 1. double percent = (double) (totalHours / 8*workedDaysCount) * 100; 
+        
         AttendacneMonthPercentResponseDTO response = new AttendacneMonthPercentResponseDTO();
         response.of(totalHours, percent);
 

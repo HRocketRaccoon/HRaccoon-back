@@ -42,10 +42,10 @@ public class Attendance extends BaseTimeEntity{
 	private LocalDate attendanceDate;
 
 	@Column(name = "attendance_start_time", nullable = false)
-	private String attendanceStartTime;
+	private LocalDateTime attendanceStartTime;
 
 	@Column(name = "attendance_end_time")
-	private String attendanceEndTime;
+	private LocalDateTime attendanceEndTime;
 
 	@Column(name = "attendance_total_time")
 	private LocalTime attendanceTotalTime;

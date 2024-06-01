@@ -15,8 +15,6 @@ import io.lettuce.core.dynamic.annotation.Param;
 public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 	List<Approval> findByUser_UserNo(Long userNo);
 
-	Approval findByApprovalNo(Long approvalNo);
-
 	@Query("select a from Approval a join fetch a.user join fetch a.approvalDetail where a.user.userTeam = :userTeam and a.approvalStatus=:approvalStatus")
 	List<Approval> findByUserTeamWithUserAndApprovalDetail(String userTeam, ApprovalStatus approvalStatus);
 

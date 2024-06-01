@@ -1,7 +1,10 @@
 package org.finalpjt.hraccoon.domain.user.service;
 
+import static java.lang.System.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
@@ -60,11 +63,11 @@ public class UserService {
 		} catch (Exception e) {
 			log.error("error", e);
 			/*
-			 * TODO: 위 상황에 대한 예외처리 논의
-			 *  - 이미 존재하는 아이디일 경우
-			 *  - 이미 존재하는 이메일일 경우
-			 *  - 이미 존재하는 핸드폰번호일 경우
-			 * */
+			* TODO: 위 상황에 대한 예외처리 논의
+			*  - 이미 존재하는 아이디일 경우
+			*  - 이미 존재하는 이메일일 경우
+			*  - 이미 존재하는 핸드폰번호일 경우
+			* */
 			throw new RuntimeException(UserMessageConstants.USER_CREATE_FAIL);
 		}
 	}

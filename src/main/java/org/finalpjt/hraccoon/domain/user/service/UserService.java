@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
@@ -121,9 +123,13 @@ public class UserService {
 
 		if (!department.equals("")) {
 
+			department = codeRepository.findCodeNoByCodeName(department);
+
 			spec = spec.and(UserSpecification.findByDepartment(department));
 		}
 		if (!ability.equals("")) {
+
+			ability = codeRepository.findCodeNoByCodeName(ability);
 
 			List<User> users = abilityRepository.findUserByAbilityName(ability);
 			List<Long> userNos = users.stream().map(User::getUserNo).collect(Collectors.toList());
@@ -140,7 +146,9 @@ public class UserService {
 	@Transactional
 	public List<ApprovalResponse> getTeamApprovalInfo(String userTeam) {
 
-		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam);
+		userTeam = codeRepository.findCodeNoByCodeName(userTeam);
+
+		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam, ApprovalStatus.APPROVED);
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}

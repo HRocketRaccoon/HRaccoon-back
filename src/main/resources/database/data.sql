@@ -30,26 +30,31 @@ INSERT INTO code (code_no, code_name) VALUES
 ('TM010', '인사지원팀'),
 ('TM011', '총무팀'),
 -- 역량
-('AB001','Python'),
-('AB002','Java'),
-('AB003','C'),
-('AB004','C++'),
-('AB005','C#'),
-('AB006','JavaScript'),
-('AB007','TypeScript'),
-('AB008','Ruby'),
-('AB009','PHP'),
-('AB010','Swift'),
-('AB011','Kotlin'),
-('AB012','R'),
-('AB013','Go'),
-('AB014','Rust'),
-('AB015','Scala'),
-('AB016','Perl'),
-('AB017','Haskell'),
-('AB018','Objective-C'),
-('AB019','MATLAB'),
-('AB020','SQL');
+('ABP001','Python'),
+('ABP002','Java'),
+('ABP003','C'),
+('ABP004','C++'),
+('ABP005','C#'),
+('ABP006','JavaScript'),
+('ABP007','TypeScript'),
+('ABP008','Ruby'),
+('ABP009','PHP'),
+('ABP010','Swift'),
+('ABP011','Kotlin'),
+('ABP012','R'),
+('ABP013','Go'),
+('ABP014','Rust'),
+('ABP015','Scala'),
+('ABP016','Perl'),
+('ABP017','Haskell'),
+('ABP018','Objective-C'),
+('ABP019','MATLAB'),
+('ABP020','SQL'),
+
+-- 오피스
+('OJS01','잠실'),
+('OMP02','마포'),
+('OSB03','성북');
 
 -- user table
 INSERT INTO user_detail (user_detail_no, user_join_date, user_leaving_date, user_leaving_reason, user_remain_vacation) VALUES
@@ -90,8 +95,8 @@ INSERT INTO ability (ability_name, user_no) VALUES
 ('ABP004', 9),
 ('ABP007', 10);
 
--- approval table
--- Insert into ApprovalDetail table
+-- -- approval table
+-- -- Insert into ApprovalDetail table
 INSERT INTO approval_detail (approval_detail_no, approval_detail_content, approval_detail_start_date, approval_detail_end_date, approval_detail_response_date, approval_detail_response_content)
 VALUES
     (1, '상세 내용 1', '2024-05-01 09:00:00', '2024-05-10 18:00:00', NULL, NULL),
@@ -101,9 +106,9 @@ VALUES
 -- Insert into Approval table
 INSERT INTO approval (approval_no, approval_type, approval_submit_date, approval_status, approval_authority, user_no, approval_detail_no)
 VALUES
-    (1, '휴가', '2024-04-20 10:00:00', '승인', '팀장', 1, 1),
-    (2, '출장', '2024-05-15 14:00:00', '승인', '부서장', 2, 2),
-    (3, '사내 교육', '2024-06-20 09:00:00', '반려', '팀장', 3, 3);
+    (1, 'BUSINESS_TRIP', '2024-04-20 10:00:00', 'APPROVED', 'PS002', 1, 1),
+    (2, 'OUT_ON_BUSINESS', '2024-05-15 14:00:00', 'APPROVED', 'PS002', 2, 2),
+    (3, 'VACATION', '2024-06-20 09:00:00', 'APPROVED', 'PS002', 3, 3);
 
 INSERT INTO Seat (seat_location, seat_office) VALUES
 ('JSL001', 'OJS01'),

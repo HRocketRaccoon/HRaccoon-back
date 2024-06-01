@@ -9,6 +9,7 @@ import org.finalpjt.hraccoon.domain.seat.service.SeatService;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @Valid
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class SeatController {
 
 	private final SeatService seatService;
 
-	@GetMapping("/user/seatoffice/{seatOffice}")
+	@GetMapping("/seat/office/{seatOffice}")
 	public ApiResponse<List<SeatOfficeResponse>> getOfficeSeatInfo(@PathVariable String seatOffice) {
 
 		List<SeatOfficeResponse> responses = seatService.getOfficeSeatInfo(seatOffice);

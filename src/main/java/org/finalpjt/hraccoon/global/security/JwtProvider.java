@@ -145,7 +145,8 @@ public class JwtProvider {
 			.build();
 	}
 
-	public void deleteToken(String userId) {
-		redisDao.deleteValues(userId);
+	public void deleteToken(String refreshToken) throws JsonProcessingException {
+		PayLoad refreshTokenPayLoad = getPayLoad(refreshToken);
+		redisDao.deleteValues(refreshTokenPayLoad.getUserId());
 	}
 }

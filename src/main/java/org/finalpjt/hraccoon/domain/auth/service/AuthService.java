@@ -75,6 +75,10 @@ public class AuthService {
 
 	@Transactional
 	public void signOut(String refreshToken) {
-		jwtProvider.deleteToken(refreshToken);
+		try {
+			jwtProvider.deleteToken(refreshToken);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(AuthMessageConstants.AUTH_LOGOUT_FAIL);
+		}
 	}
 }

@@ -10,4 +10,5 @@ public class AuthMessageConstants {
 	public static final String AUTH_TOKEN_REFRESH_FAIL = "토큰 재발급에 실패했습니다.";
 
 	public static final String AUTH_LOGOUT = "로그아웃에 성공했습니다.";
+	public static final String AUTH_LOGOUT_FAIL = "로그아웃에 실패했습니다.";
 }

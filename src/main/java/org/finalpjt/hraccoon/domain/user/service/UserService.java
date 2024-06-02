@@ -1,17 +1,13 @@
 package org.finalpjt.hraccoon.domain.user.service;
 
-import static java.lang.System.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
-import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
@@ -30,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+	private final PasswordEncoder passwordEncoder;
 
 	private final UserRepository userRepository;
 
@@ -53,7 +52,8 @@ public class UserService {
 
 	@Transactional
 	public void createUser(UserRequest params) {
-		User entity = params.toEntity();
+		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
+		User entity = params.toEntity(encryptedPassword);
 
 		try {
 			UserDetail userDetail = createUserDetail(params.getUserJoinDate());
@@ -63,11 +63,11 @@ public class UserService {
 		} catch (Exception e) {
 			log.error("error", e);
 			/*
-			* TODO: 위 상황에 대한 예외처리 논의
-			*  - 이미 존재하는 아이디일 경우
-			*  - 이미 존재하는 이메일일 경우
-			*  - 이미 존재하는 핸드폰번호일 경우
-			* */
+			 * TODO: 위 상황에 대한 예외처리 논의
+			 *  - 이미 존재하는 아이디일 경우
+			 *  - 이미 존재하는 이메일일 경우
+			 *  - 이미 존재하는 핸드폰번호일 경우
+			 * */
 			throw new RuntimeException(UserMessageConstants.USER_CREATE_FAIL);
 		}
 	}
@@ -155,4 +155,6 @@ public class UserService {
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}
+
+	// TODO: 비밀번호 변경
 }

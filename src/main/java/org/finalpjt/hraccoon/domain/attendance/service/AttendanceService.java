@@ -27,7 +27,7 @@ public class AttendanceService {
     private final UserRepository userRepository;
     private final AttendanceRepository attendanceRepository;
 
-    // 특정 일자의 출/퇴근 시간을 조회하는 로직
+    // Todo : 특정 일자의 출/퇴근 시간을 조회하는 로직
     public Attendance startend(String attendanceDate, String userNo) {
         LocalDate date = LocalDate.parse(attendanceDate);
         Attendance start = attendanceRepository.startend(date, userNo);
@@ -35,7 +35,7 @@ public class AttendanceService {
         return start;
     }
 
-    // 특정 주의 근무 일수를 구하는 로직
+    // Todo : 특정 주의 근무 일수를 구하는 로직
     public int calculateWorkedDays(List<Attendance> attendances) {
         int workedDaysCount = 0;
         Set<LocalDate> workedDays = new HashSet<>();
@@ -51,7 +51,7 @@ public class AttendanceService {
         return workedDaysCount;
     }
     
-    // 금주의 총 근무 시간을 계산하는 로직
+    // Todo : 금주의 총 근무 시간을 계산하는 로직
     public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
         // 평일 구하는 로직
         LocalDate today = LocalDate.now();
@@ -80,7 +80,7 @@ public class AttendanceService {
         return response;
     }
 
-    // 월의 총 근무 시간을 계산하는 로직
+    // Todo : 월의 총 근무 시간을 계산하는 로직
     public AttendacneMonthPercentResponseDTO calculateMonthlyHours(Long userNo, LocalDate date) {
 
         LocalDate startOfMonth = date.withDayOfMonth(1);
@@ -101,7 +101,7 @@ public class AttendanceService {
         return response;
     }
 
-    // 해당 주의 요일별 근무시간 조회하는 로직
+    // Todo : 해당 주의 요일별 근무시간 조회하는 로직
     public List<Attendance> getDailyAttendance(Long userNo) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
@@ -116,9 +116,9 @@ public class AttendanceService {
         return response;
     }
 
-    public Attendance getAttendanceByDate(Long userNo, LocalDate attendanceDate) {
-        return attendanceRepository.findByUserNoAndDate(userNo, attendanceDate)
-                .orElseThrow(() -> new IllegalArgumentException("Attendance not found for given date"));
-    }
+    // public Attendance getAttendanceByDate(Long userNo, LocalDate attendanceDate) {
+    //     return attendanceRepository.findByUserNoAndDate(userNo, attendanceDate)
+    //             .orElseThrow(() -> new IllegalArgumentException("Attendance not found for given date"));
+    // }
 
 }

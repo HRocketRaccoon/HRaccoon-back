@@ -52,17 +52,8 @@ public class AttendanceController {
         return null;
     }
     
-    // 해당 주 총 근무 시간  -> totalTime에서 확인 가능
-    // 사용자는 근태관리 페이지에서 금주 총 근무 시간을 확인할 수 있다.
-    // @GetMapping("/attendance/worktimeperweek/{userNo}")
-    // public ApiResponse<AttendacneWeekTotalHourResponseDTO> workTimePerWeek(@PathVariable Long userNo) {
-    //     AttendacneWeekTotalHourResponseDTO resonse = attendanceService.getWeeklyAttendance(userNo);
-    //     return ApiResponse.createSuccess(response);
-    // }    
-
-    
     // 사용자는 금주 근무일별 총 근무 시간을 확인할 수 있다 (해당 주 전체)
-    // 단, 일정이 있는 경우 해당일정을 기재한다.
+    // 단, 일정이 있는 경우 해당일정이 기재된다.
     @GetMapping("/attendance/worktimeperdate/{userNo}")
     public ApiResponse<List<Attendance>> workTimePerDay(@PathVariable Long userNo) {
         List<Attendance> response = attendanceService.getDailyAttendance(userNo);
@@ -80,7 +71,7 @@ public class AttendanceController {
 
         Attendance response = attendanceService.startend(attendanceDate, user_no);
         System.out.println("debug >>> ctrl response , "+response);
-        
+
         return ApiResponse.createSuccess(response);
     }
     

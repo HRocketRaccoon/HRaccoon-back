@@ -90,7 +90,8 @@ public class UserService {
 
 		UserResponse response = new UserResponse();
 		response.of(entity);
-		response.insertUserRemainVacation(entity.getUserDetail().getUserRemainVacation());
+		response.insertUserDetail(entity.getUserDetail().getUserRemainVacation(),
+			entity.getUserDetail().getUserJoinDate());
 
 		return response;
 	}
@@ -104,7 +105,8 @@ public class UserService {
 
 		UserResponse response = new UserResponse();
 		response.of(entity);
-		response.insertUserRemainVacation(entity.getUserDetail().getUserRemainVacation());
+		response.insertUserDetail(entity.getUserDetail().getUserRemainVacation(),
+			entity.getUserDetail().getUserJoinDate());
 
 		return response;
 	}
@@ -151,7 +153,8 @@ public class UserService {
 
 		userTeam = codeRepository.findCodeNoByCodeName(userTeam);
 
-		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam, ApprovalStatus.APPROVED);
+		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam,
+			ApprovalStatus.APPROVED);
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}

@@ -1,5 +1,7 @@
 package org.finalpjt.hraccoon.domain.user.data.dto.response;
 
+import java.time.LocalDateTime;
+
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 
 import lombok.Getter;
@@ -26,6 +28,7 @@ public class UserResponse {
 
 	/* UserDetail */
 	private Integer userRemainVacation;
+	private LocalDateTime userJoinDate;
 
 	public void of(User user) {
 		this.userId = user.getUserId();
@@ -42,7 +45,8 @@ public class UserResponse {
 		this.userEmail = user.getUserEmail();
 	}
 
-	public void insertUserRemainVacation(Integer userRemainVacation) {
+	public void insertUserDetail(Integer userRemainVacation, LocalDateTime userJoinDate) {
 		this.userRemainVacation = userRemainVacation;
+		this.userJoinDate = userJoinDate;
 	}
 }

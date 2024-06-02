@@ -1,12 +1,17 @@
 package org.finalpjt.hraccoon.domain.user.service;
 
+import static java.lang.System.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
@@ -58,11 +63,11 @@ public class UserService {
 		} catch (Exception e) {
 			log.error("error", e);
 			/*
-			 * TODO: 위 상황에 대한 예외처리 논의
-			 *  - 이미 존재하는 아이디일 경우
-			 *  - 이미 존재하는 이메일일 경우
-			 *  - 이미 존재하는 핸드폰번호일 경우
-			 * */
+			* TODO: 위 상황에 대한 예외처리 논의
+			*  - 이미 존재하는 아이디일 경우
+			*  - 이미 존재하는 이메일일 경우
+			*  - 이미 존재하는 핸드폰번호일 경우
+			* */
 			throw new RuntimeException(UserMessageConstants.USER_CREATE_FAIL);
 		}
 	}
@@ -121,9 +126,13 @@ public class UserService {
 
 		if (!department.equals("")) {
 
+			department = codeRepository.findCodeNoByCodeName(department);
+
 			spec = spec.and(UserSpecification.findByDepartment(department));
 		}
 		if (!ability.equals("")) {
+
+			ability = codeRepository.findCodeNoByCodeName(ability);
 
 			List<User> users = abilityRepository.findUserByAbilityName(ability);
 			List<Long> userNos = users.stream().map(User::getUserNo).collect(Collectors.toList());
@@ -140,7 +149,9 @@ public class UserService {
 	@Transactional
 	public List<ApprovalResponse> getTeamApprovalInfo(String userTeam) {
 
-		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam);
+		userTeam = codeRepository.findCodeNoByCodeName(userTeam);
+
+		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam, ApprovalStatus.APPROVED);
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}

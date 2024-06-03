@@ -1,12 +1,15 @@
 package org.finalpjt.hraccoon.domain.user.data.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.UpdateTimestamp;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
+import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
+import org.finalpjt.hraccoon.domain.user.data.enums.Role;
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +50,10 @@ public class User {
 	@Column(name = "user_address", nullable = false)
 	private String userAddress;
 
-	// TODO: Enum으로 변경
 	@Column(name = "user_gender", nullable = false)
-	private String userGender;
+	@Enumerated(EnumType.STRING)
+	private Gender userGender;
 
-	// TODO: 8자리 조건 추가
 	@Column(name = "user_birth", nullable = false)
 	private String userBirth;
 
@@ -69,15 +72,41 @@ public class User {
 	@Column(name = "user_rank", nullable = false)
 	private String userRank;
 
-	@UpdateTimestamp
-	@Column(name = "user_update_date", nullable = false)
-	private LocalDateTime userUpdateDate;
-
-	//TODO: Enum으로 변경
 	@Column(name = "user_role", nullable = false)
-	private String userRole;
+	@Enumerated(EnumType.STRING)
+	private Role userRole;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "user_detail_no")
 	private UserDetail userDetail;
+
+	@Builder
+	private User(String userId, String userPassword, String userName, String userMobile,
+		String userAddress, Gender userGender, String userBirth, String userEmail,
+		String userDepartment, String userPosition, String userTeam, String userRank,
+		Role userRole) {
+		this.userId = userId;
+		this.userPassword = userPassword;
+		this.userName = userName;
+		this.userMobile = userMobile;
+		this.userAddress = userAddress;
+		this.userGender = userGender;
+		this.userBirth = userBirth;
+		this.userEmail = userEmail;
+		this.userDepartment = userDepartment;
+		this.userPosition = userPosition;
+		this.userTeam = userTeam;
+		this.userRank = userRank;
+		this.userRole = userRole;
+	}
+
+	public void updateUserDetail(UserDetail userDetail) {
+		this.userDetail = userDetail;
+	}
+
+	public void updateUserSelf(UserInfoRequest userInfoRequest) {
+		this.userAddress = userInfoRequest.getUserAddress();
+		this.userMobile = userInfoRequest.getUserMobile();
+		this.userEmail = userInfoRequest.getUserEmail();
+	}
 }

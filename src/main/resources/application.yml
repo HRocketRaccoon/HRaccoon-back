@@ -35,6 +35,21 @@ spring:
       platform: mariadb
       data-locations: classpath:database/data.sql
 
+  # Redis 설정
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  # jwt 설정
+  jwt:
+    secret-key: { secret-key }
+    life:
+      accessToken: 300000
+      refreshToken: 3000000
+    issuer: OrangeVinyl
+
+# 로깅 설정
 logging:
   level:
     org:

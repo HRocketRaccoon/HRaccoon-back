@@ -4,27 +4,20 @@ import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneMonth
 import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneWeekPercentResponseDTO;
 import org.finalpjt.hraccoon.domain.attendance.data.entity.Attendance;
 import org.finalpjt.hraccoon.domain.attendance.repository.AttendanceRepository;
-import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
-import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
 
-    private final UserRepository userRepository;
     private final AttendanceRepository attendanceRepository;
 
     // Todo : 특정 일자의 출/퇴근 시간을 조회하는 로직
@@ -35,28 +28,36 @@ public class AttendanceService {
         return start;
     }
 
+    // Todo: 근무 상태가 '퇴근'인 경우의 총 근무 시간을 구하는 로직
+    // 아래의 중복 코드 간단하게 수정하고 싶은디,,흠
+    // public Attendance totalHours(Long userNo) {
+        
+    // }
+
     // Todo : 특정 주의 근무 일수를 구하는 로직
     public int calculateWorkedDays(List<Attendance> attendances) {
         int workedDaysCount = 0;
         Set<LocalDate> workedDays = new HashSet<>();
     
         for (Attendance attendance : attendances) {
-            if ("출근".equals(attendance.getAttendanceStatus()) || "퇴근".equals(attendance.getAttendanceStatus())) {
+            if ("퇴근".equals(attendance.getAttendanceStatus())) {
                 workedDays.add(attendance.getAttendanceDate());
-                System.out.println("출퇴근 debug >>> " + attendance.getAttendanceStatus());
+                System.out.println("퇴근 debug >>> " + attendance.getAttendanceStatus());
             } 
         }
     
         workedDaysCount = workedDays.size();
+        System.out.println("workedDaysCount debug >>> " + workedDaysCount);
         return workedDaysCount;
     }
+
     
     // Todo : 금주의 총 근무 시간과 달성률 계산하는 로직
     public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
         // 평일 구하는 로직
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        LocalDate endOfWeek = startOfWeek.plusDays(4);
         System.out.println("service debug >>>> "+startOfWeek+"\t"+endOfWeek);
 
         List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
@@ -66,9 +67,13 @@ public class AttendanceService {
 
         int totalHours = 0;
         for (Attendance attendance : attendances) {
-            if ( "출근".equals(attendance.getAttendanceStatus()) || "퇴근".equals(attendance.getAttendanceStatus()) ) {
+            if ( "퇴근".equals(attendance.getAttendanceStatus()) ) {
                 Duration duration = Duration.between(attendance.getAttendanceStartTime(), attendance.getAttendanceEndTime());
-                totalHours += duration.toHours();
+                totalHours += duration.toHoursPart();
+                System.out.println("debug >>> attendance: " + attendance);
+                System.out.println("debug >>> getAttendanceStartTime: " + attendance.getAttendanceStartTime());
+                System.out.println("debug >>> getAttendanceEndTime: " + attendance.getAttendanceEndTime());
+                System.out.println("debug >>> duration: " + duration);
             }
         }
         System.out.println("service debug >>> totalHours : "+totalHours);
@@ -85,13 +90,28 @@ public class AttendanceService {
 
         LocalDate startOfMonth = date.withDayOfMonth(1);
         LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
+        System.out.println("service debug >>> startOfMonth: " + startOfMonth);
+        System.out.println("service debug >>> endOfMonth: " + endOfMonth);
 
         List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth , endOfMonth);
-        int totalHours = attendances.stream()
-                .mapToInt(a -> a.getAttendanceTotalTime().getHour())
-                .sum();
+
+        int totalHours = 0;
+        for (Attendance attendance : attendances) {
+            if ( "퇴근".equals(attendance.getAttendanceStatus()) ) {
+                Duration duration = Duration.between(attendance.getAttendanceStartTime(), attendance.getAttendanceEndTime());
+                totalHours += duration.toHoursPart();
+                System.out.println("debug >>> attendance: " + attendance);
+                System.out.println("debug >>> getAttendanceStartTime: " + attendance.getAttendanceStartTime());
+                System.out.println("debug >>> getAttendanceEndTime: " + attendance.getAttendanceEndTime());
+                System.out.println("debug >>> duration: " + duration);
+            }
+        }
+        System.out.println("service debug >>> totalHours: " + totalHours);
+        
 
         int workedDaysCount = calculateWorkedDays(attendances);
+        System.out.println("service debug >>> workedDaysCount: " + workedDaysCount);
+
         double percent = workedDaysCount > 0 ? ((double) totalHours / (8 * workedDaysCount)) * 100 : 0;
         // double percent = (double) (totalHours / 8*workedDaysCount) * 100; 
         

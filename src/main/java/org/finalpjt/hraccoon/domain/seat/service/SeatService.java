@@ -5,8 +5,11 @@ import java.util.List;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
+import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
+import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +42,14 @@ public class SeatService {
 		List<SeatStatus> approvals= seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice,floor);
 
 		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
+	}
+
+	@Transactional
+	public SeatUsingUserResponse getSeatUsingUserInfo(Long seatStatusNo) {
+
+		User user= seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+		SeatUsingUserResponse response = new SeatUsingUserResponse(user);
+		return response;
 	}
 }

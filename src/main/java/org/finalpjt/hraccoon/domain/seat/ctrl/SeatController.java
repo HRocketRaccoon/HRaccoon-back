@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
 import org.finalpjt.hraccoon.domain.seat.service.SeatService;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,5 +40,13 @@ public class SeatController {
 		List<SeatOfficeFloorResponse> responses = seatService.getOfficeFloorSeatInfo(seatOffice,floor);
 
 		return ApiResponse.createSuccess(responses);
+	}
+
+	@GetMapping("/seat/info/{seatStatusNo}")
+	public ApiResponse<SeatUsingUserResponse> getSeatUsingUserInfo(@PathVariable Long seatStatusNo) {
+
+		SeatUsingUserResponse response = seatService.getSeatUsingUserInfo(seatStatusNo);
+
+		return ApiResponse.createSuccess(response);
 	}
 }

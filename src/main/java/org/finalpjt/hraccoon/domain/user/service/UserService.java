@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+	private final PasswordEncoder passwordEncoder;
 
 	private final UserRepository userRepository;
 
@@ -48,7 +52,8 @@ public class UserService {
 
 	@Transactional
 	public void createUser(UserRequest params) {
-		User entity = params.toEntity();
+		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
+		User entity = params.toEntity(encryptedPassword);
 
 		try {
 			UserDetail userDetail = createUserDetail(params.getUserJoinDate());
@@ -85,7 +90,8 @@ public class UserService {
 
 		UserResponse response = new UserResponse();
 		response.of(entity);
-		response.insertUserRemainVacation(entity.getUserDetail().getUserRemainVacation());
+		response.insertUserDetail(entity.getUserDetail().getUserRemainVacation(),
+			entity.getUserDetail().getUserJoinDate());
 
 		return response;
 	}
@@ -99,7 +105,8 @@ public class UserService {
 
 		UserResponse response = new UserResponse();
 		response.of(entity);
-		response.insertUserRemainVacation(entity.getUserDetail().getUserRemainVacation());
+		response.insertUserDetail(entity.getUserDetail().getUserRemainVacation(),
+			entity.getUserDetail().getUserJoinDate());
 
 		return response;
 	}
@@ -121,9 +128,13 @@ public class UserService {
 
 		if (!department.equals("")) {
 
+			department = codeRepository.findCodeNoByCodeName(department);
+
 			spec = spec.and(UserSpecification.findByDepartment(department));
 		}
 		if (!ability.equals("")) {
+
+			ability = codeRepository.findCodeNoByCodeName(ability);
 
 			List<User> users = abilityRepository.findUserByAbilityName(ability);
 			List<Long> userNos = users.stream().map(User::getUserNo).collect(Collectors.toList());
@@ -140,8 +151,13 @@ public class UserService {
 	@Transactional
 	public List<ApprovalResponse> getTeamApprovalInfo(String userTeam) {
 
-		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam);
+		userTeam = codeRepository.findCodeNoByCodeName(userTeam);
+
+		List<Approval> approvals = approvalRepository.findByUserTeamWithUserAndApprovalDetail(userTeam,
+			ApprovalStatus.APPROVED);
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}
+
+	// TODO: 비밀번호 변경
 }

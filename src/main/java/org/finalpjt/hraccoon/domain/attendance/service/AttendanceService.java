@@ -44,14 +44,14 @@ public class AttendanceService {
             if ("출근".equals(attendance.getAttendanceStatus()) || "퇴근".equals(attendance.getAttendanceStatus())) {
                 workedDays.add(attendance.getAttendanceDate());
                 System.out.println("출퇴근 debug >>> " + attendance.getAttendanceStatus());
-            }
+            } 
         }
     
         workedDaysCount = workedDays.size();
         return workedDaysCount;
     }
     
-    // Todo : 금주의 총 근무 시간을 계산하는 로직
+    // Todo : 금주의 총 근무 시간과 달성률 계산하는 로직
     public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
         // 평일 구하는 로직
         LocalDate today = LocalDate.now();
@@ -80,7 +80,7 @@ public class AttendanceService {
         return response;
     }
 
-    // Todo : 월의 총 근무 시간을 계산하는 로직
+    // Todo : 월의 총 근무 시간과 달성률 계산하는 로직
     public AttendacneMonthPercentResponseDTO calculateMonthlyHours(Long userNo, LocalDate date) {
 
         LocalDate startOfMonth = date.withDayOfMonth(1);

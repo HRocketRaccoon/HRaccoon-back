@@ -3,6 +3,7 @@ package org.finalpjt.hraccoon.domain.seat.service;
 import java.util.List;
 
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
@@ -28,5 +29,15 @@ public class SeatService {
 		List<SeatStatus> approvals= seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
 
 		return approvals.stream().map(SeatOfficeResponse::new).toList();
+	}
+
+	@Transactional
+	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice,String floor) {
+
+		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
+
+		List<SeatStatus> approvals= seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice,floor);
+
+		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
 	}
 }

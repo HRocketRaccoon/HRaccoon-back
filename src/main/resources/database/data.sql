@@ -125,12 +125,12 @@ INSERT INTO Seat (seat_location, seat_office) VALUES
 ('JS2001', 'OJS01'),
 ('JS2002', 'OJS01'),
 ('JS2003', 'OJS01'),
+('JS3001', 'OJS01'),
+('JS3002', 'OJS01'),
+('JS3003', 'OJS01'),
 ('JS3004', 'OJS01'),
 ('JS3005', 'OJS01'),
 ('JS3006', 'OJS01'),
-('JS3007', 'OJS01'),
-('JS3008', 'OJS01'),
-('JS3009', 'OJS01'),
 
 
 -- 마포 오피스 좌석 데이터

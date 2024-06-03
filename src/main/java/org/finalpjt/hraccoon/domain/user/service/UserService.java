@@ -114,7 +114,9 @@ public class UserService {
 
 		List<Ability> abilities = abilityRepository.findByUserId(userId);
 
-		return abilities.stream().map(AbilityResponse::new).toList();
+		List<AbilityResponse> responses = abilities.stream().map(AbilityResponse::new).toList();
+
+		return responses;
 	}
 
 	@Transactional(readOnly = true)
@@ -141,7 +143,9 @@ public class UserService {
 		}
 
 		Page<User> users = userRepository.findAll(spec,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
+
+
 
 		return users.map(UserSearchResponse::new);
 	}

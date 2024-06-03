@@ -1,6 +1,4 @@
-package org.finalpjt.hraccoon.domain.user.data.dto.response;
-
-import java.util.List;
+package org.finalpjt.hraccoon.domain.seat.data.dto;
 
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 
@@ -9,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserSearchResponse {
+public class SeatUsingUserResponse {
+
 	private String userId;
 	private String userName;
 	private String userGender;
@@ -20,13 +19,7 @@ public class UserSearchResponse {
 	private String userRank;
 	private String userRole;
 
-	private String userMobile;
-	private String userAddress;
-	private String userEmail;
-
-	// private List<ApprovalResponse> approval;
-
-	public UserSearchResponse(User user) {
+	public SeatUsingUserResponse(User user) {
 		this.userId = user.getUserId();
 		this.userName = user.getUserName();
 		this.userGender = user.getUserGender().toString();
@@ -36,12 +29,5 @@ public class UserSearchResponse {
 		this.userTeam = user.getUserTeam();
 		this.userRank = user.getUserRank();
 		this.userRole = user.getUserRole().toString();
-		this.userMobile = user.getUserMobile();
-		this.userAddress = user.getUserAddress();
-		this.userEmail = user.getUserEmail();
 	}
-
-	// public UserSearchResponse(User user) {
-	// 	this.
-	// }
 }

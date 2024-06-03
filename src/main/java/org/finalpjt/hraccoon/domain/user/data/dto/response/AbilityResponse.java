@@ -14,7 +14,7 @@ public class AbilityResponse {
 	private String abilityName;
 
 	public AbilityResponse(Ability ability) {
-		this.abilityNo=ability.getAbilityNo();
-		this.abilityName=ability.getAbilityName();
+		this.abilityNo = ability.getAbilityNo();
+		this.abilityName = ability.getAbilityName();
 	}
 }

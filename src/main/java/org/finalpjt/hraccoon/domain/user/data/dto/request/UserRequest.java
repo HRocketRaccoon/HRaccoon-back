@@ -29,6 +29,7 @@ public class UserRequest {
 
 	@NotBlank
 	@Size(min = 8, max = 16, message = ValidationConstants.PASSWORD_SIZE_MESSAGE)
+	@Pattern(regexp = ValidationConstants.PASSWORD_PATTERN, message = ValidationConstants.PASSWORD_PATTERN_MESSAGE)
 	private String userPassword;
 
 	@NotBlank
@@ -72,10 +73,10 @@ public class UserRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime userJoinDate;
 
-	public User toEntity() {
+	public User toEntity(String encryptedPassword) {
 		return User.builder()
 			.userId(userId)
-			.userPassword(userPassword)
+			.userPassword(encryptedPassword)
 			.userName(userName)
 			.userMobile(userMobile)
 			.userAddress(userAddress)

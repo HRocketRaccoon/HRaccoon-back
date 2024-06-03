@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CodeRepository extends JpaRepository<Code,String> {
+public interface CodeRepository extends JpaRepository<Code, String> {
 	@Query("select c.codeNo from Code c where c.codeName = :codeName")
 	String findCodeNoByCodeName(String codeName);
 

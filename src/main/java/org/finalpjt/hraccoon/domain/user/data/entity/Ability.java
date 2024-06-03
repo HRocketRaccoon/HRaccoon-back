@@ -9,11 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-
-import org.springframework.data.domain.Range;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +29,13 @@ public class Ability {
 	@Column(name = "ability_name", nullable = false)
 	private String abilityName;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_no", nullable = false)
 	private User user;
+
+	@Builder
+	public Ability(String abilityName, User user) {
+		this.abilityName = abilityName;
+		this.user = user;
+	}
 }

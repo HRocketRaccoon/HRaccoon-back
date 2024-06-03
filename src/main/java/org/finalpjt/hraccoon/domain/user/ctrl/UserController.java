@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
@@ -65,6 +66,14 @@ public class UserController {
 	public ApiResponse<List<AbilityResponse>> getUserAbilityInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);
 		return ApiResponse.createSuccess(userService.getUserAbilityInfo(userId));
+	}
+
+	@PostMapping("/user/ability/update/{userId}")
+	public ApiResponse<List<AbilityResponse>> updateUserAbilityInfo(@PathVariable String userId, @RequestBody List<AbilityRequest> params) {
+		log.info("updateUserAbilityInfo userId = {}", userId);
+		List<AbilityResponse> response = userService.updateUserAbility(userId, params);
+
+		return ApiResponse.createSuccessWithMessage(response, UserMessageConstants.USER_ABILITY_UPDATE_SUCCESS);
 	}
 
 	@GetMapping("/user/search")

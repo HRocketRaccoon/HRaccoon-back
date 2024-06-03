@@ -9,6 +9,7 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
@@ -113,10 +114,26 @@ public class UserService {
 
 	@Transactional
 	public List<AbilityResponse> getUserAbilityInfo(String userId) {
-
 		List<Ability> abilities = abilityRepository.findByUserId(userId);
 
 		return abilities.stream().map(AbilityResponse::new).toList();
+	}
+
+	@Transactional
+	public List<AbilityResponse> updateUserAbility(String userId, List<AbilityRequest> params) {
+		User entity = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		List<Ability> abilities = abilityRepository.findByUserId(entity.getUserId());
+		abilityRepository.deleteAllInBatch(abilities);
+
+		List<Ability> newAbilities = params.stream()
+			.map(param -> param.toEntity(entity))
+			.toList();
+
+		abilityRepository.saveAll(newAbilities);
+
+		return newAbilities.stream().map(AbilityResponse::new).toList();
 	}
 
 	@Transactional(readOnly = true)

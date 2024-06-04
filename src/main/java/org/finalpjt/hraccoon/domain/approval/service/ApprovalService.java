@@ -1,7 +1,5 @@
 package org.finalpjt.hraccoon.domain.approval.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
@@ -12,6 +10,9 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,33 +53,27 @@ public class ApprovalService {
 			approvalRepository.delete(approval);
 		}
 	}
-
+	
 	@Transactional
-	public List<ApprovalResponse> submittedApprovalList(Long userNo) {
-		List<Approval> approvals = approvalRepository.findByUser_UserNo(userNo);
-		List<ApprovalResponse> approvalResponses = new ArrayList<>();
+	public Page<ApprovalResponse> submittedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
+		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
-		for (Approval approval : approvals) {
-			ApprovalResponse approvalResponse = ApprovalResponse.builder()
-				.approvalNo(approval.getApprovalNo())
-				.userTeam(approval.getUser().getUserTeam())
-				.userId(approval.getUser().getUserId())
-				.userName(approval.getUser().getUserName())
-				.approvalType(approval.getApprovalType())
-				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
-				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
-				.approvalAuthority(approval.getApprovalAuthority())
-				.approvalSubmitDate(approval.getApprovalSubmitDate())
-				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
-				.approvalStatus(approval.getApprovalStatus())
-				.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
-				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
-				.build();
-
-			approvalResponses.add(approvalResponse);
-		}
-
-		return approvalResponses;
+		return approvals.map(approval -> ApprovalResponse.builder()
+			.approvalNo(approval.getApprovalNo())
+			.userTeam(approval.getUser().getUserTeam())
+			.userId(approval.getUser().getUserId())
+			.userName(approval.getUser().getUserName())
+			.approvalType(approval.getApprovalType())
+			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
+			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
+			.approvalAuthority(approval.getApprovalAuthority())
+			.approvalSubmitDate(approval.getApprovalSubmitDate())
+			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
+			.approvalStatus(approval.getApprovalStatus())
+			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
+			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
+			.build());
 	}
 
 	@Transactional

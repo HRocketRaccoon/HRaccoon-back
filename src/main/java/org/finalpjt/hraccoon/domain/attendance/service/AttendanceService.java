@@ -34,8 +34,8 @@ public class AttendanceService {
     * }
      */
 
-    public int calculateWorkedDays(List<Attendance> attendances) {
-        int workedDaysCount = 0;
+    public Integer calculateWorkedDays(List<Attendance> attendances) {
+        Integer workedDaysCount = 0;
         Set<LocalDate> workedDays = new HashSet<>();
     
         for (Attendance attendance : attendances) {
@@ -56,9 +56,9 @@ public class AttendanceService {
         List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
         attendances.forEach(System.out::print); 
 
-        int workedDaysCount = calculateWorkedDays(attendances);
+        Integer workedDaysCount = calculateWorkedDays(attendances);
 
-        int totalHours = 0;
+        Integer totalHours = 0;
         for (Attendance attendance : attendances) {
             if ( "퇴근".equals(attendance.getAttendanceStatus()) ) {
                 Duration duration = Duration.between(attendance.getAttendanceStartTime(), attendance.getAttendanceEndTime());
@@ -79,7 +79,7 @@ public class AttendanceService {
 
         List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth , endOfMonth);
 
-        int totalHours = 0;
+        Integer totalHours = 0;
         for (Attendance attendance : attendances) {
             if ( "퇴근".equals(attendance.getAttendanceStatus()) ) {
                 Duration duration = Duration.between(attendance.getAttendanceStartTime(), attendance.getAttendanceEndTime());
@@ -87,7 +87,7 @@ public class AttendanceService {
             }
         }
 
-        int workedDaysCount = calculateWorkedDays(attendances);
+        Integer workedDaysCount = calculateWorkedDays(attendances);
         double percent = workedDaysCount > 0 ? ((double) totalHours / (8 * workedDaysCount)) * 100 : 0;
 
         AttendacneMonthPercentResponseDTO response = new AttendacneMonthPercentResponseDTO();

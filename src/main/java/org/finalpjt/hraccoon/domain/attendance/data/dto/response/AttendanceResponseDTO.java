@@ -2,8 +2,6 @@ package org.finalpjt.hraccoon.domain.attendance.data.dto.response;
 
 import java.time.LocalDateTime;
 
-import org.finalpjt.hraccoon.domain.user.data.entity.User;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;

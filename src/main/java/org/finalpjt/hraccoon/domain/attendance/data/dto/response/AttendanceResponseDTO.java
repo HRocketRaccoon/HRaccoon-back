@@ -20,6 +20,4 @@ public class AttendanceResponseDTO {
 	private LocalDateTime attendanceTotalTime;
 	private String attendanceStatus;
 
-
-
 }

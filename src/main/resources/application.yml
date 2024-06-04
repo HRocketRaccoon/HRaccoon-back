@@ -8,9 +8,9 @@ spring:
 # DB 설정(local)
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: ulsansaram17!           
+    url: jdbc:mariadb://{url}/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
+    username: { username }
+    password: { userpassword }
     hikari:
       connection-test-query: SELECT NOW() FROM DUAL
 
@@ -43,7 +43,7 @@ spring:
 
 # jwt 설정
   jwt:
-    secret-key: IenVnrcQA4lnxVEyzyGFSPbq8YexqhaEPVn3IgBBpJ3wY1ODOKmS1j0nLIqLKEkfvNjYvdnT7QfXSltrcT5r03B5jqFe40PGvSXLGpJkMRsFTyUgPb01oqG1NbFyeOiN
+    secret-key: { secret-key }
     life:
       accessToken: 300000
       refreshToken: 3000000

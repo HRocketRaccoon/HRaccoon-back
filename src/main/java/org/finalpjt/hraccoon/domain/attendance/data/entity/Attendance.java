@@ -6,7 +6,6 @@ import java.time.LocalTime;
 
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
-import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,14 +18,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,7 +33,6 @@ public class Attendance extends BaseTimeEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long attendanceNo;
 	
-	// LocalDateTime 로데 ~
 	@Column(name = "attendance_date", nullable = false)
 	private LocalDate attendanceDate;
 
@@ -49,7 +44,6 @@ public class Attendance extends BaseTimeEntity{
 
 	@Column(name = "attendance_total_time")
 	private LocalTime attendanceTotalTime;
-	// 로데 끝
 
 	@Column(name = "attendance_status", nullable = false)
 	private String attendanceStatus;

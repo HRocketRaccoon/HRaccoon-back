@@ -15,5 +15,4 @@ public class AttendacneWeekPercentResponseDTO {
         this.formattedPercent = formattedPercent;
     }
 
-
 }

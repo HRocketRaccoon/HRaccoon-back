@@ -69,8 +69,9 @@ INSERT INTO user_detail (user_detail_no, user_join_date, user_leaving_date, user
 (9, '2020-01-01 00:00:00', NULL, NULL, 15),
 (10, '2020-01-01 00:00:00', NULL, NULL, 15);
 
+-- base password: Tnghksdldla8!
 INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address, user_gender, user_birth, user_email, user_department, user_position, user_team, user_rank, user_role, user_detail_no) VALUES
-('user01', 'password01', '김철수', '010-1234-5678', '서울특별시 강남구', 'MALE', '1990-01-01', 'user01@example.com', 'DP001', 'PS001', 'TM001', 'RK001', 'USER', 1),
+('A019408', '$2a$10$b0GFr8jkVXjXxOrZpvErNO7t.D/gtjO6cUwHjV5oc6LckOmHxAD2K', '홍길동', '010-1234-5678', '서울특별시 광진구 뚝섬로 123 101-1232', 'MALE', '1998-10-31', 'user01@example.com', 'DP001', 'PS001', 'TM001', 'RK001', 'USER', 1),
 ('user02', 'password02', '이영희', '010-2345-6789', '서울특별시 서초구', 'FEMALE', '1992-02-02', 'user02@example.com', 'DP002', 'PS001', 'TM001', 'RK002', 'USER', 2),
 ('user03', 'password03', '박민수', '010-3456-7890', '서울특별시 종로구', 'MALE', '1988-03-03', 'user03@example.com', 'DP002', 'PS001', 'TM001', 'RK003', 'USER', 3),
 ('user04', 'password04', '최지우', '010-4567-8901', '서울특별시 용산구', 'FEMALE', '1991-04-04', 'user04@example.com', 'DP004', 'PS002', 'TM010', 'RK001', 'USER', 4),

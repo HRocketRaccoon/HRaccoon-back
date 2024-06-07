@@ -5,7 +5,9 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
 import org.finalpjt.hraccoon.domain.seat.service.SeatService;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,22 @@ public class SeatController {
 		List<SeatOfficeResponse> responses = seatService.getOfficeSeatInfo(seatOffice);
 
 		return ApiResponse.createSuccess(responses);
+	}
+
+	@GetMapping("/seat/office/{seatOffice}/{floor}")
+	public ApiResponse<List<SeatOfficeFloorResponse>> getOfficeFloorSeatInfo(@PathVariable String seatOffice,@PathVariable String floor) {
+
+		List<SeatOfficeFloorResponse> responses = seatService.getOfficeFloorSeatInfo(seatOffice,floor);
+
+		return ApiResponse.createSuccess(responses);
+	}
+
+	@GetMapping("/seat/info/{seatStatusNo}")
+	public ApiResponse<SeatUsingUserResponse> getSeatUsingUserInfo(@PathVariable Long seatStatusNo) {
+
+		SeatUsingUserResponse response = seatService.getSeatUsingUserInfo(seatStatusNo);
+
+		return ApiResponse.createSuccess(response);
 	}
 
 	@GetMapping("/seat/availableseats/{seatOffice}")

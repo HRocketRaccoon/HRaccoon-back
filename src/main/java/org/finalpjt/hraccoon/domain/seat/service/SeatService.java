@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
+import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,26 @@ public class SeatService {
 
 		return approvals.stream().map(SeatOfficeResponse::new).toList();
 	}
+
+	@Transactional
+	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice,String floor) {
+
+		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
+
+		List<SeatStatus> approvals= seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice,floor);
+
+		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
+	}
+
+	@Transactional
+	public SeatUsingUserResponse getSeatUsingUserInfo(Long seatStatusNo) {
+
+		SeatStatus seatStatus= seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
+		return response;
+	}
+
 
 	@Transactional(readOnly = true)
 	public List<SeatOfficeResponse> getAvailableSeats(String seatOffice) {

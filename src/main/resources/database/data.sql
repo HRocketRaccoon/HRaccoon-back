@@ -70,7 +70,7 @@ INSERT INTO user_detail (user_detail_no, user_join_date, user_leaving_date, user
 (10, '2020-01-01 00:00:00', NULL, NULL, 15);
 
 INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address, user_gender, user_birth, user_email, user_department, user_position, user_team, user_rank, user_role, user_detail_no) VALUES
-('user01', 'password01', '김철수', '010-1234-5678', '서울특별시 강남구', 'MALE', '1990-01-01', 'user01@example.com', 'DP001', 'PS001', 'TM001', 'RK001', 'USER', 1),
+('user01', 'password01', '정광수', '010-2532-9705', '서울특별시 성북구 아리랑로 75', 'MALE', '1998-12-04', 'ericj1204@naver.com', 'DP001', 'PS001', 'TM001', 'RK001', 'USER', 1),
 ('user02', 'password02', '이영희', '010-2345-6789', '서울특별시 서초구', 'FEMALE', '1992-02-02', 'user02@example.com', 'DP002', 'PS001', 'TM001', 'RK002', 'USER', 2),
 ('user03', 'password03', '박민수', '010-3456-7890', '서울특별시 종로구', 'MALE', '1988-03-03', 'user03@example.com', 'DP002', 'PS001', 'TM001', 'RK003', 'USER', 3),
 ('user04', 'password04', '최지우', '010-4567-8901', '서울특별시 용산구', 'FEMALE', '1991-04-04', 'user04@example.com', 'DP004', 'PS002', 'TM010', 'RK001', 'USER', 4),
@@ -82,6 +82,8 @@ INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address,
 ('user10', 'password10', '조인성', '010-0123-4567', '서울특별시 관악구', 'MALE', '1990-10-10', 'user10@example.com', 'DP001', 'PS000', 'TM003', 'RK001', 'USER', 10);
 
 INSERT INTO ability (ability_name, user_no) VALUES
+('ABP001', 1),
+('ABP002', 1),
 ('ABP001', 2),
 ('ABP002', 2),
 ('ABP003', 2),

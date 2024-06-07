@@ -1,6 +1,10 @@
 package org.finalpjt.hraccoon.domain.approval.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
@@ -37,10 +41,39 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
-			String approvalAuthority = getApprovalAuthority(user.getUserPosition());
-			Approval approval = params.toEntity(user, approvalAuthority);
+			List<String> approvalAuthorities = getApprovalAuthority(user.getUserPosition());
+			Approval approval = params.toEntity(user, approvalAuthorities);
 			approvalRepository.save(approval);
 		}
+	}
+
+	public List<String> getApprovalAuthority(String userPosition) {
+		List<String> positions;
+
+		switch (userPosition) {
+			case "PS000":
+				positions = Arrays.asList("PS001", "PS002", "PS003");
+				break;
+			case "PS001":
+				positions = Arrays.asList("PS002", "PS003");
+				break;
+			case "PS002":
+				positions = Arrays.asList("PS003");
+				break;
+			case "PS003":
+				return new ArrayList<>();
+			default:
+				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_AUTHORITY_NOT_FOUND);
+		}
+
+		List<String> approvalAuthorities = new ArrayList<>();
+
+		for (String position : positions) {
+			List<User> users = userRepository.findByUserPosition(position);
+			approvalAuthorities.addAll(users.stream().map(User::getUserName).collect(Collectors.toList()));
+		}
+
+		return approvalAuthorities;
 	}
 
 	@Transactional
@@ -53,7 +86,7 @@ public class ApprovalService {
 			approvalRepository.delete(approval);
 		}
 	}
-	
+
 	@Transactional
 	public Page<ApprovalResponse> submittedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
 		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
@@ -100,16 +133,6 @@ public class ApprovalService {
 				.build();
 		} else {
 			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
-		}
-	}
-
-	public String getApprovalAuthority(String userPosition) {
-		if (userPosition.equals("PS000")) {
-			return "PS001";
-		} else if (userPosition.equals("PS001")) {
-			return "PS002";
-		} else {
-			return "PS002"; // TODO: 사수가 없을 경우
 		}
 	}
 }

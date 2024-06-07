@@ -30,8 +30,9 @@ public class ApprovalService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public void submitApproval(User user, ApprovalRequest params) {
+	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
 		Optional<User> userOptional = userRepository.findById(user.getUserNo());
+
 		if (userOptional.isPresent()) {
 			if (params.getApprovalDetailStartDate() == null || params.getApprovalDetailEndDate() == null) {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_DATE_MISSING);
@@ -41,8 +42,7 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
-			List<String> approvalAuthorities = getApprovalAuthority(user.getUserPosition());
-			Approval approval = params.toEntity(user, approvalAuthorities);
+			Approval approval = params.toEntity(user, selectedApprovalAuthority);
 			approvalRepository.save(approval);
 		}
 	}
@@ -70,7 +70,8 @@ public class ApprovalService {
 
 		for (String position : positions) {
 			List<User> users = userRepository.findByUserPosition(position);
-			approvalAuthorities.addAll(users.stream().map(User::getUserName).collect(Collectors.toList()));
+			approvalAuthorities.addAll(
+				users.stream().map(User::getUserName).collect(Collectors.toList()));
 		}
 
 		return approvalAuthorities;

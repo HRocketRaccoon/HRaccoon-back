@@ -37,7 +37,9 @@ public class ApprovalController {
 	public ApiResponse<Void> postSubmitApproval(@PathVariable Long userNo, @RequestBody ApprovalRequest params) {
 		Optional<User> userOptional = userRepository.findById(userNo);
 		User user = userOptional.get();
-		approvalService.submitApproval(user, params);
+
+		String selectedApprovalAuthority = params.getSelectedApprovalAuthority();
+		approvalService.submitApproval(user, selectedApprovalAuthority, params);
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_SUBMIT_SUCCESS);
 	}
 

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,5 +38,21 @@ public class Todo {
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_no", nullable = false)
-	private User user;
+	private User userNo;
+
+	@Builder
+	public Todo(User user, String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn) {
+		this.userNo = user;
+		this.todoContent = todoContent;
+		this.todoCompleteYn = todoCompleteYn;
+		this.todoDeleteYn = todoDeleteYn;
+	}
+
+	public void updateTodoCompleteYn() {
+		this.todoCompleteYn = !this.todoCompleteYn;
+	}
+
+	public void updateTodoDeleteYn() {
+		this.todoDeleteYn = !this.todoDeleteYn;
+	}
 }

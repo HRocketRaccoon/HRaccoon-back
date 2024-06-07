@@ -1,6 +1,7 @@
 package org.finalpjt.hraccoon.domain.approval.data.dto.request;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -38,7 +39,9 @@ public class ApprovalRequest {
 	@NotBlank
 	private String approvalDetailContent;
 
-	public Approval toEntity(User user, String approvalAuthority) {
+	public Approval toEntity(User user, List<String> approvalAuthorities) {
+		String approvalAuthority = String.join(",", approvalAuthorities);
+
 		return Approval.builder()
 			.approvalType(this.approvalType)
 			.user(user)

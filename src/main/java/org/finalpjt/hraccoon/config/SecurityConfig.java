@@ -32,11 +32,8 @@ public class SecurityConfig {
 
 	/* 허용 URL. 인증과 인가를 거치지 않을 경우 사용*/
 	private final String[] allowUrls = {
-		"/api/v1/user/**",
+		"/api/v1/user/create",
 		"/api/v1/auth/sign-in",
-		"/api/v1/seat/**",
-		"/api/v1/approval/**",
-		"/api/v1/attendance/**",
 	};
 
 	@Bean

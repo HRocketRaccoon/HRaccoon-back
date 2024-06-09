@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface CodeRepository extends JpaRepository<Code, String> {
 	@Query("select c.codeNo from Code c where c.codeName = :codeName")
 	String findCodeNoByCodeName(String codeName);
+
+	@Query("select c.codeName from Code c where c.codeNo = :codeNo")
+	String findCodeNameByCodeNo(String codeNo);
 }

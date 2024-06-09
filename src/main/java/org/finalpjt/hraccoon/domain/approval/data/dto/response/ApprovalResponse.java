@@ -1,6 +1,7 @@
 package org.finalpjt.hraccoon.domain.approval.data.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
@@ -22,6 +23,7 @@ public class ApprovalResponse {
 	private LocalDateTime approvalDetailStartDate;
 	private LocalDateTime approvalDetailEndDate;
 	private String approvalAuthority;
+	private List<String> approvalAuthorityNames;
 	private LocalDateTime approvalSubmitDate;
 	private String approvalDetailContent;
 	private ApprovalStatus approvalStatus;
@@ -30,9 +32,9 @@ public class ApprovalResponse {
 
 	@Builder
 	public ApprovalResponse(Long approvalNo, String userTeam, String userId, String userName, ApprovalType approvalType,
-			LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, String approvalAuthority,
-			LocalDateTime approvalSubmitDate, String approvalDetailContent, ApprovalStatus approvalStatus,
-			LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
+		LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, String approvalAuthority,
+		LocalDateTime approvalSubmitDate, String approvalDetailContent, ApprovalStatus approvalStatus,
+		LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
 		this.approvalNo = approvalNo;
 		this.userTeam = userTeam;
 		this.userId = userId;

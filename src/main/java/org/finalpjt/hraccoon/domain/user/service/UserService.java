@@ -14,6 +14,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
@@ -63,12 +64,6 @@ public class UserService {
 			userRepository.saveAndFlush(entity);
 		} catch (Exception e) {
 			log.error("error", e);
-			/*
-			 * TODO: 위 상황에 대한 예외처리 논의
-			 *  - 이미 존재하는 아이디일 경우
-			 *  - 이미 존재하는 이메일일 경우
-			 *  - 이미 존재하는 핸드폰번호일 경우
-			 * */
 			throw new RuntimeException(UserMessageConstants.USER_CREATE_FAIL);
 		}
 	}
@@ -93,6 +88,23 @@ public class UserService {
 		response.of(entity);
 		response.insertUserDetail(entity.getUserDetail().getUserRemainVacation(),
 			entity.getUserDetail().getUserJoinDate());
+
+		return response;
+	}
+
+	@Transactional
+	public UserBelongInfoResponse getUserBelongInfo(String userId) {
+		User entity = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		UserBelongInfoResponse response = new UserBelongInfoResponse();
+
+		response.of(entity);
+
+		String userTeam = codeRepository.findCodeNameByCodeNo(entity.getUserTeam());
+		String userPosition = codeRepository.findCodeNameByCodeNo(entity.getUserPosition());
+
+		response.transferCode(userTeam, userPosition);
 
 		return response;
 	}

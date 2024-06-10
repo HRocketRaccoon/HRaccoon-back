@@ -36,15 +36,18 @@ public class ApprovalRequest {
 	private LocalDateTime approvalDetailEndDate;
 
 	@NotBlank
+	private String selectedApprovalAuthority;
+
+	@NotBlank
 	private String approvalDetailContent;
 
-	public Approval toEntity(User user, String approvalAuthority) {
+	public Approval toEntity(User user, String selectedApprovalAuthority) {
 		return Approval.builder()
 			.approvalType(this.approvalType)
 			.user(user)
 			.approvalSubmitDate(LocalDateTime.now())
 			.approvalStatus(ApprovalStatus.PENDING)
-			.approvalAuthority(approvalAuthority)
+			.approvalAuthority(selectedApprovalAuthority)
 			.approvalDetail(ApprovalDetail.builder()
 				.approvalDetailContent(this.approvalDetailContent)
 				.approvalDetailStartDate(this.approvalDetailStartDate)

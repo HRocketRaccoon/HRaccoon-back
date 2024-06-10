@@ -16,10 +16,13 @@ import io.lettuce.core.dynamic.annotation.Param;
 public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 	Page<Approval> findByUser_UserNo(Long userNo, Pageable pageable);
 
+	Page<Approval> findByApprovalAuthorityContaining(Long userNo, Pageable pageable);
+
 	@Query("select a from Approval a join fetch a.user join fetch a.approvalDetail where a.user.userTeam = :userTeam and a.approvalStatus=:approvalStatus")
 	List<Approval> findByUserTeamWithUserAndApprovalDetail(String userTeam, ApprovalStatus approvalStatus);
 
 	@Query("SELECT a FROM Approval a WHERE a.user.userTeam = :userTeam AND a.approvalAuthority = :approvalAuthority")
 	List<Approval> findByApprovalAuthorityAndUserTeam(@Param("userTeam") String userTeam,
 		@Param("approvalAuthority") String approvalAuthority);
+
 }

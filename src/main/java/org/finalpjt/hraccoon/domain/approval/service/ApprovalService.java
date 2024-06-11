@@ -90,10 +90,14 @@ public class ApprovalService {
 	public void cancelApproval(Long userNo, Long approvalNo) {
 		Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
 
-		Approval approval = approvalOptional.get();
+		if (approvalOptional.isPresent()) {
+			Approval approval = approvalOptional.get();
 
-		if (approval.getUser().getUserNo().equals(userNo) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
-			approvalRepository.delete(approval);
+			if (approval.getUser().getUserNo().equals(userNo)
+				&& approval.getApprovalStatus() == ApprovalStatus.PENDING) {
+				approval.setApprovalStatus(ApprovalStatus.CANCELED);
+				approvalRepository.save(approval);
+			}
 		}
 	}
 

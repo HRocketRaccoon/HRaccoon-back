@@ -33,7 +33,7 @@ spring:
       mode: always
       encoding: utf-8
       platform: mariadb
-      data-locations: classpath:database/data.sql
+      data-locations: classpath:database/init-data.sql
 
 # Redis 설정
   data:
@@ -45,8 +45,8 @@ spring:
   jwt:
     secret-key: { secret-key }
     life:
-      accessToken: 300000
-      refreshToken: 3000000
+      accessToken: 3600000
+      refreshToken: 10800000 # 3시간
     issuer: OrangeVinyl
 
 
@@ -62,3 +62,7 @@ logging:
         orm:
           jdbc:
             bind: trace
+
+# CORS 설정
+cors:
+  allowed-origins: "http://localhost:3000"

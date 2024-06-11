@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.UserUsingSeatResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
@@ -48,13 +50,23 @@ public class SeatService {
 	}
 
 	@Transactional
-	public SeatUsingUserResponse getSeatUsingUserInfo(Long seatStatusNo) {
+	public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
 
 		SeatStatus seatStatus= seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
+		return response;
+	}
+
+	@Transactional
+	public SeatUsingUserResponse getSeatUsingUserInfo(String userId) {
+
+		SeatStatus seatStatus= seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
+			.orElseThrow(() -> new IllegalArgumentException(SeatMessageConstants.SEAT_NOT_FOUND));
 		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
 		return response;
 	}
+
 
 
 	@Transactional(readOnly = true)

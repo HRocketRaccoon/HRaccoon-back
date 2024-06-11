@@ -8,6 +8,7 @@ import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.UserUsingSeatResponse;
 import org.finalpjt.hraccoon.domain.seat.service.SeatService;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -45,10 +46,18 @@ public class SeatController {
 		return ApiResponse.createSuccess(responses);
 	}
 
-	@GetMapping("/seat/info/{seatStatusNo}")
-	public ApiResponse<SeatUsingUserResponse> getSeatUsingUserInfo(@PathVariable Long seatStatusNo) {
+	@GetMapping("/seat/user/info/{seatStatusNo}")
+	public ApiResponse<UserUsingSeatResponse> getUserUsingSeatInfo(@PathVariable Long seatStatusNo) {
 
-		SeatUsingUserResponse response = seatService.getSeatUsingUserInfo(seatStatusNo);
+		UserUsingSeatResponse response = seatService.getUserUsingSeatInfo(seatStatusNo);
+
+		return ApiResponse.createSuccess(response);
+	}
+
+	@GetMapping("/seat/info/{userId}")
+	public ApiResponse<SeatUsingUserResponse> getSeatUsingUserInfo(@PathVariable String userId) {
+
+		SeatUsingUserResponse response = seatService.getSeatUsingUserInfo(userId);
 
 		return ApiResponse.createSuccess(response);
 	}

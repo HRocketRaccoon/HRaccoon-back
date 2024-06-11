@@ -3,9 +3,10 @@ package org.finalpjt.hraccoon.domain.approval.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
@@ -48,7 +49,7 @@ public class ApprovalService {
 		}
 	}
 
-	public List<String> getApprovalAuthority(String userPosition) {
+	public List<Map<String, String>> getApprovalAuthority(String userPosition) {
 		List<String> positions;
 
 		switch (userPosition) {
@@ -67,12 +68,17 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_AUTHORITY_NOT_FOUND);
 		}
 
-		List<String> approvalAuthorities = new ArrayList<>();
+		List<Map<String, String>> approvalAuthorities = new ArrayList<>();
 
 		for (String position : positions) {
 			List<User> users = userRepository.findByUserPosition(position);
-			approvalAuthorities.addAll(
-				users.stream().map(User::getUserName).collect(Collectors.toList()));
+
+			for (User user : users) {
+				Map<String, String> userInfo = new HashMap<>();
+				userInfo.put("userId", user.getUserId());
+				userInfo.put("userName", user.getUserName());
+				approvalAuthorities.add(userInfo);
+			}
 		}
 
 		return approvalAuthorities;
@@ -207,7 +213,11 @@ public class ApprovalService {
 			if (isApproved) {
 				approval.setApprovalStatus(ApprovalStatus.APPROVED);
 				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
+				approval.getApprovalDetail().setApprovalDetailResponseContent(null);
 			} else {
+				if (rejectionReason == null || rejectionReason.isEmpty()) {
+					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
+				}
 				approval.setApprovalStatus(ApprovalStatus.REJECTED);
 				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
 				approval.getApprovalDetail().setApprovalDetailResponseContent(rejectionReason);

@@ -92,7 +92,10 @@ public class ApprovalController {
 		// @RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
 		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userNo, pageNumber, pageable);
+		Optional<User> userOptional = userRepository.findByUserNo(userNo);
+		String userId = userOptional.get().getUserId();
+
+		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userId, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
 	}

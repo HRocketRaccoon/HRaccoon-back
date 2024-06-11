@@ -1,7 +1,6 @@
 package org.finalpjt.hraccoon.domain.approval.data.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
@@ -23,7 +22,6 @@ public class ApprovalResponse {
 	private LocalDateTime approvalDetailStartDate;
 	private LocalDateTime approvalDetailEndDate;
 	private String approvalAuthority;
-	private List<String> approvalAuthorityNames;
 	private LocalDateTime approvalSubmitDate;
 	private String approvalDetailContent;
 	private ApprovalStatus approvalStatus;

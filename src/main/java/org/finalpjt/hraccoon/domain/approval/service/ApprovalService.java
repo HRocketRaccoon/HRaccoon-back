@@ -14,6 +14,7 @@ import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
+import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class ApprovalService {
 
 	private final ApprovalRepository approvalRepository;
 	private final UserRepository userRepository;
+	private final CodeRepository codeRepository;
 
 	@Transactional
 	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
@@ -124,9 +126,12 @@ public class ApprovalService {
 		Approval approval = approvalOptional.get();
 
 		if (approval.getUser().getUserNo().equals(userNo)) {
+			String teamCode = approval.getUser().getUserTeam();
+			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
-				.userTeam(approval.getUser().getUserTeam())
+				.userTeam(teamName)
 				.userId(approval.getUser().getUserId())
 				.userName(approval.getUser().getUserName())
 				.approvalType(approval.getApprovalType())
@@ -145,8 +150,8 @@ public class ApprovalService {
 	}
 
 	@Transactional
-	public Page<ApprovalResponse> requestedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
-		Page<Approval> approvals = approvalRepository.findByApprovalAuthorityContaining(userNo,
+	public Page<ApprovalResponse> requestedApprovalList(String userId, int pageNumber, Pageable pageable) {
+		Page<Approval> approvals = approvalRepository.findByApprovalAuthority(userId,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		return approvals.map(approval -> ApprovalResponse.builder()
@@ -178,9 +183,12 @@ public class ApprovalService {
 		Approval approval = approvalOptional.get();
 
 		if (approval.getApprovalAuthority().equals(userId)) {
+			String teamCode = approval.getUser().getUserTeam();
+			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
-				.userTeam(approval.getUser().getUserTeam())
+				.userTeam(teamName)
 				.userId(approval.getUser().getUserId())
 				.userName(approval.getUser().getUserName())
 				.approvalType(approval.getApprovalType())

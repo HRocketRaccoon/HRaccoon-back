@@ -360,9 +360,9 @@ VALUES (1, '2016-03-28', NULL, NULL, 13),
        (299, '2019-11-06', NULL, NULL, 6),
        (300, '2023-06-05', NULL, NULL, 11);
 
--- A00004 password : A1b!2c3d
--- A00005 password : P@ssw0rd
--- A00006 password : Qw3$rty4
+-- A000004 password : A1b!2c3d
+-- A000005 password : P@ssw0rd
+-- A000006 password : Qw3$rty4
 INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address, user_gender, user_birth, user_email,
                    user_department, user_position, user_team, user_rank, user_role, user_detail_no)
 VALUES ('A000001', 'password01', '허수지', '010-1234-5678', '서울특별시 종로구 종로 1길 1', 'MALE', '1977-03-02', 'abc1234@naver.com',

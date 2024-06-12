@@ -1,6 +1,5 @@
 package org.finalpjt.hraccoon.domain.approval.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -95,7 +94,8 @@ public class ApprovalService {
 
 			if (approval.getUser().getUserNo().equals(userNo)
 				&& approval.getApprovalStatus() == ApprovalStatus.PENDING) {
-				approval.setApprovalStatus(ApprovalStatus.CANCELED);
+				approval.cancelApproval();
+
 				approvalRepository.save(approval);
 			}
 		}
@@ -221,18 +221,14 @@ public class ApprovalService {
 
 		Approval approval = approvalOptional.get();
 
-		if (approval.getApprovalAuthority().equals(userId)) {
+		if (approval.getApprovalAuthority().equals(userId) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
 			if (isApproved) {
-				approval.setApprovalStatus(ApprovalStatus.APPROVED);
-				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
-				approval.getApprovalDetail().setApprovalDetailResponseContent(null);
+				approval.approveApproval();
 			} else {
 				if (rejectionReason == null || rejectionReason.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
-				approval.setApprovalStatus(ApprovalStatus.REJECTED);
-				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
-				approval.getApprovalDetail().setApprovalDetailResponseContent(rejectionReason);
+				approval.rejectApproval(rejectionReason);
 			}
 
 			approvalRepository.save(approval);

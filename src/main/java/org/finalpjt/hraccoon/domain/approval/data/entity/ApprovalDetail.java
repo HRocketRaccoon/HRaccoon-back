@@ -2,15 +2,13 @@ package org.finalpjt.hraccoon.domain.approval.data.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,14 +42,27 @@ public class ApprovalDetail {
 	@OneToOne(mappedBy = "approvalDetail")
 	private Approval approval;
 
-
 	@Builder
-	public ApprovalDetail(String approvalDetailContent, LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
+	public ApprovalDetail(String approvalDetailContent, LocalDateTime approvalDetailStartDate,
+		LocalDateTime approvalDetailEndDate, LocalDateTime approvalDetailResponseDate,
+		String approvalDetailResponseContent) {
 		this.approvalDetailContent = approvalDetailContent;
 		this.approvalDetailStartDate = approvalDetailStartDate;
 		this.approvalDetailEndDate = approvalDetailEndDate;
 		this.approvalDetailResponseDate = approvalDetailResponseDate;
 		this.approvalDetailResponseContent = approvalDetailResponseContent;
 	}
+
+	public ApprovalDetail updateApprovalDetail(LocalDateTime approvalDetailResponseDate,
+		String approvalDetailResponseContent) {
+		return ApprovalDetail.builder()
+			.approvalDetailContent(this.approvalDetailContent)
+			.approvalDetailStartDate(this.approvalDetailStartDate)
+			.approvalDetailEndDate(this.approvalDetailEndDate)
+			.approvalDetailResponseDate(approvalDetailResponseDate)
+			.approvalDetailResponseContent(approvalDetailResponseContent)
+			.build();
+	}
+
 }
 

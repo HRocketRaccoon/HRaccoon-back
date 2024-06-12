@@ -10,6 +10,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.service.UserService;
@@ -51,6 +52,14 @@ public class UserController {
 		log.info("getUserInfo userId = {}", userId);
 
 		return ApiResponse.createSuccess(userService.getUserInfo(userId));
+	}
+
+	@GetMapping("/user/belong-info/{userId}")
+	public ApiResponse<UserBelongInfoResponse> getUserBelongInfo(@PathVariable String userId) {
+		log.info("getUserBelongInfo userId = {}", userId);
+		UserBelongInfoResponse response = userService.getUserBelongInfo(userId);
+
+		return ApiResponse.createSuccess(response);
 	}
 
 	@PostMapping("/user/update")

@@ -79,7 +79,8 @@ INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address,
 ('user07', 'password07', '김하늘', '010-7890-1234', '서울특별시 동대문구', 'FEMALE', '1994-07-07', 'user07@example.com', 'DP004', 'PS000', 'TM010', 'RK001', 'USER', 7),
 ('user08', 'password08', '이동욱', '010-8901-2345', '서울특별시 영등포구', 'MALE', '1987-08-08', 'user08@example.com', 'DP001', 'PS000', 'TM003', 'RK004', 'USER', 8),
 ('user09', 'password09', '고아라', '010-9012-3456', '서울특별시 서대문구', 'FEMALE', '1995-09-09', 'user09@example.com', 'DP001', 'PS000', 'TM001', 'RK003', 'USER', 9),
-('user10', 'password10', '조인성', '010-0123-4567', '서울특별시 관악구', 'MALE', '1990-10-10', 'user10@example.com', 'DP001', 'PS000', 'TM003', 'RK001', 'USER', 10);
+('user10', 'password10', '조인성', '010-0123-4567', '서울특별시 관악구', 'MALE', '1990-10-10', 'user10@example.com', 'DP001', 'PS000', 'TM003', 'RK001', 'USER', 10),
+
 
 INSERT INTO ability (ability_name, user_no) VALUES
 ('ABP001', 2),

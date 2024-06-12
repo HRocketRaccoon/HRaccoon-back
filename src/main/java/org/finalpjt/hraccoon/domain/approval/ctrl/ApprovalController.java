@@ -47,7 +47,7 @@ public class ApprovalController {
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_SUBMIT_SUCCESS);
 	}
 
-	@GetMapping("/approval/approvalauthority/{userNo}")
+	@GetMapping("/approval/approval-authority/{userNo}")
 	public ApiResponse<List<Map<String, String>>> getApprovalAuthority(@PathVariable Long userNo) {
 		Optional<User> userOptional = userRepository.findByUserNo(userNo);
 
@@ -58,7 +58,7 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalAuthority);
 	}
 
-	@GetMapping("/approval/submittedapprovallist/{userNo}")
+	@GetMapping("/approval/submitted-approval-list/{userNo}")
 	public ApiResponse<Page<ApprovalResponse>> getSubmittedApprovalList(@PathVariable Long userNo,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -70,7 +70,7 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalResponses);
 	}
 
-	@GetMapping("/approval/submittedapprovallist/{userNo}/{approvalNo}")
+	@GetMapping("/approval/submitted-approval-list/{userNo}/{approvalNo}")
 	public ApiResponse<ApprovalResponse> getSubmittedApprovalListDetail(@PathVariable Long userNo,
 		@PathVariable Long approvalNo) {
 		ApprovalResponse approvalResponse = approvalService.submittedApprovalListDetail(userNo, approvalNo);
@@ -78,14 +78,14 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalResponse);
 	}
 
-	@PostMapping("/approval/submittedapprovallist/{userNo}/{approvalNo}/cancel")
+	@PostMapping("/approval/submitted-approval-list/{userNo}/{approvalNo}/cancel")
 	public ApiResponse<Void> postCancelApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
 		approvalService.cancelApproval(userNo, approvalNo);
 
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_CANCEL_SUCCESS);
 	}
 
-	@GetMapping("/approval/requestedapprovallist/{userNo}")
+	@GetMapping("/approval/requested-approval-list/{userNo}")
 	public ApiResponse<Page<ApprovalResponse>> getRequestedApprovalList(@PathVariable Long userNo,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -100,7 +100,7 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalResponses);
 	}
 
-	@GetMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}")
+	@GetMapping("/approval/requested-approval-list/{userNo}/{approvalNo}")
 	public ApiResponse<ApprovalResponse> getRequestedApprovalDetail(@PathVariable Long userNo,
 		@PathVariable Long approvalNo) {
 		ApprovalResponse approvalResponse = approvalService.requestedApprovalListDetail(userNo, approvalNo);
@@ -108,7 +108,7 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalResponse);
 	}
 
-	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/approve")
+	@PostMapping("/approval/requested-approval-list/{userNo}/{approvalNo}/approve")
 	public ApiResponse<ApprovalResponse> postApproveApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
 		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, true, null);
 
@@ -116,7 +116,7 @@ public class ApprovalController {
 			ApprovalMessageConstants.APPROVAL_APPROVAL_SUCCESS);
 	}
 
-	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/reject")
+	@PostMapping("/approval/requested-approval-list/{userNo}/{approvalNo}/reject")
 	public ApiResponse<ApprovalResponse> postRejectApproval(@PathVariable Long userNo, @PathVariable Long approvalNo,
 		@RequestBody ApprovalResponseRequest params) {
 		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, params.getIsApproved(),

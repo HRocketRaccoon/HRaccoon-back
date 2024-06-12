@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
@@ -77,14 +78,13 @@ public class SeatService {
 		if (seatStatusOptional.isPresent()) {
 			SeatStatus seatStatus = seatStatusOptional.get();
 
-			User user = userRepository.findById(userNo)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid userNo"));
+			User user = userRepository.findById(userNo).get();
 
 			SeatStatus selectedSeatStatus = seatStatus.selectSeat(user);
 
 			seatStatusRepository.save(selectedSeatStatus);
 		} else {
-			throw new IllegalStateException("Seat is not available");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_SELECT_NOT_ALLOWED);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class SeatService {
 
 			seatStatusRepository.save(cancelledSeatStatus);
 		} else {
-			throw new IllegalStateException("Seat is not currently selected by the user");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_CANCEL_NOT_ALLOWED);
 		}
 	}
 

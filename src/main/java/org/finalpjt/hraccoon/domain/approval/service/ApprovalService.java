@@ -106,21 +106,27 @@ public class ApprovalService {
 		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
-		return approvals.map(approval -> ApprovalResponse.builder()
-			.approvalNo(approval.getApprovalNo())
-			.userTeam(approval.getUser().getUserTeam())
-			.userId(approval.getUser().getUserId())
-			.userName(approval.getUser().getUserName())
-			.approvalType(approval.getApprovalType())
-			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
-			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
-			.approvalAuthority(approval.getApprovalAuthority())
-			.approvalSubmitDate(approval.getApprovalSubmitDate())
-			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
-			.approvalStatus(approval.getApprovalStatus())
-			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
-			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
-			.build());
+		return approvals.map(approval -> {
+			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
+			String approvalAuthorityName = approvalAuthorityUser.getUserName();
+
+			return ApprovalResponse.builder()
+				.approvalNo(approval.getApprovalNo())
+				.userTeam(approval.getUser().getUserTeam())
+				.userId(approval.getUser().getUserId())
+				.userName(approval.getUser().getUserName())
+				.approvalType(approval.getApprovalType())
+				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
+				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
+				.approvalAuthority(approval.getApprovalAuthority())
+				.approvalAuthorityName(approvalAuthorityName)
+				.approvalSubmitDate(approval.getApprovalSubmitDate())
+				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
+				.approvalStatus(approval.getApprovalStatus())
+				.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
+				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
+				.build();
+		});
 	}
 
 	@Transactional

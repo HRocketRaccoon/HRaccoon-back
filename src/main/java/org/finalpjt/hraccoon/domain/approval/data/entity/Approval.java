@@ -23,13 +23,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Approval {
 
@@ -71,7 +69,17 @@ public class Approval {
 		this.approvalDetail = approvalDetail;
 	}
 
-	public void updateApprovalDetail(ApprovalDetail approvalDetail) {
-		this.approvalDetail = approvalDetail;
+	public void cancelApproval() {
+		this.approvalStatus = ApprovalStatus.CANCELED;
+	}
+
+	public void approveApproval() {
+		this.approvalStatus = ApprovalStatus.APPROVED;
+		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), "승인되었습니다.");
+	}
+
+	public void rejectApproval(String rejectionReason) {
+		this.approvalStatus = ApprovalStatus.REJECTED;
+		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), rejectionReason);
 	}
 }

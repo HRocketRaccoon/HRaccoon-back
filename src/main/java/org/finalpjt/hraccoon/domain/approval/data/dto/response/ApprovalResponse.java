@@ -8,10 +8,8 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ApprovalResponse {
 	private Long approvalNo;

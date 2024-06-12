@@ -54,6 +54,13 @@ public class UserController {
 		return ApiResponse.createSuccess(userService.getUserInfo(userId));
 	}
 
+	@GetMapping("/user/info/name/{userId}")
+	public ApiResponse<String> getUserName(@PathVariable String userId) {
+		log.info("getUserName userId = {}", userId);
+
+		return ApiResponse.createSuccess(userService.getUserName(userId));
+	}
+
 	@GetMapping("/user/belong-info/{userId}")
 	public ApiResponse<UserBelongInfoResponse> getUserBelongInfo(@PathVariable String userId) {
 		log.info("getUserBelongInfo userId = {}", userId);
@@ -77,7 +84,8 @@ public class UserController {
 	}
 
 	@PostMapping("/user/ability/update/{userId}")
-	public ApiResponse<List<AbilityResponse>> updateUserAbilityInfo(@PathVariable String userId, @RequestBody List<AbilityRequest> params) {
+	public ApiResponse<List<AbilityResponse>> updateUserAbilityInfo(@PathVariable String userId,
+		@RequestBody List<AbilityRequest> params) {
 		log.info("updateUserAbilityInfo userId = {}", userId);
 		List<AbilityResponse> response = userService.updateUserAbility(userId, params);
 

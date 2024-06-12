@@ -24,7 +24,7 @@ public class ApprovalDetail {
 	@Column(name = "approval_detail_no", nullable = false)
 	private Long approvalDetailNo;
 
-	@Column(name = "approval_detail_content", nullable = false)
+	@Column(name = "approval_detail_content", nullable = false, columnDefinition = "TEXT")
 	private String approvalDetailContent;
 
 	@Column(name = "approval_detail_start_date")

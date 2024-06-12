@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.UserUsingSeatResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
@@ -48,13 +50,24 @@ public class SeatService {
 	}
 
 	@Transactional
-	public SeatUsingUserResponse getSeatUsingUserInfo(Long seatStatusNo) {
+	public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
 
 		SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
+		return response;
+	}
+
+	@Transactional
+	public SeatUsingUserResponse getSeatUsingUserInfo(String userId) {
+
+		SeatStatus seatStatus= seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
+			.orElseThrow(() -> new IllegalArgumentException(SeatMessageConstants.SEAT_NOT_FOUND));
 		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
 		return response;
 	}
+
+
 
 	@Transactional(readOnly = true)
 	public List<SeatOfficeResponse> getAvailableSeats(String seatOffice) {
@@ -77,19 +90,20 @@ public class SeatService {
 		if (seatStatusOptional.isPresent()) {
 			SeatStatus seatStatus = seatStatusOptional.get();
 
-			User user = userRepository.findById(userNo)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid userNo"));
+			User user = userRepository.findById(userNo).get();
 
 			SeatStatus selectedSeatStatus = seatStatus.selectSeat(user);
 
 			seatStatusRepository.save(selectedSeatStatus);
 		} else {
-			throw new IllegalStateException("Seat is not available");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_SELECT_NOT_ALLOWED);
 		}
 	}
 
 	@Transactional
 	public void cancelSeat(Long seatNo, Long userNo, String seatOffice) {
+		log.debug("Cancelling seat: {}, user: {}, seat office: {}", seatNo, userNo, seatOffice);
+
 		Optional<SeatStatus> seatStatusOptional = seatStatusRepository.findBySeatSeatNoAndUserUserNo(seatNo, userNo);
 
 		if (seatStatusOptional.isPresent()) {
@@ -98,7 +112,7 @@ public class SeatService {
 
 			seatStatusRepository.save(cancelledSeatStatus);
 		} else {
-			throw new IllegalStateException("Seat is not currently selected by the user");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_CANCEL_NOT_ALLOWED);
 		}
 	}
 

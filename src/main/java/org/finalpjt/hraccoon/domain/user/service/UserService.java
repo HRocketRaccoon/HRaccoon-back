@@ -110,6 +110,14 @@ public class UserService {
 	}
 
 	@Transactional
+	public String getUserName(String userId) {
+		User entity = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		return entity.getUserName();
+	}
+
+	@Transactional
 	public UserResponse updateUserInfo(UserInfoRequest params) {
 		User entity = userRepository.findByUserId(params.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));

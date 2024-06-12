@@ -13,6 +13,7 @@ import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
+import org.finalpjt.hraccoon.domain.attendance.service.AttendanceService;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
@@ -31,6 +32,7 @@ public class ApprovalService {
 	private final ApprovalRepository approvalRepository;
 	private final UserRepository userRepository;
 	private final CodeRepository codeRepository;
+	private final AttendanceService attendanceService;
 
 	@Transactional
 	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
@@ -106,21 +108,27 @@ public class ApprovalService {
 		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
-		return approvals.map(approval -> ApprovalResponse.builder()
-			.approvalNo(approval.getApprovalNo())
-			.userTeam(approval.getUser().getUserTeam())
-			.userId(approval.getUser().getUserId())
-			.userName(approval.getUser().getUserName())
-			.approvalType(approval.getApprovalType())
-			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
-			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
-			.approvalAuthority(approval.getApprovalAuthority())
-			.approvalSubmitDate(approval.getApprovalSubmitDate())
-			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
-			.approvalStatus(approval.getApprovalStatus())
-			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
-			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
-			.build());
+		return approvals.map(approval -> {
+			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
+			String approvalAuthorityName = approvalAuthorityUser.getUserName();
+
+			return ApprovalResponse.builder()
+				.approvalNo(approval.getApprovalNo())
+				.userTeam(approval.getUser().getUserTeam())
+				.userId(approval.getUser().getUserId())
+				.userName(approval.getUser().getUserName())
+				.approvalType(approval.getApprovalType())
+				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
+				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
+				.approvalAuthority(approval.getApprovalAuthority())
+				.approvalAuthorityName(approvalAuthorityName)
+				.approvalSubmitDate(approval.getApprovalSubmitDate())
+				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
+				.approvalStatus(approval.getApprovalStatus())
+				.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
+				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
+				.build();
+		});
 	}
 
 	@Transactional
@@ -133,6 +141,9 @@ public class ApprovalService {
 			String teamCode = approval.getUser().getUserTeam();
 			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
 
+			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
+			String approvalAuthorityName = approvalAuthorityUser.getUserName();
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
 				.userTeam(teamName)
@@ -142,6 +153,7 @@ public class ApprovalService {
 				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
 				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
 				.approvalAuthority(approval.getApprovalAuthority())
+				.approvalAuthorityName(approvalAuthorityName)
 				.approvalSubmitDate(approval.getApprovalSubmitDate())
 				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
 				.approvalStatus(approval.getApprovalStatus())
@@ -149,7 +161,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
 		}
 	}
 
@@ -206,7 +218,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
 		}
 	}
 
@@ -224,10 +236,12 @@ public class ApprovalService {
 		if (approval.getApprovalAuthority().equals(userId) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
 			if (isApproved) {
 				approval.approveApproval();
+				attendanceService.updateAttendance(approvalNo);
 			} else {
 				if (rejectionReason == null || rejectionReason.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
+				
 				approval.rejectApproval(rejectionReason);
 			}
 
@@ -249,7 +263,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 처리할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_RESPONSE_NOT_ALLOWED);
 		}
 	}
 }

@@ -18,6 +18,7 @@ import jakarta.persistence.OneToOne;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Approval {
+public class Approval extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

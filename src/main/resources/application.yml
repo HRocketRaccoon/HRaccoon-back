@@ -8,9 +8,9 @@ spring:
 # DB 설정(local)
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
-    username: 
-    password: 
+    url: jdbc:mariadb://{ url }/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
+    username: { userName }
+    password: { userPassword }
     hikari:
       connection-test-query: SELECT NOW() FROM DUAL
 
@@ -62,7 +62,3 @@ logging:
         orm:
           jdbc:
             bind: trace
-
-# CORS 설정
-cors:
-  allowed-origins: "http://localhost:3000"

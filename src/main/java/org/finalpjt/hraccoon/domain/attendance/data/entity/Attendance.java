@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.attendance.data.entity;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -48,8 +49,17 @@ public class Attendance extends BaseTimeEntity{
 	@Column(name = "attendance_status", nullable = false)
 	private String attendanceStatus;
 
+	// 요일 표기 추가
+	@Column(name = "attendance_day")
+	private String attendanceDay;
+
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_no", nullable = false)
 	@JsonIgnore
 	private User user;
+
+    public void setAttendanceDay(String dayOfWeek) {
+        this.attendanceDay = dayOfWeek;
+    }
+
 }

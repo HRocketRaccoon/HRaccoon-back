@@ -13,6 +13,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.Locale;
+import java.util.Calendar;
+import java.util.Date;
+import java.time.format.TextStyle;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +108,12 @@ public class AttendanceService {
         
         List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
         
-        return response;
+        // 요일을 설정
+        List<Attendance> responseWithDays = response.stream()
+            .peek(attendance -> attendance.setAttendanceDay(attendance.getAttendanceDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN)))
+            .collect(Collectors.toList());
+
+        return responseWithDays;
     }
 
 }

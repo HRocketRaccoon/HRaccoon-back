@@ -135,4 +135,41 @@ public class AttendanceService {
         return responseWithDetails;
     }
 
+	@Transactional
+	public void updateAttendance(Long approvalNo) {
+		Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
+
+		if (approvalOptional.isPresent()) {
+			Approval approval = approvalOptional.get();
+
+			if (approval.getApprovalStatus() == ApprovalStatus.APPROVED) {
+				LocalDateTime startDate = approval.getApprovalDetail().getApprovalDetailStartDate();
+				LocalDateTime endDate = approval.getApprovalDetail().getApprovalDetailEndDate();
+				List<LocalDate> dates = getDatesBetween(startDate.toLocalDate(), endDate.toLocalDate());
+
+				for (LocalDate date : dates) {
+					Attendance attendance = Attendance.builder()
+						.attendanceDate(date)
+						.user(approval.getUser())
+						.build();
+
+					attendance.updateAttendance(approval);
+					attendanceRepository.save(attendance);
+				}
+			}
+		}
+	}
+
+	private List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+		List<LocalDate> dates = new ArrayList<>();
+		LocalDate currentDate = startDate;
+
+		while (!currentDate.isAfter(endDate)) {
+			dates.add(currentDate);
+			currentDate = currentDate.plusDays(1);
+		}
+
+		return dates;
+	}
+
 }

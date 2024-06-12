@@ -5,7 +5,6 @@ import java.util.Collections;
 
 import org.finalpjt.hraccoon.global.security.JwtAuthenticationFilter;
 import org.finalpjt.hraccoon.global.security.JwtProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,9 +30,6 @@ public class SecurityConfig {
 
 	private final AuthenticationEntryPoint entryPoint;
 
-	@Value("${cors.allowed-origins}")
-	private String allowedOrigins;
-
 	/* 허용 URL. 인증과 인가를 거치지 않을 경우 사용*/
 	private final String[] allowUrls = {
 		"/api/v1/user/create",
@@ -48,7 +44,7 @@ public class SecurityConfig {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration config = new CorsConfiguration();
-					config.addAllowedOrigin(allowedOrigins); // CORS 허용할 Origin 설정
+					config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4173")); // CORS 허용할 Origin 설정
 					config.setAllowedMethods(Collections.singletonList("*"));
 					config.setAllowCredentials(true);
 					config.setAllowedHeaders(Collections.singletonList("*"));

@@ -3,9 +3,10 @@ package org.finalpjt.hraccoon.domain.approval.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
@@ -13,6 +14,7 @@ import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
+import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,7 @@ public class ApprovalService {
 
 	private final ApprovalRepository approvalRepository;
 	private final UserRepository userRepository;
+	private final CodeRepository codeRepository;
 
 	@Transactional
 	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
@@ -48,7 +51,7 @@ public class ApprovalService {
 		}
 	}
 
-	public List<String> getApprovalAuthority(String userPosition) {
+	public List<Map<String, String>> getApprovalAuthority(String userPosition) {
 		List<String> positions;
 
 		switch (userPosition) {
@@ -67,12 +70,17 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_AUTHORITY_NOT_FOUND);
 		}
 
-		List<String> approvalAuthorities = new ArrayList<>();
+		List<Map<String, String>> approvalAuthorities = new ArrayList<>();
 
 		for (String position : positions) {
 			List<User> users = userRepository.findByUserPosition(position);
-			approvalAuthorities.addAll(
-				users.stream().map(User::getUserName).collect(Collectors.toList()));
+
+			for (User user : users) {
+				Map<String, String> userInfo = new HashMap<>();
+				userInfo.put("userId", user.getUserId());
+				userInfo.put("userName", user.getUserName());
+				approvalAuthorities.add(userInfo);
+			}
 		}
 
 		return approvalAuthorities;
@@ -82,10 +90,14 @@ public class ApprovalService {
 	public void cancelApproval(Long userNo, Long approvalNo) {
 		Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
 
-		Approval approval = approvalOptional.get();
+		if (approvalOptional.isPresent()) {
+			Approval approval = approvalOptional.get();
 
-		if (approval.getUser().getUserNo().equals(userNo) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
-			approvalRepository.delete(approval);
+			if (approval.getUser().getUserNo().equals(userNo)
+				&& approval.getApprovalStatus() == ApprovalStatus.PENDING) {
+				approval.setApprovalStatus(ApprovalStatus.CANCELED);
+				approvalRepository.save(approval);
+			}
 		}
 	}
 
@@ -118,9 +130,12 @@ public class ApprovalService {
 		Approval approval = approvalOptional.get();
 
 		if (approval.getUser().getUserNo().equals(userNo)) {
+			String teamCode = approval.getUser().getUserTeam();
+			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
-				.userTeam(approval.getUser().getUserTeam())
+				.userTeam(teamName)
 				.userId(approval.getUser().getUserId())
 				.userName(approval.getUser().getUserName())
 				.approvalType(approval.getApprovalType())
@@ -139,8 +154,8 @@ public class ApprovalService {
 	}
 
 	@Transactional
-	public Page<ApprovalResponse> requestedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
-		Page<Approval> approvals = approvalRepository.findByApprovalAuthorityContaining(userNo,
+	public Page<ApprovalResponse> requestedApprovalList(String userId, int pageNumber, Pageable pageable) {
+		Page<Approval> approvals = approvalRepository.findByApprovalAuthority(userId,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		return approvals.map(approval -> ApprovalResponse.builder()
@@ -172,9 +187,12 @@ public class ApprovalService {
 		Approval approval = approvalOptional.get();
 
 		if (approval.getApprovalAuthority().equals(userId)) {
+			String teamCode = approval.getUser().getUserTeam();
+			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
-				.userTeam(approval.getUser().getUserTeam())
+				.userTeam(teamName)
 				.userId(approval.getUser().getUserId())
 				.userName(approval.getUser().getUserName())
 				.approvalType(approval.getApprovalType())
@@ -207,7 +225,11 @@ public class ApprovalService {
 			if (isApproved) {
 				approval.setApprovalStatus(ApprovalStatus.APPROVED);
 				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
+				approval.getApprovalDetail().setApprovalDetailResponseContent(null);
 			} else {
+				if (rejectionReason == null || rejectionReason.isEmpty()) {
+					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
+				}
 				approval.setApprovalStatus(ApprovalStatus.REJECTED);
 				approval.getApprovalDetail().setApprovalDetailResponseDate(LocalDateTime.now());
 				approval.getApprovalDetail().setApprovalDetailResponseContent(rejectionReason);

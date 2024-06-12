@@ -38,9 +38,10 @@ public class SeatController {
 	}
 
 	@GetMapping("/seat/office/{seatOffice}/{floor}")
-	public ApiResponse<List<SeatOfficeFloorResponse>> getOfficeFloorSeatInfo(@PathVariable String seatOffice,@PathVariable String floor) {
+	public ApiResponse<List<SeatOfficeFloorResponse>> getOfficeFloorSeatInfo(@PathVariable String seatOffice,
+		@PathVariable String floor) {
 
-		List<SeatOfficeFloorResponse> responses = seatService.getOfficeFloorSeatInfo(seatOffice,floor);
+		List<SeatOfficeFloorResponse> responses = seatService.getOfficeFloorSeatInfo(seatOffice, floor);
 
 		return ApiResponse.createSuccess(responses);
 	}
@@ -53,14 +54,14 @@ public class SeatController {
 		return ApiResponse.createSuccess(response);
 	}
 
-	@GetMapping("/seat/availableseats/{seatOffice}")
+	@GetMapping("/seat/available-seats/{seatOffice}")
 	public ApiResponse<List<SeatOfficeResponse>> getAvailableSeats(@PathVariable String seatOffice) {
 		List<SeatOfficeResponse> responses = seatService.getAvailableSeats(seatOffice);
 
 		return ApiResponse.createSuccess(responses);
 	}
 
-	@PostMapping("/seat/availableseats/{seatOffice}/select/{seatNo}/{userNo}")
+	@PostMapping("/seat/available-seats/{seatOffice}/select/{seatNo}/{userNo}")
 	public ApiResponse<String> selectSeat(@PathVariable String seatOffice, @PathVariable Long seatNo,
 		@PathVariable Long userNo) {
 		seatService.selectSeat(seatNo, userNo, seatOffice);
@@ -68,7 +69,7 @@ public class SeatController {
 		return ApiResponse.createSuccessWithMessage(null, SeatMessageConstants.SEAT_SELECT_SUCCESS);
 	}
 
-	@PostMapping("/seat/availableseats/{seatOffice}/cancel/{seatNo}/{userNo}")
+	@PostMapping("/seat/available-seats/{seatOffice}/cancel/{seatNo}/{userNo}")
 	public ApiResponse<String> cancelSeat(@PathVariable String seatOffice, @PathVariable Long seatNo,
 		@PathVariable Long userNo) {
 		seatService.cancelSeat(seatNo, userNo, seatOffice);
@@ -76,7 +77,7 @@ public class SeatController {
 		return ApiResponse.createSuccessWithMessage(null, SeatMessageConstants.SEAT_CANCEL_SUCCESS);
 	}
 
-	@GetMapping("seat/checkduplicateseatselection/{seatOffice}/select/{seatNo}/{userNo}")
+	@GetMapping("seat/check-duplicate-selection/{seatOffice}/select/{seatNo}/{userNo}")
 	public ResponseEntity<Boolean> checkDuplicateSeatSelection(@PathVariable String seatOffice,
 		@PathVariable Long seatNo, @PathVariable Long userNo) {
 		boolean isDuplicate = seatService.checkDuplicateSeatSelection(userNo);

@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Locale;
-import java.util.Calendar;
-import java.util.Date;
 import java.time.format.TextStyle;
 
 @Service
@@ -108,12 +106,16 @@ public class AttendanceService {
         
         List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
         
-        // 요일을 설정
-        List<Attendance> responseWithDays = response.stream()
-            .peek(attendance -> attendance.setAttendanceDay(attendance.getAttendanceDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN)))
+        // 요일 설정
+        List<Attendance> responseWithDetails = response.stream()
+            .peek(attendance -> {
+                attendance.setAttendanceDay(attendance.getAttendanceDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN));
+                attendance.setAttendanceTotalTime();
+            })
             .collect(Collectors.toList());
-
-        return responseWithDays;
+            
+        attendanceRepository.saveAllAndFlush(responseWithDetails);
+        return responseWithDetails;
     }
 
 }

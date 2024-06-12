@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Duration;
 
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
@@ -58,8 +59,21 @@ public class Attendance extends BaseTimeEntity{
 	@JsonIgnore
 	private User user;
 
-    public void setAttendanceDay(String dayOfWeek) {
-        this.attendanceDay = dayOfWeek;
+    public void setAttendanceDay(String attendanceDay) {
+        this.attendanceDay = attendanceDay;
     }
+
+	public void setAttendanceTotalTime() {
+		if (attendanceStartTime != null && attendanceEndTime != null) {
+			Duration duration = Duration.between(attendanceStartTime, attendanceEndTime);
+			long seconds = duration.getSeconds();
+			long hours = seconds / 3600;
+			long minutes = (seconds % 3600) / 60;
+			long remainingSeconds = seconds % 60;
+			this.attendanceTotalTime = LocalTime.of((int) hours, (int) minutes, (int) remainingSeconds);
+		} else {
+			this.attendanceTotalTime = null;
+		}
+	}
 
 }

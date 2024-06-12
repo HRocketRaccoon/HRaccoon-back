@@ -13,6 +13,7 @@ import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
+import org.finalpjt.hraccoon.domain.attendance.service.AttendanceService;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
@@ -31,6 +32,7 @@ public class ApprovalService {
 	private final ApprovalRepository approvalRepository;
 	private final UserRepository userRepository;
 	private final CodeRepository codeRepository;
+	private final AttendanceService attendanceService;
 
 	@Transactional
 	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
@@ -234,10 +236,12 @@ public class ApprovalService {
 		if (approval.getApprovalAuthority().equals(userId) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
 			if (isApproved) {
 				approval.approveApproval();
+				attendanceService.updateAttendance(approvalNo);
 			} else {
 				if (rejectionReason == null || rejectionReason.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
+				
 				approval.rejectApproval(rejectionReason);
 			}
 

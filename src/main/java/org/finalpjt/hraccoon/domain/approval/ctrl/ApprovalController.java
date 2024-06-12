@@ -112,7 +112,8 @@ public class ApprovalController {
 	public ApiResponse<ApprovalResponse> postApproveApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
 		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, true, null);
 
-		return ApiResponse.createSuccess(approvalResponse);
+		return ApiResponse.createSuccessWithMessage(approvalResponse,
+			ApprovalMessageConstants.APPROVAL_APPROVAL_SUCCESS);
 	}
 
 	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/reject")
@@ -121,6 +122,7 @@ public class ApprovalController {
 		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, params.getIsApproved(),
 			params.getRejectionReason());
 
-		return ApiResponse.createSuccess(approvalResponse);
+		return ApiResponse.createSuccessWithMessage(approvalResponse,
+			ApprovalMessageConstants.APPROVAL_REJECTION_SUCCESS);
 	}
 }

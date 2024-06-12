@@ -133,6 +133,9 @@ public class ApprovalService {
 			String teamCode = approval.getUser().getUserTeam();
 			String teamName = codeRepository.findCodeNameByCodeNo(teamCode);
 
+			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
+			String approvalAuthorityName = approvalAuthorityUser.getUserName();
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
 				.userTeam(teamName)
@@ -142,6 +145,7 @@ public class ApprovalService {
 				.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
 				.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
 				.approvalAuthority(approval.getApprovalAuthority())
+				.approvalAuthorityName(approvalAuthorityName)
 				.approvalSubmitDate(approval.getApprovalSubmitDate())
 				.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
 				.approvalStatus(approval.getApprovalStatus())
@@ -149,7 +153,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
 		}
 	}
 
@@ -206,7 +210,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 조회할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
 		}
 	}
 
@@ -249,7 +253,7 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException("해당 결재안을 처리할 수 없습니다.");
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_RESPONSE_NOT_ALLOWED);
 		}
 	}
 }

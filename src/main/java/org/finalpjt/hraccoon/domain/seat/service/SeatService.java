@@ -40,11 +40,11 @@ public class SeatService {
 	}
 
 	@Transactional
-	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice,String floor) {
+	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice, String floor) {
 
 		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
 
-		List<SeatStatus> approvals= seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice,floor);
+		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
 
 		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
 	}
@@ -52,7 +52,7 @@ public class SeatService {
 	@Transactional
 	public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
 
-		SeatStatus seatStatus= seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+		SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
 		return response;
@@ -89,15 +89,14 @@ public class SeatService {
 
 		if (seatStatusOptional.isPresent()) {
 			SeatStatus seatStatus = seatStatusOptional.get();
-			seatStatus.setSeatStatusYn(true);
 
-			User user = userRepository.findById(userNo)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid userNo"));
-			seatStatus.setUser(user);
+			User user = userRepository.findById(userNo).get();
 
-			seatStatusRepository.save(seatStatus);
+			SeatStatus selectedSeatStatus = seatStatus.selectSeat(user);
+
+			seatStatusRepository.save(selectedSeatStatus);
 		} else {
-			throw new IllegalStateException("Seat is not available");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_SELECT_NOT_ALLOWED);
 		}
 	}
 
@@ -109,15 +108,11 @@ public class SeatService {
 
 		if (seatStatusOptional.isPresent()) {
 			SeatStatus seatStatus = seatStatusOptional.get();
-			seatStatus.setSeatStatusYn(false);
-			seatStatus.setUser(null);
+			SeatStatus cancelledSeatStatus = seatStatus.cancelSeat();
 
-			log.debug("Cancelling seat {} for user {}", seatNo, userNo);
-
-			seatStatusRepository.save(seatStatus);
+			seatStatusRepository.save(cancelledSeatStatus);
 		} else {
-			log.error("Seat {} is not currently selected by user {} in office {}", seatNo, userNo, seatOffice);
-			throw new IllegalStateException("Seat is not currently selected by the user");
+			throw new IllegalStateException(SeatMessageConstants.SEAT_CANCEL_NOT_ALLOWED);
 		}
 	}
 

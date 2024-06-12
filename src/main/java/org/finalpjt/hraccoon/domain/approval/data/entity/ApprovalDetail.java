@@ -13,11 +13,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ApprovalDetail {
 
@@ -54,5 +52,17 @@ public class ApprovalDetail {
 		this.approvalDetailResponseDate = approvalDetailResponseDate;
 		this.approvalDetailResponseContent = approvalDetailResponseContent;
 	}
+
+	public ApprovalDetail updateApprovalDetail(LocalDateTime approvalDetailResponseDate,
+		String approvalDetailResponseContent) {
+		return ApprovalDetail.builder()
+			.approvalDetailContent(this.approvalDetailContent)
+			.approvalDetailStartDate(this.approvalDetailStartDate)
+			.approvalDetailEndDate(this.approvalDetailEndDate)
+			.approvalDetailResponseDate(approvalDetailResponseDate)
+			.approvalDetailResponseContent(approvalDetailResponseContent)
+			.build();
+	}
+
 }
 

@@ -1,9 +1,12 @@
 package org.finalpjt.hraccoon.domain.approval.ctrl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.approval.constant.ApprovalMessageConstants;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
+import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalResponseRequest;
 import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.service.ApprovalService;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
@@ -40,17 +43,28 @@ public class ApprovalController {
 
 		String selectedApprovalAuthority = params.getSelectedApprovalAuthority();
 		approvalService.submitApproval(user, selectedApprovalAuthority, params);
+
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_SUBMIT_SUCCESS);
+	}
+
+	@GetMapping("/approval/approvalauthority/{userNo}")
+	public ApiResponse<List<Map<String, String>>> getApprovalAuthority(@PathVariable Long userNo) {
+		Optional<User> userOptional = userRepository.findByUserNo(userNo);
+
+		User user = userOptional.get();
+		List<Map<String, String>> approvalAuthority = approvalService.getApprovalAuthority(
+			userOptional.get().getUserPosition());
+
+		return ApiResponse.createSuccess(approvalAuthority);
 	}
 
 	@GetMapping("/approval/submittedapprovallist/{userNo}")
 	public ApiResponse<Page<ApprovalResponse>> getSubmittedApprovalList(@PathVariable Long userNo,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-		@RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-		@RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
-		@RequestParam(value = "direction", defaultValue = "DESC") String direction,
+		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+		// @RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
+		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-
 		Page<ApprovalResponse> approvalResponses = approvalService.submittedApprovalList(userNo, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
@@ -74,12 +88,14 @@ public class ApprovalController {
 	@GetMapping("/approval/requestedapprovallist/{userNo}")
 	public ApiResponse<Page<ApprovalResponse>> getRequestedApprovalList(@PathVariable Long userNo,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-		@RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-		@RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
-		@RequestParam(value = "direction", defaultValue = "DESC") String direction,
+		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+		// @RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
+		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
+		Optional<User> userOptional = userRepository.findByUserNo(userNo);
+		String userId = userOptional.get().getUserId();
 
-		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userNo, pageNumber, pageable);
+		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userId, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
 	}
@@ -92,12 +108,21 @@ public class ApprovalController {
 		return ApiResponse.createSuccess(approvalResponse);
 	}
 
-	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/response")
-	public ApiResponse<ApprovalResponse> postResponseApproval(@PathVariable Long userNo, @PathVariable Long approvalNo,
-		@RequestParam boolean isApproved, @RequestParam(required = false) String rejectionReason) {
-		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, isApproved,
-			rejectionReason);
+	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/approve")
+	public ApiResponse<ApprovalResponse> postApproveApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
+		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, true, null);
 
-		return ApiResponse.createSuccess(approvalResponse);
+		return ApiResponse.createSuccessWithMessage(approvalResponse,
+			ApprovalMessageConstants.APPROVAL_APPROVAL_SUCCESS);
+	}
+
+	@PostMapping("/approval/requestedapprovallist/{userNo}/{approvalNo}/reject")
+	public ApiResponse<ApprovalResponse> postRejectApproval(@PathVariable Long userNo, @PathVariable Long approvalNo,
+		@RequestBody ApprovalResponseRequest params) {
+		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, params.getIsApproved(),
+			params.getRejectionReason());
+
+		return ApiResponse.createSuccessWithMessage(approvalResponse,
+			ApprovalMessageConstants.APPROVAL_REJECTION_SUCCESS);
 	}
 }

@@ -360,9 +360,9 @@ VALUES (1, '2016-03-28', NULL, NULL, 13),
        (299, '2019-11-06', NULL, NULL, 6),
        (300, '2023-06-05', NULL, NULL, 11);
 
--- A00004 password : A1b!2c3d
--- A00005 password : P@ssw0rd
--- A00006 password : Qw3$rty4
+-- A000004 password : A1b!2c3d
+-- A000005 password : P@ssw0rd
+-- A000006 password : Qw3$rty4
 INSERT INTO users (user_id, user_password, user_name, user_mobile, user_address, user_gender, user_birth, user_email,
                    user_department, user_position, user_team, user_rank, user_role, user_detail_no)
 VALUES ('A000001', 'password01', '허수지', '010-1234-5678', '서울특별시 종로구 종로 1길 1', 'MALE', '1977-03-02', 'abc1234@naver.com',
@@ -3984,7 +3984,7 @@ VALUES (1, 'VACATION', '2024-05-02 00:00:00', 'APPROVED', 'A000003', 4, 1),
        (6, 'BUSINESS_TRIP', '2024-04-24 00:00:00', 'APPROVED', 'A000005', 12, 6),
        (7, 'VACATION', '2024-05-29 00:00:00', 'APPROVED', 'A000005', 12, 7),
        (8, 'OUT_ON_BUSINESS', '2024-05-01 00:00:00', 'APPROVED', 'A000005', 13, 8),
-       (9, 'VACATION', '2024-05-02 00:00:00', 'CANCELLED', 'A000005', 13, 9),
+       (9, 'VACATION', '2024-05-02 00:00:00', 'CANCELED', 'A000005', 13, 9),
        (10, 'BUSINESS_TRIP', '2024-05-15 00:00:00', 'APPROVED', 'A000005', 13, 10),
        (11, 'VACATION', '2024-05-21 00:00:00', 'APPROVED', 'A000004', 14, 11),
        (12, 'BUSINESS_TRIP', '2024-04-24 00:00:00', 'APPROVED', 'A000014', 15, 12),
@@ -4000,7 +4000,7 @@ VALUES (1, 'VACATION', '2024-05-02 00:00:00', 'APPROVED', 'A000003', 4, 1),
        (22, 'OUT_ON_BUSINESS', '2024-05-17 00:00:00', 'REJECTED', 'A000024', 25, 22),
        (23, 'VACATION', '2024-05-29 00:00:00', 'APPROVED', 'A000024', 26, 23),
        (24, 'VACATION', '2024-04-24 00:00:00', 'APPROVED', 'A000024', 27, 24),
-       (25, 'BUSINESS_TRIP', '2024-04-25 00:00:00', 'CANCELLED', 'A000024', 27, 25),
+       (25, 'BUSINESS_TRIP', '2024-04-25 00:00:00', 'CANCELED', 'A000024', 27, 25),
        (26, 'VACATION', '2024-04-26 00:00:00', 'APPROVED', 'A000024', 28, 26),
        (27, 'BUSINESS_TRIP', '2024-05-27 00:00:00', 'APPROVED', 'A000024', 28, 27),
        (28, 'VACATION', '2024-05-27 00:00:00', 'APPROVED', 'A000024', 29, 28),
@@ -4018,7 +4018,7 @@ VALUES (1, 'VACATION', '2024-05-02 00:00:00', 'APPROVED', 'A000003', 4, 1),
        (40, 'OUT_ON_BUSINESS', '2024-05-27 00:00:00', 'APPROVED', 'A000165', 168, 40),
        (41, 'OUT_ON_BUSINESS', '2024-05-15 00:00:00', 'APPROVED', 'A000164', 174, 41),
        (42, 'VACATION', '2024-04-24 00:00:00', 'APPROVED', 'A000174', 178, 42),
-       (43, 'VACATION', '2024-04-26 00:00:00', 'CANCELLED', 'A000174', 178, 43),
+       (43, 'VACATION', '2024-04-26 00:00:00', 'CANCELED', 'A000174', 178, 43),
        (44, 'OUT_ON_BUSINESS', '2024-05-22 00:00:00', 'APPROVED', 'A000174', 180, 44),
        (45, 'BUSINESS_TRIP', '2024-05-20 00:00:00', 'APPROVED', 'A000174', 181, 45),
 

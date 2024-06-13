@@ -4,6 +4,8 @@ import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 
 import jakarta.validation.constraints.NotBlank;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,5 +21,10 @@ public class AbilityRequest {
 			.abilityName(abilityName)
 			.user(user)
 			.build();
+	}
+
+	@Builder
+	public AbilityRequest(String abilityName) {
+		this.abilityName = abilityName;
 	}
 }

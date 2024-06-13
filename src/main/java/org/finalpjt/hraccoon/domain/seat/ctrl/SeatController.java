@@ -63,6 +63,13 @@ public class SeatController {
 		return ApiResponse.createSuccess(response);
 	}
 
+	@GetMapping("/seat/all-seats/{seatOffice}")
+	public ApiResponse<List<SeatOfficeResponse>> getAllSeats(@PathVariable String seatOffice) {
+		List<SeatOfficeResponse> responses = seatService.getAllSeats(seatOffice);
+
+		return ApiResponse.createSuccess(responses);
+	}
+
 	@GetMapping("/seat/available-seats/{seatOffice}")
 	public ApiResponse<List<SeatOfficeResponse>> getAvailableSeats(@PathVariable String seatOffice) {
 		List<SeatOfficeResponse> responses = seatService.getAvailableSeats(seatOffice);

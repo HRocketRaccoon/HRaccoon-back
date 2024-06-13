@@ -138,6 +138,10 @@ public class UserService {
 
 		List<AbilityResponse> responses = abilities.stream().map(AbilityResponse::new).toList();
 
+		for(AbilityResponse response : responses) {
+			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getAbilityName()));
+		}
+
 		return responses;
 	}
 
@@ -184,9 +188,14 @@ public class UserService {
 		Page<User> users = userRepository.findAll(spec,
 			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
 
+		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 
+		for(UserSearchResponse response : responses.getContent()) {
+			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getUserDepartment()),
+				codeRepository.findCodeNameByCodeNo(response.getUserTeam()));
+		}
 
-		return users.map(UserSearchResponse::new);
+		return responses;
 	}
 
 	@Transactional

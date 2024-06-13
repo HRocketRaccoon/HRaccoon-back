@@ -47,10 +47,17 @@ public class SeatController {
 		return ApiResponse.createSuccess(responses);
 	}
 
-	@GetMapping("/seat/user/info/{seatStatusNo}")
-	public ApiResponse<UserUsingSeatResponse> getUserUsingSeatInfo(@PathVariable Long seatStatusNo) {
+	// @GetMapping("/seat/user/info/{seatStatusNo}")
+	// public ApiResponse<UserUsingSeatResponse> getUserUsingSeatInfo(@PathVariable Long seatStatusNo) {
+	//
+	// 	UserUsingSeatResponse response = seatService.getUserUsingSeatInfo(seatStatusNo);
+	//
+	// 	return ApiResponse.createSuccess(response);
+	// }
+	@GetMapping("/seat/user/info/{seatLocation}")
+	public ApiResponse<UserUsingSeatResponse> getUserUsingSeatInfo(@PathVariable String seatLocation) {
 
-		UserUsingSeatResponse response = seatService.getUserUsingSeatInfo(seatStatusNo);
+		UserUsingSeatResponse response = seatService.getUserUsingSeatInfo(seatLocation);
 
 		return ApiResponse.createSuccess(response);
 	}

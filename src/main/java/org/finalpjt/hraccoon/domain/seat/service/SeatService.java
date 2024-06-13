@@ -49,10 +49,18 @@ public class SeatService {
 		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
 	}
 
+	// @Transactional
+	// public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
+	//
+	// 	SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+	// 		.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+	// 	UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
+	// 	return response;
+	// }
 	@Transactional
-	public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
+	public UserUsingSeatResponse getUserUsingSeatInfo(String seatLocation) {
 
-		SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+		SeatStatus seatStatus = seatStatusRepository.findUserBySeatLocationNoWithUser(seatLocation)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
 		return response;
@@ -61,13 +69,11 @@ public class SeatService {
 	@Transactional
 	public SeatUsingUserResponse getSeatUsingUserInfo(String userId) {
 
-		SeatStatus seatStatus= seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
+		SeatStatus seatStatus = seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
 			.orElseThrow(() -> new IllegalArgumentException(SeatMessageConstants.SEAT_NOT_FOUND));
 		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
 		return response;
 	}
-
-
 
 	@Transactional(readOnly = true)
 	public List<SeatOfficeResponse> getAllSeats(String seatOffice) {

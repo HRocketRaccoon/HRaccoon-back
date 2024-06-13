@@ -17,4 +17,8 @@ public class AbilityResponse {
 		this.abilityNo = ability.getAbilityNo();
 		this.abilityName = ability.getAbilityName();
 	}
+
+	public void transferCode(String abilityName) {
+		this.abilityName = abilityName;
+	}
 }

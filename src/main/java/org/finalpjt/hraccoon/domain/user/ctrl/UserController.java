@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.user.ctrl;
 
+import java.io.Console;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -99,7 +100,7 @@ public class UserController {
 		@RequestParam(value = "department", defaultValue = "") String department,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-
+		log.info("pageNumber: {}",pageNumber);
 		Page<UserSearchResponse> users = userService.searchUser(keyword, ability, department, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);

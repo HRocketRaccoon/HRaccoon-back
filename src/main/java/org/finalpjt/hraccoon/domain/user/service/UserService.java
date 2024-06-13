@@ -136,7 +136,13 @@ public class UserService {
 	public List<AbilityResponse> getUserAbilityInfo(String userId) {
 		List<Ability> abilities = abilityRepository.findByUserId(userId);
 
-		return abilities.stream().map(AbilityResponse::new).toList();
+		List<AbilityResponse> responses = abilities.stream().map(AbilityResponse::new).toList();
+
+		for(AbilityResponse response : responses) {
+			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getAbilityName()));
+		}
+
+		return responses;
 	}
 
 	@Transactional
@@ -180,9 +186,16 @@ public class UserService {
 		}
 
 		Page<User> users = userRepository.findAll(spec,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
 
-		return users.map(UserSearchResponse::new);
+		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
+
+		for(UserSearchResponse response : responses.getContent()) {
+			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getUserDepartment()),
+				codeRepository.findCodeNameByCodeNo(response.getUserTeam()));
+		}
+
+		return responses;
 	}
 
 	@Transactional

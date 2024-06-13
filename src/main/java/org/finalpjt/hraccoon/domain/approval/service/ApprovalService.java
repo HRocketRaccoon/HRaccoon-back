@@ -20,6 +20,7 @@ import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,8 +106,13 @@ public class ApprovalService {
 
 	@Transactional
 	public Page<ApprovalResponse> submittedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
+		Sort sort = Sort.by(
+			Sort.Order.asc("approvalStatus"),
+			Sort.Order.desc("approvalSubmitDate")
+		);
+
 		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), sort));
 
 		return approvals.map(approval -> {
 			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
@@ -166,9 +172,14 @@ public class ApprovalService {
 	}
 
 	@Transactional
-	public Page<ApprovalResponse> requestedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
-		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+	public Page<ApprovalResponse> requestedApprovalList(String userId, int pageNumber, Pageable pageable) {
+		Sort sort = Sort.by(
+			Sort.Order.asc("approvalStatus"),
+			Sort.Order.desc("approvalSubmitDate")
+		);
+
+		Page<Approval> approvals = approvalRepository.findByApprovalAuthority(userId,
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), sort));
 
 		return approvals.map(approval -> ApprovalResponse.builder()
 			.approvalNo(approval.getApprovalNo())
@@ -222,50 +233,6 @@ public class ApprovalService {
 		}
 	}
 
-	// @Transactional
-	// public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved, String rejectionReason) {
-	// 	Optional<User> userOptional = userRepository.findByUserNo(userNo);
-	//
-	// 	User user = userOptional.get();
-	// 	String userId = user.getUserId();
-	//
-	// 	Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
-	//
-	// 	Approval approval = approvalOptional.get();
-	//
-	// 	if (approval.getApprovalAuthority().equals(userId) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
-	// 		if (isApproved) {
-	// 			approval.approveApproval();
-	// 			attendanceService.updateAttendance(approvalNo);
-	// 		} else {
-	// 			if (rejectionReason == null || rejectionReason.isEmpty()) {
-	// 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
-	// 			}
-	//
-	// 			approval.rejectApproval(rejectionReason);
-	// 		}
-	//
-	// 		approvalRepository.save(approval);
-	//
-	// 		return ApprovalResponse.builder()
-	// 			.approvalNo(approval.getApprovalNo())
-	// 			.userTeam(approval.getUser().getUserTeam())
-	// 			.userId(approval.getUser().getUserId())
-	// 			.userName(approval.getUser().getUserName())
-	// 			.approvalType(approval.getApprovalType())
-	// 			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
-	// 			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
-	// 			.approvalAuthority(approval.getApprovalAuthority())
-	// 			.approvalSubmitDate(approval.getApprovalSubmitDate())
-	// 			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
-	// 			.approvalStatus(approval.getApprovalStatus())
-	// 			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
-	// 			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
-	// 			.build();
-	// 	} else {
-	// 		throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_RESPONSE_NOT_ALLOWED);
-	// 	}
-	// }
 	@Transactional
 	public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved,
 		String approvalDetailResponseContent) {

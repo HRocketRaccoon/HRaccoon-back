@@ -538,7 +538,7 @@ class ApprovalServiceTest {
 		Pageable pageable = PageRequest.of(pageNumber - 1, 10, Sort.by("approvalNo").ascending());
 
 		// when
-		Page<ApprovalResponse> requestedApprovals = approvalService.requestedApprovalList(userNo1, pageNumber,
+		Page<ApprovalResponse> requestedApprovals = approvalService.requestedApprovalList(user2.getUserId(), pageNumber,
 			pageable);
 
 		// then

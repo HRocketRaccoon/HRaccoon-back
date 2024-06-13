@@ -14,7 +14,6 @@ import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.global.api.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,10 +58,7 @@ public class ApprovalController {
 	@GetMapping("/approval/submitted-approval-list/{userNo}")
 	public ApiResponse<Page<ApprovalResponse>> getSubmittedApprovalList(@PathVariable Long userNo,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-		// @RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
-		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
-		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault Pageable pageable) {
 		Page<ApprovalResponse> approvalResponses = approvalService.submittedApprovalList(userNo, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
@@ -83,16 +79,11 @@ public class ApprovalController {
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_CANCEL_SUCCESS);
 	}
 
-	@GetMapping("/approval/requested-approval-list/{userNo}")
-	public ApiResponse<Page<ApprovalResponse>> getRequestedApprovalList(@PathVariable Long userNo,
+	@GetMapping("/approval/requested-approval-list/{userId}")
+	public ApiResponse<Page<ApprovalResponse>> getRequestedApprovalList(@PathVariable String userId,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-		// @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-		// @RequestParam(value = "sortBy", defaultValue = "approvalSubmitDate") String sortBy,
-		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
-		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		Optional<User> userOptional = userRepository.findByUserNo(userNo);
-
-		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userNo, pageNumber, pageable);
+		@PageableDefault Pageable pageable) {
+		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userId, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
 	}

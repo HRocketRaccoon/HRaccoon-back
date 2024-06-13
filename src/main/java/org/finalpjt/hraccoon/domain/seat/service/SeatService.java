@@ -70,6 +70,15 @@ public class SeatService {
 
 
 	@Transactional(readOnly = true)
+	public List<SeatOfficeResponse> getAllSeats(String seatOffice) {
+		List<SeatStatus> allSeats = seatStatusRepository.findAllSeatsBySeatOffice(seatOffice);
+
+		return allSeats.stream()
+			.map(SeatOfficeResponse::new)
+			.toList();
+	}
+
+	@Transactional(readOnly = true)
 	public List<SeatOfficeResponse> getAvailableSeats(String seatOffice) {
 		List<SeatStatus> availableSeats = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
 

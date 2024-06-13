@@ -8,11 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface SeatStatusRepository extends JpaRepository<SeatStatus, Long> {
 	@Modifying
-	@Query("update SeatStatus s SET s.seatStatusYn = false")
+	@Transactional
+	@Query("update SeatStatus s SET s.seatStatusYn = false, s.user = null")
 	void resetSeatStatus();
 
 	@Query("select s from SeatStatus s  join fetch s.seat where s.seat.seatOffice=:seatOffice")

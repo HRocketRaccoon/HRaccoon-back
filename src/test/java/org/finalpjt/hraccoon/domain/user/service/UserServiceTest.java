@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.entity.ApprovalDetail;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
@@ -24,7 +26,7 @@ import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
 import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
-import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
+
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -135,7 +137,15 @@ class UserServiceTest {
 	}
 
 	@Test
+	@DisplayName("사용자 디테일 정보를 생성할 수 있다.")
 	void createUserDetail() {
+		// given
+		LocalDateTime userJoinDate = LocalDateTime.now();
+		// when
+		UserDetail userDetail = userService.createUserDetail(userJoinDate);
+		// then
+		assertThat(userDetail.getUserJoinDate()).isNotNull();
+		assertThat(userDetail.getUserRemainVacation()).isEqualTo(24);
 	}
 
 	@Test
@@ -159,6 +169,18 @@ class UserServiceTest {
 		assertThat(userInfo.getUserRole()).isEqualTo("USER");
 		assertThat(userInfo.getUserRemainVacation()).isEqualTo(24);
 		assertThat(userInfo.getUserJoinDate()).isNotNull();
+	}
+
+	@Test
+	@DisplayName("사용자 정보를 조회 시, 사용자가 없는 경우 예외 발생")
+	void getUserInfo_exception() {
+		// given
+		String userId = "A000004";
+		// when
+		// then
+		assertThatThrownBy(() -> userService.getUserInfo(userId))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("해당 유저가 존재하지 않습니다.");
 	}
 
 	@Test
@@ -276,7 +298,7 @@ class UserServiceTest {
 		// then
 		assertThat(users.size()).isEqualTo(1);
 		assertThat(users.get(0).getUserId()).isEqualTo("A000001");
-		assertThat(users.get(0).getUserDepartment()).isEqualTo("DP001");
+		assertThat(users.get(0).getUserDepartment()).isEqualTo("IT 사업부");
 	}
 
 

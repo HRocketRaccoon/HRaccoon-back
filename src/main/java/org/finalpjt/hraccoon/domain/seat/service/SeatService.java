@@ -34,9 +34,9 @@ public class SeatService {
 
 		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
 
-		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
+		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
 
-		return approvals.stream().map(SeatOfficeResponse::new).toList();
+		return seatStatuses.stream().map(SeatOfficeResponse::new).toList();
 	}
 
 	@Transactional
@@ -49,14 +49,6 @@ public class SeatService {
 		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
 	}
 
-	// @Transactional
-	// public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
-	//
-	// 	SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
-	// 		.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
-	// 	UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
-	// 	return response;
-	// }
 	@Transactional
 	public UserUsingSeatResponse getUserUsingSeatInfo(String seatLocation) {
 

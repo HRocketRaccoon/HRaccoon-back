@@ -41,8 +41,7 @@ public class ApprovalController {
 		Optional<User> userOptional = userRepository.findById(userNo);
 		User user = userOptional.get();
 
-		String selectedApprovalAuthority = params.getSelectedApprovalAuthority();
-		approvalService.submitApproval(user, selectedApprovalAuthority, params);
+		approvalService.submitApproval(user, params);
 
 		return ApiResponse.createSuccessWithMessage(null, ApprovalMessageConstants.APPROVAL_SUBMIT_SUCCESS);
 	}
@@ -51,7 +50,6 @@ public class ApprovalController {
 	public ApiResponse<List<Map<String, String>>> getApprovalAuthority(@PathVariable Long userNo) {
 		Optional<User> userOptional = userRepository.findByUserNo(userNo);
 
-		User user = userOptional.get();
 		List<Map<String, String>> approvalAuthority = approvalService.getApprovalAuthority(
 			userOptional.get().getUserPosition());
 
@@ -93,9 +91,8 @@ public class ApprovalController {
 		// @RequestParam(value = "direction", defaultValue = "DESC") String direction,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
 		Optional<User> userOptional = userRepository.findByUserNo(userNo);
-		String userId = userOptional.get().getUserId();
 
-		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userId, pageNumber, pageable);
+		Page<ApprovalResponse> approvalResponses = approvalService.requestedApprovalList(userNo, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(approvalResponses);
 	}
@@ -110,7 +107,8 @@ public class ApprovalController {
 
 	@PostMapping("/approval/requested-approval-list/{userNo}/{approvalNo}/approve")
 	public ApiResponse<ApprovalResponse> postApproveApproval(@PathVariable Long userNo, @PathVariable Long approvalNo) {
-		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, true, null);
+		ApprovalResponse approvalResponse = approvalService.responseApproval(userNo, approvalNo, true,
+			ApprovalMessageConstants.APPROVAL_APPROVED);
 
 		return ApiResponse.createSuccessWithMessage(approvalResponse,
 			ApprovalMessageConstants.APPROVAL_APPROVAL_SUCCESS);

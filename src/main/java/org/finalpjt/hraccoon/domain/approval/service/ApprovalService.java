@@ -35,7 +35,7 @@ public class ApprovalService {
 	private final AttendanceService attendanceService;
 
 	@Transactional
-	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
+	public void submitApproval(User user, ApprovalRequest params) {
 		Optional<User> userOptional = userRepository.findById(user.getUserNo());
 
 		if (userOptional.isPresent()) {
@@ -47,7 +47,7 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
-			Approval approval = params.toEntity(user, selectedApprovalAuthority);
+			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());
 			approvalRepository.save(approval);
 		}
 	}
@@ -161,13 +161,13 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_OTHER_USER_SUBMITTED);
 		}
 	}
 
 	@Transactional
-	public Page<ApprovalResponse> requestedApprovalList(String userId, int pageNumber, Pageable pageable) {
-		Page<Approval> approvals = approvalRepository.findByApprovalAuthority(userId,
+	public Page<ApprovalResponse> requestedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
+		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		return approvals.map(approval -> ApprovalResponse.builder()
@@ -218,12 +218,57 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_OTHER_USER_REQUESTED);
 		}
 	}
 
+	// @Transactional
+	// public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved, String rejectionReason) {
+	// 	Optional<User> userOptional = userRepository.findByUserNo(userNo);
+	//
+	// 	User user = userOptional.get();
+	// 	String userId = user.getUserId();
+	//
+	// 	Optional<Approval> approvalOptional = approvalRepository.findById(approvalNo);
+	//
+	// 	Approval approval = approvalOptional.get();
+	//
+	// 	if (approval.getApprovalAuthority().equals(userId) && approval.getApprovalStatus() == ApprovalStatus.PENDING) {
+	// 		if (isApproved) {
+	// 			approval.approveApproval();
+	// 			attendanceService.updateAttendance(approvalNo);
+	// 		} else {
+	// 			if (rejectionReason == null || rejectionReason.isEmpty()) {
+	// 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
+	// 			}
+	//
+	// 			approval.rejectApproval(rejectionReason);
+	// 		}
+	//
+	// 		approvalRepository.save(approval);
+	//
+	// 		return ApprovalResponse.builder()
+	// 			.approvalNo(approval.getApprovalNo())
+	// 			.userTeam(approval.getUser().getUserTeam())
+	// 			.userId(approval.getUser().getUserId())
+	// 			.userName(approval.getUser().getUserName())
+	// 			.approvalType(approval.getApprovalType())
+	// 			.approvalDetailStartDate(approval.getApprovalDetail().getApprovalDetailStartDate())
+	// 			.approvalDetailEndDate(approval.getApprovalDetail().getApprovalDetailEndDate())
+	// 			.approvalAuthority(approval.getApprovalAuthority())
+	// 			.approvalSubmitDate(approval.getApprovalSubmitDate())
+	// 			.approvalDetailContent(approval.getApprovalDetail().getApprovalDetailContent())
+	// 			.approvalStatus(approval.getApprovalStatus())
+	// 			.approvalDetailResponseDate(approval.getApprovalDetail().getApprovalDetailResponseDate())
+	// 			.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
+	// 			.build();
+	// 	} else {
+	// 		throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_RESPONSE_NOT_ALLOWED);
+	// 	}
+	// }
 	@Transactional
-	public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved, String rejectionReason) {
+	public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved,
+		String approvalDetailResponseContent) {
 		Optional<User> userOptional = userRepository.findByUserNo(userNo);
 
 		User user = userOptional.get();
@@ -238,11 +283,11 @@ public class ApprovalService {
 				approval.approveApproval();
 				attendanceService.updateAttendance(approvalNo);
 			} else {
-				if (rejectionReason == null || rejectionReason.isEmpty()) {
+				if (approvalDetailResponseContent == null || approvalDetailResponseContent.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
 
-				approval.rejectApproval(rejectionReason);
+				approval.rejectApproval(approvalDetailResponseContent);
 			}
 
 			approvalRepository.save(approval);

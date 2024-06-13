@@ -138,8 +138,8 @@ public class UserService {
 
 		List<AbilityResponse> responses = abilities.stream().map(AbilityResponse::new).toList();
 
-		for(AbilityResponse response : responses) {
-			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getAbilityName()));
+		for (AbilityResponse response : responses) {
+			response.insertAbilityName(codeRepository.findCodeNameByCodeNo(response.getAbilityCode()));
 		}
 
 		return responses;

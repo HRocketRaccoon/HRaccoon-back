@@ -4124,16 +4124,16 @@ VALUES (false, 1),
        (false, 33);
 
 
--- INSERT INTO ability (ability_name, user_no) VALUES
--- ('ABP001', 2),
--- ('ABP002', 2),
--- ('ABP003', 2),
--- ('ABP001', 4),
--- ('ABP001', 5),
--- ('ABP001', 6),
--- ('ABP002', 7),
--- ('ABP002', 8),
--- ('ABP002', 9),
--- ('ABP004', 8),
--- ('ABP004', 9),
--- ('ABP007', 10);
+INSERT INTO ability (ability_name, user_no) VALUES
+('ABP001', 2),
+('ABP002', 2),
+('ABP003', 2),
+('ABP001', 5),
+('ABP002', 5),
+('ABP004', 5),
+('ABP003', 5),
+('ABP005', 5),
+('ABP006', 5),
+('ABP007', 5),
+('ABP004', 9),
+('ABP007', 10);

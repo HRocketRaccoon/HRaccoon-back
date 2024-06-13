@@ -27,6 +27,9 @@ public interface SeatStatusRepository extends JpaRepository<SeatStatus, Long> {
 	@Query("select s from SeatStatus s join fetch s.user where s.seatStatusNo=:seatStatusNo")
 	Optional<SeatStatus> findUserBySeatStatusNoWithUser(Long seatStatusNo);
 
+	@Query("select s from SeatStatus s join fetch s.user where s.seat.seatLocation=:seatLocation")
+	Optional<SeatStatus> findUserBySeatLocationNoWithUser(String seatLocation);
+
 	@Query("SELECT s FROM SeatStatus s join fetch s.user join fetch s.seat WHERE s.user.userId = :userId")
 	Optional<SeatStatus> findSeatByUserIdWithUserAndSeat(String userId);
 

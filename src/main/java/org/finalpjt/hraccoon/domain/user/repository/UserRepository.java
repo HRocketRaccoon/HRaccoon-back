@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.user.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
@@ -19,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	boolean existsByUserEmail(String userEmail);
 
 	Page<User> findAll(Specification<User> spec, Pageable pageable);
+
+	List<User> findByUserPosition(String userPosition);
 }

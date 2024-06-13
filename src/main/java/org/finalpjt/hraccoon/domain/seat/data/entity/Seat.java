@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,4 +29,10 @@ public class Seat {
 	@Column(name = "seat_office", nullable = false)
 	private String seatOffice;
 
+	@Builder
+	public Seat(Long seatNo, String seatLocation, String seatOffice) {
+		this.seatNo = seatNo;
+		this.seatLocation = seatLocation;
+		this.seatOffice = seatOffice;
+	}
 }

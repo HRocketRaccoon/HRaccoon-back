@@ -18,6 +18,7 @@ import jakarta.persistence.OneToOne;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Approval {
+public class Approval extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,7 +70,17 @@ public class Approval {
 		this.approvalDetail = approvalDetail;
 	}
 
-	public void updateApprovalDetail(ApprovalDetail approvalDetail) {
-		this.approvalDetail = approvalDetail;
+	public void cancelApproval() {
+		this.approvalStatus = ApprovalStatus.CANCELED;
+	}
+
+	public void approveApproval() {
+		this.approvalStatus = ApprovalStatus.APPROVED;
+		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), "승인되었습니다.");
+	}
+
+	public void rejectApproval(String rejectionReason) {
+		this.approvalStatus = ApprovalStatus.REJECTED;
+		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), rejectionReason);
 	}
 }

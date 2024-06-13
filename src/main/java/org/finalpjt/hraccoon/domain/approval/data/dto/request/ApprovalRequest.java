@@ -12,12 +12,11 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ApprovalRequest {
 
@@ -36,15 +35,29 @@ public class ApprovalRequest {
 	private LocalDateTime approvalDetailEndDate;
 
 	@NotBlank
+	private String selectedApprovalAuthority;
+
+	@NotBlank
 	private String approvalDetailContent;
 
-	public Approval toEntity(User user, String approvalAuthority) {
+	@Builder
+	public ApprovalRequest(Long userNo, ApprovalType approvalType, LocalDateTime approvalDetailStartDate,
+		LocalDateTime approvalDetailEndDate, String selectedApprovalAuthority, String approvalDetailContent) {
+		this.userNo = userNo;
+		this.approvalType = approvalType;
+		this.approvalDetailStartDate = approvalDetailStartDate;
+		this.approvalDetailEndDate = approvalDetailEndDate;
+		this.selectedApprovalAuthority = selectedApprovalAuthority;
+		this.approvalDetailContent = approvalDetailContent;
+	}
+
+	public Approval toEntity(User user, String selectedApprovalAuthority) {
 		return Approval.builder()
 			.approvalType(this.approvalType)
 			.user(user)
 			.approvalSubmitDate(LocalDateTime.now())
 			.approvalStatus(ApprovalStatus.PENDING)
-			.approvalAuthority(approvalAuthority)
+			.approvalAuthority(selectedApprovalAuthority)
 			.approvalDetail(ApprovalDetail.builder()
 				.approvalDetailContent(this.approvalDetailContent)
 				.approvalDetailStartDate(this.approvalDetailStartDate)

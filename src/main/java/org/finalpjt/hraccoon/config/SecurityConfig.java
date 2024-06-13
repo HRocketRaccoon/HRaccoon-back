@@ -36,6 +36,7 @@ public class SecurityConfig {
 		"/api/v1/auth/sign-in"
 	};
 
+
 	@Bean
 	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
@@ -44,7 +45,7 @@ public class SecurityConfig {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration config = new CorsConfiguration();
-					config.setAllowedOrigins(Collections.singletonList("*"));
+					config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4173")); // CORS 허용할 Origin 설정
 					config.setAllowedMethods(Collections.singletonList("*"));
 					config.setAllowCredentials(true);
 					config.setAllowedHeaders(Collections.singletonList("*"));

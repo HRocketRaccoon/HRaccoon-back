@@ -11,6 +11,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.service.UserService;
@@ -54,6 +55,21 @@ public class UserController {
 		return ApiResponse.createSuccess(userService.getUserInfo(userId));
 	}
 
+	@GetMapping("/user/info/name/{userId}")
+	public ApiResponse<String> getUserName(@PathVariable String userId) {
+		log.info("getUserName userId = {}", userId);
+
+		return ApiResponse.createSuccess(userService.getUserName(userId));
+	}
+
+	@GetMapping("/user/belong-info/{userId}")
+	public ApiResponse<UserBelongInfoResponse> getUserBelongInfo(@PathVariable String userId) {
+		log.info("getUserBelongInfo userId = {}", userId);
+		UserBelongInfoResponse response = userService.getUserBelongInfo(userId);
+
+		return ApiResponse.createSuccess(response);
+	}
+
 	@PostMapping("/user/update")
 	public ApiResponse<UserResponse> updateUserInfo(@RequestBody UserInfoRequest params) {
 		log.info("updateUserInfo params = {}", params);
@@ -69,7 +85,8 @@ public class UserController {
 	}
 
 	@PostMapping("/user/ability/update/{userId}")
-	public ApiResponse<List<AbilityResponse>> updateUserAbilityInfo(@PathVariable String userId, @RequestBody List<AbilityRequest> params) {
+	public ApiResponse<List<AbilityResponse>> updateUserAbilityInfo(@PathVariable String userId,
+		@RequestBody List<AbilityRequest> params) {
 		log.info("updateUserAbilityInfo userId = {}", userId);
 		List<AbilityResponse> response = userService.updateUserAbility(userId, params);
 

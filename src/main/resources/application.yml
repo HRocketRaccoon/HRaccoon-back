@@ -8,9 +8,9 @@ spring:
 # DB 설정(local)
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{url}/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
-    username: { username }
-    password: { userpassword }
+    url: jdbc:mariadb://{ url }/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
+    username: { userName }
+    password: { userPassword }
     hikari:
       connection-test-query: SELECT NOW() FROM DUAL
 
@@ -33,7 +33,7 @@ spring:
       mode: always
       encoding: utf-8
       platform: mariadb
-      data-locations: classpath:database/data.sql
+      data-locations: classpath:database/init-data.sql
 
 # Redis 설정
   data:
@@ -45,8 +45,8 @@ spring:
   jwt:
     secret-key: { secret-key }
     life:
-      accessToken: 300000
-      refreshToken: 3000000
+      accessToken: 3600000
+      refreshToken: 10800000 # 3시간
     issuer: OrangeVinyl
 
 

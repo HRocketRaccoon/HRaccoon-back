@@ -1,6 +1,6 @@
 package org.finalpjt.hraccoon.domain.seat.data.dto;
 
-import org.finalpjt.hraccoon.domain.user.data.entity.User;
+import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,15 +9,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SeatUsingUserResponse {
 
-	private String userId;
-	private String userName;
-	private String userPosition;
-	private String userTeam;
+	private String seatLocation;
+	private String seatOffice;
+	private String seatFloor;
+	private String seatNum;
 
-	public SeatUsingUserResponse(User user) {
-		this.userId = user.getUserId();
-		this.userName = user.getUserName();
-		this.userPosition = user.getUserPosition();
-		this.userTeam = user.getUserTeam();
+	public SeatUsingUserResponse(SeatStatus seatStatus) {
+		this.seatOffice = seatStatus.getSeat().getSeatOffice();
+		this.seatLocation = seatStatus.getSeat().getSeatLocation();
+		parseSeatLocation(seatLocation);
+	}
+
+	private void parseSeatLocation(String seatLocation) {
+		if (seatLocation != null && seatLocation.length() >= 4) {
+			this.seatFloor = seatLocation.substring(2, 3);
+			this.seatNum = seatLocation.substring(3);
+		}
 	}
 }

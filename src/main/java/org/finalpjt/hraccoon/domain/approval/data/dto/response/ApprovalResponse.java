@@ -8,10 +8,8 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ApprovalResponse {
 	private Long approvalNo;
@@ -22,6 +20,7 @@ public class ApprovalResponse {
 	private LocalDateTime approvalDetailStartDate;
 	private LocalDateTime approvalDetailEndDate;
 	private String approvalAuthority;
+	private String approvalAuthorityName;
 	private LocalDateTime approvalSubmitDate;
 	private String approvalDetailContent;
 	private ApprovalStatus approvalStatus;
@@ -30,9 +29,10 @@ public class ApprovalResponse {
 
 	@Builder
 	public ApprovalResponse(Long approvalNo, String userTeam, String userId, String userName, ApprovalType approvalType,
-			LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, String approvalAuthority,
-			LocalDateTime approvalSubmitDate, String approvalDetailContent, ApprovalStatus approvalStatus,
-			LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
+		LocalDateTime approvalDetailStartDate, LocalDateTime approvalDetailEndDate, String approvalAuthority,
+		String approvalAuthorityName,
+		LocalDateTime approvalSubmitDate, String approvalDetailContent, ApprovalStatus approvalStatus,
+		LocalDateTime approvalDetailResponseDate, String approvalDetailResponseContent) {
 		this.approvalNo = approvalNo;
 		this.userTeam = userTeam;
 		this.userId = userId;
@@ -41,6 +41,7 @@ public class ApprovalResponse {
 		this.approvalDetailStartDate = approvalDetailStartDate;
 		this.approvalDetailEndDate = approvalDetailEndDate;
 		this.approvalAuthority = approvalAuthority;
+		this.approvalAuthorityName = approvalAuthorityName;
 		this.approvalSubmitDate = approvalSubmitDate;
 		this.approvalDetailContent = approvalDetailContent;
 		this.approvalStatus = approvalStatus;

@@ -21,6 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.Locale;
+import java.time.format.TextStyle;
+
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
@@ -107,15 +116,24 @@ public class AttendanceService {
 		return response;
 	}
 
-	public List<Attendance> getDailyAttendance(Long userNo) {
-		LocalDate today = LocalDate.now();
-		LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-		LocalDate endOfWeek = startOfWeek.plusDays(6);
-
-		List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
-
-		return response;
-	}
+    public List<Attendance> getDailyAttendance(Long userNo) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        
+        List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek , endOfWeek);
+        
+        // 요일 설정
+        List<Attendance> responseWithDetails = response.stream()
+            .peek(attendance -> {
+                attendance.setAttendanceDay(attendance.getAttendanceDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN));
+                attendance.setAttendanceTotalTime();
+            })
+            .collect(Collectors.toList());
+            
+        attendanceRepository.saveAllAndFlush(responseWithDetails);
+        return responseWithDetails;
+    }
 
 	@Transactional
 	public void updateAttendance(Long approvalNo) {

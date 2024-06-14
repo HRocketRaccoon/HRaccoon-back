@@ -42,11 +42,19 @@ public class SeatService {
 	@Transactional
 	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice, String floor) {
 
-		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
+		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
 
-		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
+		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatStatuses.stream().map(SeatOfficeFloorResponse::new).toList();
 
-		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
+		for (SeatOfficeFloorResponse response : seatOfficeFloorResponses) {
+			Optional<SeatStatus> userSeatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(response.getSeatStatusNo());
+			userSeatStatus.ifPresentOrElse(
+				uss -> response.updateUserId(uss.getUser().getUserId()),
+				() -> response.updateUserId(null)
+			);
+		}
+
+		return seatOfficeFloorResponses;
 	}
 
 	@Transactional

@@ -15,6 +15,7 @@ public class SeatOfficeFloorResponse {
 	private String seatOffice;
 	private String seatFloor;
 	private String seatNum;
+	private String  userId;
 
 	public SeatOfficeFloorResponse(SeatStatus seatStatus) {
 		this.seatStatusNo = seatStatus.getSeatStatusNo();
@@ -29,5 +30,8 @@ public class SeatOfficeFloorResponse {
 			this.seatFloor = seatLocation.substring(2, 3);
 			this.seatNum = seatLocation.substring(3);
 		}
+	}
+	public void updateUserId(String userId) {
+		this.userId = userId;
 	}
 }

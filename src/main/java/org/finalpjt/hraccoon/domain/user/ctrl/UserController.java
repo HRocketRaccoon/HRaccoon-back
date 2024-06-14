@@ -1,6 +1,5 @@
 package org.finalpjt.hraccoon.domain.user.ctrl;
 
-import java.io.Console;
 import java.util.List;
 
 import jakarta.validation.Valid;

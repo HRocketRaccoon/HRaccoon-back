@@ -42,8 +42,6 @@ public class SeatService {
 	@Transactional
 	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice, String floor) {
 
-		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
-
 		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
 
 		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatStatuses.stream().map(SeatOfficeFloorResponse::new).toList();

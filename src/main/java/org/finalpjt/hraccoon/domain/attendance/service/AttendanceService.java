@@ -21,11 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Locale;
 import java.time.format.TextStyle;
@@ -37,33 +32,12 @@ public class AttendanceService {
 	private final AttendanceRepository attendanceRepository;
 	private final ApprovalRepository approvalRepository;
 
-	public Attendance startend(String attendanceDate, String userNo) {
-		LocalDate date = LocalDate.parse(attendanceDate);
-		Attendance start = attendanceRepository.startend(date, userNo);
-
-		return start;
-	}
-
 	/**
 	 * Todo: 근무 상태가 '퇴근'인 경우의 총 근무 시간을 구하는 로직
-	 * 아래의 중복 코드 간단하게 수정하면 좋을듯함
+	 * 중복 코드 간단하게 수정하면 좋을듯함
 	 * public Attendance totalHours(Long userNo) {
 	 * }
 	 */
-
-	public Integer calculateWorkedDays(List<Attendance> attendances) {
-		Integer workedDaysCount = 0;
-		Set<LocalDate> workedDays = new HashSet<>();
-
-		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
-				workedDays.add(attendance.getAttendanceDate());
-			}
-		}
-		workedDaysCount = workedDays.size();
-
-		return workedDaysCount;
-	}
 
 	public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
 		LocalDate today = LocalDate.now();
@@ -116,7 +90,7 @@ public class AttendanceService {
 		return response;
 	}
 
-    public List<Attendance> getDailyAttendance(Long userNo) {
+	public List<Attendance> getDailyAttendance(Long userNo) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
@@ -134,6 +108,27 @@ public class AttendanceService {
         attendanceRepository.saveAllAndFlush(responseWithDetails);
         return responseWithDetails;
     }
+
+	public Attendance startend(String attendanceDate, String userNo) {
+		LocalDate date = LocalDate.parse(attendanceDate);
+		Attendance start = attendanceRepository.startend(date, userNo);
+
+		return start;
+	}
+
+	public Integer calculateWorkedDays(List<Attendance> attendances) {
+		Integer workedDaysCount = 0;
+		Set<LocalDate> workedDays = new HashSet<>();
+
+		for (Attendance attendance : attendances) {
+			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+				workedDays.add(attendance.getAttendanceDate());
+			}
+		}
+		workedDaysCount = workedDays.size();
+
+		return workedDaysCount;
+	}
 
 	@Transactional
 	public void updateAttendance(Long approvalNo) {

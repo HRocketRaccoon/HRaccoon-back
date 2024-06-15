@@ -41,7 +41,8 @@ public class Todo {
 	private User userNo;
 
 	@Builder
-	public Todo(User user, String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn) {
+	public Todo(Long todoNo, User user, String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn) {
+		this.todoNo = todoNo;
 		this.userNo = user;
 		this.todoContent = todoContent;
 		this.todoCompleteYn = todoCompleteYn;

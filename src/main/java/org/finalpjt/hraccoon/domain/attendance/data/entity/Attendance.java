@@ -21,6 +21,7 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -80,14 +82,16 @@ public class Attendance extends BaseTimeEntity {
 	}
 
 	@Builder
-	public Attendance(LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
-		LocalTime attendanceTotalTime, String attendanceStatus, User user) {
+	public Attendance(Long attendanceNo, LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
+		LocalTime attendanceTotalTime, String attendanceStatus, User user, String attendanceDay) {
+		this.attendanceNo = attendanceNo;
 		this.attendanceDate = attendanceDate;
 		this.attendanceStartTime = attendanceStartTime;
 		this.attendanceEndTime = attendanceEndTime;
 		this.attendanceTotalTime = attendanceTotalTime;
 		this.attendanceStatus = attendanceStatus;
 		this.user = user;
+		this.attendanceDay = attendanceDay;
 	}
 
 	public void updateAttendance(Approval approval) {

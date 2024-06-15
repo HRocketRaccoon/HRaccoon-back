@@ -33,7 +33,15 @@ public class SecurityConfig {
 	/* 허용 URL. 인증과 인가를 거치지 않을 경우 사용*/
 	private final String[] allowUrls = {
 		"/api/v1/user/create",
-		"/api/v1/auth/sign-in"
+		"/api/v1/auth/sign-in",
+		"/api/v1/attendance/weektotalpercent/{userNo}",
+        "/api/v1/attendance/monthtotalpercent/{userNo}",
+        "/api/v1/attendance/worktimeperdate/{userNo}",
+        "/api/v1/attendance/startend/{user_no}/{attendanceDate}",
+        "/api/v1/todo/create",
+        "/api/v1/todo/list/{userNo}",
+        "/api/v1/todo/complete/{todoNo}",
+        "/api/v1/todo/delete/{todoNo}"
 	};
 
 

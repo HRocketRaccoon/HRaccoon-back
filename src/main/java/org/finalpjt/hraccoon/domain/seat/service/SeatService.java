@@ -42,17 +42,25 @@ public class SeatService {
 	@Transactional
 	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice, String floor) {
 
-		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
+		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
 
-		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
+		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatStatuses.stream().map(SeatOfficeFloorResponse::new).toList();
 
-		return approvals.stream().map(SeatOfficeFloorResponse::new).toList();
+		for (SeatOfficeFloorResponse response : seatOfficeFloorResponses) {
+			Optional<SeatStatus> userSeatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(response.getSeatStatusNo());
+			userSeatStatus.ifPresentOrElse(
+				uss -> response.updateUserId(uss.getUser().getUserId()),
+				() -> response.updateUserId(null)
+			);
+		}
+
+		return seatOfficeFloorResponses;
 	}
 
 	@Transactional
-	public UserUsingSeatResponse getUserUsingSeatInfo(Long seatStatusNo) {
+	public UserUsingSeatResponse getUserUsingSeatInfo(String seatLocation) {
 
-		SeatStatus seatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(seatStatusNo)
+		SeatStatus seatStatus = seatStatusRepository.findUserBySeatLocationNoWithUser(seatLocation)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
 		return response;
@@ -61,13 +69,20 @@ public class SeatService {
 	@Transactional
 	public SeatUsingUserResponse getSeatUsingUserInfo(String userId) {
 
-		SeatStatus seatStatus= seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
+		SeatStatus seatStatus = seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
 			.orElseThrow(() -> new IllegalArgumentException(SeatMessageConstants.SEAT_NOT_FOUND));
 		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
 		return response;
 	}
 
+	@Transactional(readOnly = true)
+	public List<SeatOfficeResponse> getAllSeats(String seatOffice) {
+		List<SeatStatus> allSeats = seatStatusRepository.findAllSeatsBySeatOffice(seatOffice);
 
+		return allSeats.stream()
+			.map(SeatOfficeResponse::new)
+			.toList();
+	}
 
 	@Transactional(readOnly = true)
 	public List<SeatOfficeResponse> getAvailableSeats(String seatOffice) {

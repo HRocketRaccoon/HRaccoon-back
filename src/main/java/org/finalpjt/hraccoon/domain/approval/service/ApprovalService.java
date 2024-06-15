@@ -241,7 +241,7 @@ public class ApprovalService {
 				if (rejectionReason == null || rejectionReason.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
-				
+
 				approval.rejectApproval(rejectionReason);
 			}
 

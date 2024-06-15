@@ -11,10 +11,15 @@ import lombok.NoArgsConstructor;
 public class AbilityResponse {
 
 	private Long abilityNo;
+	private String abilityCode;
 	private String abilityName;
 
 	public AbilityResponse(Ability ability) {
 		this.abilityNo = ability.getAbilityNo();
-		this.abilityName = ability.getAbilityName();
+		this.abilityCode = ability.getAbilityName();
 	}
-}
+
+	public void insertAbilityName(String abilityName) {
+		this.abilityName = abilityName;
+	}
+	}

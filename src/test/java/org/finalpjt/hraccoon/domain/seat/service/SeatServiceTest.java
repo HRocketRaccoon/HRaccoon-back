@@ -164,9 +164,9 @@ class SeatServiceTest {
 			.codeNo("OJS01")
 			.codeName("잠실")
 			.build();
-		// when
-		codeRepository.save(code1);
 
+		codeRepository.save(code1);
+		// when
 		List<SeatOfficeResponse> seatOfficeResponses = seatService.getOfficeSeatInfo(seatOffice);
 		// then
 		assertEquals(seatOfficeResponses.size(), 2);
@@ -176,15 +176,8 @@ class SeatServiceTest {
 	@DisplayName("회사, 층에 따른 좌석 조회")
 	void getOfficeFloorSeatInfo() {
 		// given
-		String seatOffice = "잠실";
+		String seatOffice = "OJS01";
 		String floor = "1";
-
-		Code code1 = Code.builder()
-			.codeNo("OJS01")
-			.codeName("잠실")
-			.build();
-		// when
-		codeRepository.save(code1);
 
 		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatService.getOfficeFloorSeatInfo(seatOffice, floor);
 		// then

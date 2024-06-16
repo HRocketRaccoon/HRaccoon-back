@@ -18,6 +18,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
@@ -133,7 +134,70 @@ class UserServiceTest {
 	}
 
 	@Test
+	@DisplayName("사용자 정보를 생성할 수 있다.")
 	void createUser() {
+		// given
+		UserDetail userDetail = UserDetail.builder()
+			.userJoinDate(LocalDateTime.now())
+			.userLeavingDate(null)
+			.userLeavingReason(null)
+			.userRemainVacation(null)
+			.build();
+		User user = User.builder()
+			.userId("A000004")
+			.userPassword("password15!")
+			.userName("박지훈")
+			.userMobile("010-1234-5670")
+			.userAddress("서울 강남구")
+			.userGender(Gender.valueOf("MALE"))
+			.userBirth("980911")
+			.userEmail("qweer1234@naver.com")
+			.userDepartment("DP002")
+			.userPosition("PS001")
+			.userTeam("TM005")
+			.userRank("RK004")
+			.userRole(Role.valueOf("USER"))
+			.build();
+		// when
+		user.updateUserDetail(userDetail);
+		userService.createUser(new UserRequest(user));
+		// then
+		assertThat(userRepository.findByUserId("A000004").get().getUserId()).isEqualTo("A000004");
+		assertThat(userRepository.findByUserId("A000004").get().getUserName()).isEqualTo("박지훈");
+		assertThat(userRepository.findByUserId("A000004").get().getUserMobile()).isEqualTo("010-1234-5670");
+	}
+
+	@Test
+	@DisplayName("이미 존재하는 사용자 ID로 사용자 정보 생성하는 경우 예외 발생")
+	void createUser_exception() {
+		// given
+		UserDetail userDetail = UserDetail.builder()
+			.userJoinDate(LocalDateTime.now())
+			.userLeavingDate(null)
+			.userLeavingReason(null)
+			.userRemainVacation(null)
+			.build();
+		User user = User.builder()
+			.userId("A000001")
+			.userPassword("password15!")
+			.userName("박지훈")
+			.userMobile("010-1234-5670")
+			.userAddress("서울 강남구")
+			.userGender(Gender.valueOf("MALE"))
+			.userBirth("980911")
+			.userEmail("qweer1234@naver.com")
+			.userDepartment("DP002")
+			.userPosition("PS001")
+			.userTeam("TM005")
+			.userRank("RK004")
+			.userRole(Role.valueOf("USER"))
+			.build();
+		// when
+		user.updateUserDetail(userDetail);
+		// then
+		assertThatThrownBy(() -> userService.createUser(new UserRequest(user)))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("이미 존재하는 사용자 ID입니다.");
 	}
 
 	@Test
@@ -172,10 +236,10 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("사용자 정보를 조회 시, 사용자가 없는 경우 예외 발생")
+	@DisplayName("존재하지 않는 사용자 id로 사용자 정보 조회하는 경우 예외 발생")
 	void getUserInfo_exception() {
 		// given
-		String userId = "A000004";
+		String userId = "A999999";
 		// when
 		// then
 		assertThatThrownBy(() -> userService.getUserInfo(userId))
@@ -184,11 +248,38 @@ class UserServiceTest {
 	}
 
 	@Test
+	@DisplayName("사용자의 team, position을 조회할 수 있다.")
 	void getUserBelongInfo() {
+		// given
+		String userId = "A000001";
+
+		Code code1 = Code.builder()
+			.codeNo("PS003")
+			.codeName("사원")
+			.build();
+		Code code2 = Code.builder()
+			.codeNo("TM001")
+			.codeName("IT영업팀")
+			.build();
+
+		codeRepository.save(code1);
+		codeRepository.save(code2);
+		// when
+		UserBelongInfoResponse userBelongInfo = userService.getUserBelongInfo(userId);
+		// then
+		assertThat(userBelongInfo.getUserTeam()).isEqualTo("IT영업팀");
+		assertThat(userBelongInfo.getUserPosition()).isEqualTo("사원");
 	}
 
 	@Test
+	@DisplayName("사용자 이름을 조회할 수 있다.")
 	void getUserName() {
+		// given
+		String userId = "A000001";
+		// when
+		String userName = userService.getUserName(userId);
+		// then
+		assertThat(userName).isEqualTo("방채원");
 	}
 
 	@Test
@@ -208,8 +299,26 @@ class UserServiceTest {
 		assertThat(userResponse.getUserAddress()).isEqualTo("서울특별시 성동구 한양대로 354-21");
 		assertThat(userResponse.getUserEmail()).isEqualTo("changeI@gmail.com");
 	}
+
 	@Test
-	@DisplayName("사용자의 능력 정보를 조회할 수 있다.")
+	@DisplayName("존재하지 않는 사용자 ID로 사용자 정보 수정 시 예외 발생")
+	void updateUserInfo_exception() {
+		// given
+		UserInfoRequest params = UserInfoRequest.builder()
+			.userId("A999999")
+			.userMobile("010-9876-5432")
+			.userAddress("서울특별시 성동구 한양대로 354-21")
+			.userEmail("changeI@gmail.com")
+			.build();
+		// when
+		// then
+		assertThatThrownBy(() -> userService.updateUserInfo(params))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("해당 유저가 존재하지 않습니다.");
+	}
+
+	@Test
+	@DisplayName("사용자의 역량 정보를 조회할 수 있다.")
 	void getUserAbilityInfo() {
 		// given
 		String userId = "A000001";
@@ -236,10 +345,11 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("사용자의 능력 정보를 수정할 수 있다.")
+	@DisplayName("사용자의 역량 정보를 수정할 수 있다.")
 	void updateUserAbility() {
 		// given
 		String userId = "A000001";
+
 		Ability ability1 = Ability.builder()
 			.abilityName("ABP001")
 			.user(userRepository.findByUserId("A000001").get())
@@ -252,7 +362,7 @@ class UserServiceTest {
 			.abilityName("ABP003")
 			.user(userRepository.findByUserId("A000001").get())
 			.build();
-		// when
+
 		abilityRepository.save(ability1);
 		abilityRepository.save(ability2);
 		abilityRepository.save(ability3);
@@ -262,16 +372,101 @@ class UserServiceTest {
 		params.add(AbilityRequest.builder().abilityName("ABP002").build());
 		params.add(AbilityRequest.builder().abilityName("ABP006").build());
 
+		Code code1 = Code.builder()
+			.codeNo("ABP001")
+			.codeName("PYTHON")
+			.build();
+		Code code2 = Code.builder()
+			.codeNo("ABP002")
+			.codeName("JAVA")
+			.build();
+		Code code3 = Code.builder()
+			.codeNo("ABP006")
+			.codeName("C++")
+			.build();
+
+		codeRepository.save(code1);
+		codeRepository.save(code2);
+		codeRepository.save(code3);
+		// when
 		List<AbilityResponse> abilityResponses = userService.updateUserAbility(userId, params);
 		// then
 		assertThat(abilityResponses.size()).isEqualTo(3);
-		assertThat(abilityResponses.get(0).getAbilityName()).isEqualTo("ABP001");
-		assertThat(abilityResponses.get(1).getAbilityName()).isEqualTo("ABP002");
-		assertThat(abilityResponses.get(2).getAbilityName()).isEqualTo("ABP006");
+		assertThat(abilityResponses.get(0).getAbilityCode()).isEqualTo("ABP001");
+		assertThat(abilityResponses.get(1).getAbilityCode()).isEqualTo("ABP002");
+		assertThat(abilityResponses.get(2).getAbilityCode()).isEqualTo("ABP006");
 	}
 
 	@Test
-	@DisplayName("검색을 통해 직원 리스트를 조회할 수 있다.")
+	@DisplayName("존재하지 않는 사용자 ID로 역량 정보 수정 시 예외 발생")
+	void updateUserAbility_nonexistentUser_exception() {
+		// given
+		String userId = "A999999";
+
+		Ability ability1 = Ability.builder()
+			.abilityName("ABP001")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability2 = Ability.builder()
+			.abilityName("ABP002")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability3 = Ability.builder()
+			.abilityName("ABP003")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+
+		abilityRepository.save(ability1);
+		abilityRepository.save(ability2);
+		abilityRepository.save(ability3);
+
+		List<AbilityRequest> params = new ArrayList<>();
+		params.add(AbilityRequest.builder().abilityName("ABP001").build());
+		params.add(AbilityRequest.builder().abilityName("ABP002").build());
+		params.add(AbilityRequest.builder().abilityName("ABP007").build());
+		// when
+		// then
+		assertThatThrownBy(() -> userService.updateUserAbility(userId, params))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("해당 유저가 존재하지 않습니다.");
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 역량 코드로 능력 정보 수정 시 예외 발생")
+	void updateUserAbility_nonexistentAbility_exception() {
+		// given
+		String userId = "A000001";
+
+		Ability ability1 = Ability.builder()
+			.abilityName("ABP001")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability2 = Ability.builder()
+			.abilityName("ABP002")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability3 = Ability.builder()
+			.abilityName("ABP003")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+
+		abilityRepository.save(ability1);
+		abilityRepository.save(ability2);
+		abilityRepository.save(ability3);
+
+		List<AbilityRequest> params = new ArrayList<>();
+		params.add(AbilityRequest.builder().abilityName("ABP001").build());
+		params.add(AbilityRequest.builder().abilityName("ABP002").build());
+		params.add(AbilityRequest.builder().abilityName("ABP999").build());
+		// when
+		// then
+		assertThatThrownBy(() -> userService.updateUserAbility(userId, params))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("해당 역량이 존재하지 않습니다.");
+	}
+
+	@Test
+	@DisplayName("직원 리스트를 검색할 수 있다.")
 	void searchUser() {
 		// given
 		String keyword = "A000001";
@@ -288,10 +483,10 @@ class UserServiceTest {
 			.codeNo("DP002")
 			.codeName("IOT 사업부")
 			.build();
-		// when
+
 		codeRepository.save(code1);
 		codeRepository.save(code2);
-
+		// when
 		Page<UserSearchResponse> userSearchResponses = userService.searchUser(keyword, ability, department, pageNumber, pageable);
 		List<UserSearchResponse> users = userSearchResponses.getContent();
 
@@ -299,6 +494,128 @@ class UserServiceTest {
 		assertThat(users.size()).isEqualTo(1);
 		assertThat(users.get(0).getUserId()).isEqualTo("A000001");
 		assertThat(users.get(0).getUserDepartment()).isEqualTo("IT 사업부");
+	}
+
+	@Test
+	@DisplayName("이름이나 사번으로 직원 리스트를 검색할 수 있다.")
+	void searchUserByKeyword() {
+		// given
+		String keyword = "방채원";
+		String ability = "";
+		String department = "";
+		int pageNumber = 1;
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("userNo")));
+		// when
+		Page<UserSearchResponse> userSearchResponses = userService.searchUser(keyword, ability, department, pageNumber, pageable);
+		List<UserSearchResponse> users = userSearchResponses.getContent();
+		// then
+		assertThat(users.size()).isEqualTo(1);
+		assertThat(users.get(0).getUserName()).isEqualTo("방채원");
+	}
+
+	@Test
+	@DisplayName("부서로 직원 리스트를 검색할 수 있다.")
+	void searchUserByDepartment() {
+		// given
+		String keyword = "";
+		String ability = "";
+		String department = "IT 사업부";
+		int pageNumber = 1;
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("userNo")));
+
+		Code code1 = Code.builder()
+			.codeNo("DP001")
+			.codeName("IT 사업부")
+			.build();
+		Code code2 = Code.builder()
+			.codeNo("DP002")
+			.codeName("IOT 사업부")
+			.build();
+
+		codeRepository.save(code1);
+		codeRepository.save(code2);
+		// when
+		Page<UserSearchResponse> userSearchResponses = userService.searchUser(keyword, ability, department, pageNumber, pageable);
+		List<UserSearchResponse> users = userSearchResponses.getContent();
+		// then
+		assertThat(users.size()).isEqualTo(2);
+		assertThat(users.get(0).getUserName()).isEqualTo("이윤재");
+		assertThat(users.get(1).getUserName()).isEqualTo("방채원");
+	}
+
+	@Test
+	@DisplayName("역량으로 직원 리스트를 검색할 수 있다.")
+	void searchUserByAbility() {
+		// given
+		String keyword = "";
+		String ability = "PYTHON";
+		String department = "";
+		int pageNumber = 1;
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("userNo")));
+
+		Code code1 = Code.builder()
+			.codeNo("ABP001")
+			.codeName("PYTHON")
+			.build();
+		Code code2 = Code.builder()
+			.codeNo("ABP002")
+			.codeName("JAVA")
+			.build();
+
+		codeRepository.save(code1);
+		codeRepository.save(code2);
+
+		Ability ability1 = Ability.builder()
+			.abilityName("ABP001")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability2 = Ability.builder()
+			.abilityName("ABP002")
+			.user(userRepository.findByUserId("A000001").get())
+			.build();
+		Ability ability3 = Ability.builder()
+			.abilityName("ABP001")
+			.user(userRepository.findByUserId("A000002").get())
+			.build();
+
+		abilityRepository.save(ability1);
+		abilityRepository.save(ability2);
+		abilityRepository.save(ability3);
+		// when
+		Page<UserSearchResponse> userSearchResponses = userService.searchUser(keyword, ability, department, pageNumber, pageable);
+		List<UserSearchResponse> users = userSearchResponses.getContent();
+		// then
+		assertThat(users.size()).isEqualTo(2);
+		assertThat(users.get(0).getUserName()).isEqualTo("이윤재");
+		assertThat(users.get(1).getUserName()).isEqualTo("방채원");
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 이름이나 사번으로 사용자 검색 시 예외 발생")
+	void searchUser_nonexistentUser_exception() {
+		// given
+		String keyword = "A999999";
+		String ability = "";
+		String department = "IT 사업부";
+		int pageNumber = 1;
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("userNo")));
+
+		Code code1 = Code.builder()
+			.codeNo("DP001")
+			.codeName("IT 사업부")
+			.build();
+		Code code2 = Code.builder()
+			.codeNo("DP002")
+			.codeName("IOT 사업부")
+			.build();
+
+		codeRepository.save(code1);
+		codeRepository.save(code2);
+		// when
+		// then
+		assertThatThrownBy(() -> userService.searchUser(keyword, ability, department, pageNumber, pageable))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("해당 유저를 찾을 수 없습니다.");
 	}
 
 
@@ -357,13 +674,13 @@ class UserServiceTest {
 			.codeNo("TM001")
 			.codeName("IT영업팀")
 			.build();
-		// when
+
 		codeRepository.save(code1);
 
 		approvalRepository.save(approval1);
 		approvalRepository.save(approval2);
 		approvalRepository.save(approval3);
-
+		// when
 		List<ApprovalResponse> approvalResponses = userService.getTeamApprovalInfo(userTeam);
 		// then
 		assertThat(approvalResponses.size()).isEqualTo(2);

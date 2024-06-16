@@ -32,17 +32,12 @@ public class AttendanceService {
 	private final AttendanceRepository attendanceRepository;
 	private final ApprovalRepository approvalRepository;
 
-	/**
-	 * Todo: 근무 상태가 '퇴근'인 경우의 총 근무 시간을 구하는 로직
-	 * 중복 코드 간단하게 수정하면 좋을듯함
-	 * public Attendance totalHours(Long userNo) {
-	 * }
-	 */
 
+	 // 금주 근무시간, 달성률 조회
 	public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
 		LocalDate today = LocalDate.now();
 		LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-		LocalDate endOfWeek = startOfWeek.plusDays(4);
+		LocalDate endOfWeek = startOfWeek.plusDays(6);
 
 		List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
 		attendances.forEach(System.out::print);
@@ -58,13 +53,30 @@ public class AttendanceService {
 			}
 		}
 
-		double percent = workedDaysCount > 0 ? ((double)totalHours / (8 * workedDaysCount)) * 100 : 0;
+		// 주 40시간 기준으로 
+		double percent = workedDaysCount > 0 ? ((double)totalHours / 40) * 100 : 0;
 		AttendacneWeekPercentResponseDTO response = new AttendacneWeekPercentResponseDTO();
 		response.of(totalHours, percent);
 
 		return response;
 	}
 
+	// 삭제
+	public Integer calculateWorkedDays(List<Attendance> attendances) {
+		Integer workedDaysCount = 0;
+		Set<LocalDate> workedDays = new HashSet<>();
+
+		for (Attendance attendance : attendances) {
+			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+				workedDays.add(attendance.getAttendanceDate());
+			}
+		}
+		workedDaysCount = workedDays.size();
+
+		return workedDaysCount;
+	}
+
+	// 해당 월 근무시간, 달성률 조회
 	public AttendacneMonthPercentResponseDTO calculateMonthlyHours(Long userNo, LocalDate date) {
 		LocalDate startOfMonth = date.withDayOfMonth(1);
 		LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
@@ -80,7 +92,7 @@ public class AttendanceService {
 				totalHours += duration.toHoursPart();
 			}
 		}
-
+		// workedDaysCount-> 휴일관리 따로 빼고, 달 총 근무일자 기준(ex-20일) 정해서 계산
 		Integer workedDaysCount = calculateWorkedDays(attendances);
 		double percent = workedDaysCount > 0 ? ((double)totalHours / (8 * workedDaysCount)) * 100 : 0;
 
@@ -90,6 +102,7 @@ public class AttendanceService {
 		return response;
 	}
 
+	// 해당 주 요일별 근무 시간 조회
 	public List<Attendance> getDailyAttendance(Long userNo) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
@@ -109,26 +122,14 @@ public class AttendanceService {
         return responseWithDetails;
     }
 
+	// 특정 일자 출퇴근 시간 조회
 	public Attendance startend(String attendanceDate, String userNo) {
 		LocalDate date = LocalDate.parse(attendanceDate);
 		Attendance start = attendanceRepository.startend(date, userNo);
 
 		return start;
 	}
-
-	public Integer calculateWorkedDays(List<Attendance> attendances) {
-		Integer workedDaysCount = 0;
-		Set<LocalDate> workedDays = new HashSet<>();
-
-		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
-				workedDays.add(attendance.getAttendanceDate());
-			}
-		}
-		workedDaysCount = workedDays.size();
-
-		return workedDaysCount;
-	}
+	
 
 	@Transactional
 	public void updateAttendance(Long approvalNo) {

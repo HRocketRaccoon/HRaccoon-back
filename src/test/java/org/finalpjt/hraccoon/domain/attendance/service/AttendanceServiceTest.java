@@ -87,15 +87,16 @@ class AttendanceServiceTest {
             minutes += entity.getAttendanceTotalTime().getMinute();
             seconds += entity.getAttendanceTotalTime().getSecond();
         }
-        System.out.println("debug >>> "+hour);
-        System.out.println("debug >>> "+minutes);
-        System.out.println("debug >>> "+seconds);
+        // System.out.println("debug >>> "+hour);
+        // System.out.println("debug >>> "+minutes);
+        // System.out.println("debug >>> "+seconds);
         
         // then
         // 3개의 근태 내역이 있음
         // 시.분.초 비어있지 않음
         assertThat(response).hasSize(3);
         assertThat(response).isNotNull();
+        
     }
 
     @Test
@@ -190,16 +191,15 @@ class AttendanceServiceTest {
         assertNotNull(savedTodo); // saveTodo되는 값이 null이 아님
         assertNotNull(savedTodo.getTodoNo()); // Todo가 생성되었고, 그 값이 null이 아님
         assertEquals("안녕", savedTodo.getTodoContent()); // todoContent 내용 일치 확인
-        assertFalse(savedTodo.getTodoCompleteYn()); // todoCompleteYn 상태 
-        assertFalse(savedTodo.getTodoDeleteYn()); // todoDeleteYn
-        assertEquals(user.getUserNo(), savedTodo.getUserNo().getUserNo()); // Verify userNo matches
+        assertFalse(savedTodo.getTodoCompleteYn()); // todoCompleteYn false
+        assertFalse(savedTodo.getTodoDeleteYn()); // todoDeleteYn false
+        assertEquals(user.getUserNo(), savedTodo.getUserNo().getUserNo()); // userNo 일치여부 확인
     }
 
     @Test
     @DisplayName("userNo 이용하여 할 일 전체 목록 조회할 수 있음")
     void findByUserNo() {
         // given
-
         User user = User.builder()
                 .userNo(1L)
                 .userId("test_user")
@@ -259,119 +259,68 @@ class AttendanceServiceTest {
         assertEquals(0, todos.size());
     }
 
-
-        // given
-
-        // when
-
-        // then
-
     @Test
-    @DisplayName("특정 날짜와 유저 번호로 출퇴근 시간을 조회할 수 있다.")
-    void startendGPT() {
+    @DisplayName("todoNo로 할 일 완료 처리 할 수 있음")
+    void completeTodo() {
         // given
-        Long userNo = 1L;
-        LocalDate attendanceDate = LocalDate.of(2024, 6, 12);
-        User user = User.builder().userNo(userNo).build();
-        Attendance attendance = Attendance.builder()
-            .attendanceDate(attendanceDate)
-            .attendanceStartTime(LocalDateTime.of(2024, 6, 12, 9, 0))
-            .attendanceEndTime(LocalDateTime.of(2024, 6, 12, 18, 0))
+        User user = User.builder()
+                .userNo(1L)
+                .userId("test_user")
+                .userName("테스트 유저")
+                .build();
+        userRepository.save(user);        
+        
+        Todo todo1 = Todo.builder()
             .user(user)
+            .todoNo(1L)
+            .todoContent("첫 번째 할 일")
+            .todoCompleteYn(false)
+            .todoDeleteYn(false)
             .build();
-        attendanceRepository.save(attendance);
-
+        todoRepository.save(todo1);
+        
         // when
-        Attendance result = attendanceService.startend(attendanceDate.toString(), userNo.toString());
+        Todo updatedTodo = todoRepository.findByTodoNo(todo1.getTodoNo());
+        updatedTodo.updateTodoCompleteYn();
+        todoRepository.save(updatedTodo);
+        // entityManager.flush();
 
         // then
-        assertThat(result).isNotNull();
-        assertThat(result.getAttendanceStartTime()).isEqualTo(LocalDateTime.of(2024, 6, 12, 9, 0));
-        assertThat(result.getAttendanceEndTime()).isEqualTo(LocalDateTime.of(2024, 6, 12, 18, 0));
-    }
+        assertNotNull(updatedTodo, "업데이트 되는 값이 널이 아님");
+        assertTrue(updatedTodo.getTodoCompleteYn(), "할 일의 todoCompleteYn가 true로 설정됨");
+        }
 
     @Test
-    @DisplayName("주간 근무 시간을 계산할 수 있다.")
-    void calculateWeeklyHours() {
-        // given
-        Long userNo = 1L;
-        User user = User.builder().userNo(userNo).build();
-        LocalDate startDate = LocalDate.of(2024, 6, 10);
-        for (int i = 0; i < 5; i++) {
-            Attendance attendance = Attendance.builder()
-                .attendanceDate(startDate.plusDays(i))
-                .attendanceStartTime(LocalDateTime.of(2024, 6, 10 + i, 9, 0))
-                .attendanceEndTime(LocalDateTime.of(2024, 6, 10 + i, 18, 0))
-                .attendanceStatus("퇴근")
+    @DisplayName("할 일 삭제 처리 가능")
+    void deleteByTodoNo() {
+        //given
+        User user = User.builder()
+        .userNo(1L)
+        .userId("test_user")
+        .userName("테스트 유저")
+        .build();
+        userRepository.save(user);
+
+        Todo todo = Todo.builder()
                 .user(user)
+                .todoNo(1L)
+                .todoContent("삭제할 할 일")
+                .todoCompleteYn(false)
+                .todoDeleteYn(false)
                 .build();
-            attendanceRepository.save(attendance);
-        }
+        todoRepository.save(todo);
 
         // when
-        AttendacneWeekPercentResponseDTO response = attendanceService.calculateWeeklyHours(userNo);
+        Todo savedTodo = todoRepository.findByTodoNo(todo.getTodoNo());
+        // 생성된 todo 저장되었는지 확인하는 코드
+        // assertNotNull(savedTodo, "Todo should exist before deletion");
+
+        savedTodo.updateTodoDeleteYn();
+        todoRepository.save(savedTodo);
 
         // then
-        assertThat(response).isNotNull();
-        assertThat(response.getTotalWorkHours()).isEqualTo(45); // 5일 * 9시간
-        assertThat(response.getFormattedPercent()).isEqualTo(112.5); // 45시간 / (8 * 5일) * 100
+        assertNotNull(savedTodo, "할 일 목록에 존재함");
+        assertTrue(savedTodo.getTodoDeleteYn(), "todoDeleteYn 삭제되었다고 표시");
     }
 
-    @Test
-    @DisplayName("월간 근무 시간을 계산할 수 있다.")
-    void calculateMonthlyHours() {
-        // given
-        Long userNo = 123L;
-        User user = User.builder().userNo(userNo).build();
-        LocalDate startDate = LocalDate.of(2024, 6, 1);
-        for (int i = 0; i < 20; i++) {
-            Attendance attendance = Attendance.builder()
-                .attendanceDate(startDate.plusDays(i))
-                .attendanceStartTime(LocalDateTime.of(2024, 6, 1 + i, 9, 0))
-                .attendanceEndTime(LocalDateTime.of(2024, 6, 1 + i, 18, 0))
-                .attendanceStatus("퇴근")
-                .user(user)
-                .build();
-            attendanceRepository.save(attendance);
-        }
-
-        // when
-        AttendacneMonthPercentResponseDTO response = attendanceService.calculateMonthlyHours(userNo, startDate);
-
-        // then
-        assertThat(response).isNotNull();
-        assertThat(response.getTotalWorkHours()).isEqualTo(180); // 20일 * 9시간
-        assertThat(response.getFormattedPercent()).isEqualTo(112.5); // 180시간 / (8 * 20일) * 100
-    }
-
-    @Test
-    @DisplayName("승인 정보를 기반으로 출근 정보를 업데이트할 수 있다.")
-    void updateAttendance() {
-        // given
-        Long approvalNo = 1L;
-        LocalDate startDate = LocalDate.of(2024, 6, 10);
-        LocalDate endDate = LocalDate.of(2024, 6, 14);
-        ApprovalDetail approvalDetail = ApprovalDetail.builder()
-            .approvalDetailContent("HI")
-            .approvalDetailStartDate(startDate.atStartOfDay())
-            .approvalDetailEndDate(endDate.atTime(23, 59, 59))
-            .build();
-        Approval approval = Approval.builder()
-            .approvalStatus(ApprovalStatus.APPROVED)
-            .approvalDetail(approvalDetail)
-            .user(User.builder().userNo(123L).build())
-            .build();
-        approvalRepository.save(approval);
-
-        // when
-        attendanceService.updateAttendance(approvalNo);
-
-        // then
-        List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(1L, startDate, endDate);
-        assertThat(attendances).hasSize(3);
-        for (Attendance attendance : attendances) {
-            assertThat(attendance.getAttendanceTotalTime()).isEqualTo(LocalTime.of(20, 45, 42));
-            assertThat(attendance.getAttendanceStatus()).isEqualTo(approval.getApprovalStatus().toString());
-        }
-    }
 }

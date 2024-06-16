@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,6 +69,8 @@ public class AuthService {
 	public TokenResponse reIssuance(String refreshToken) {
 		try {
 			return jwtProvider.reIssuanceTokens(refreshToken);
+		} catch (MalformedJwtException e) {
+			throw new RuntimeException("잘못된 JWT 형식입니다.");
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(AuthMessageConstants.AUTH_TOKEN_REFRESH_FAIL);
 		}

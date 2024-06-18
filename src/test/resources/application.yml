@@ -31,7 +31,7 @@ spring:
 
 # jwt 설정
   jwt:
-    secret-key: IenVnrcQA4lnxVEyzyGFSPbq8YexqhaEPVn3IgBBpJ3wY1ODOKmS1j0nLIqLKEkfvNjYvdnT7QfXSltrcT5r03B5jqFe40PGvSXLGpJkMRsFTyUgPb01oqG1NbFyeOiN
+    secret-key: { secret-key }
     life:
       accessToken: 3600000
       refreshToken: 10800000 # 3시간

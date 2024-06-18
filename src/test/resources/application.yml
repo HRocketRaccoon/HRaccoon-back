@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: hraccoon
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      # 배포 시 변경 (create -> none)
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+    # SQL 로깅 설정(더미 데이터)
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: never
+
+  # Redis 설정
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  # jwt 설정
+  jwt:
+    secret-key: { secret-key }
+    life:
+      accessToken: 3600000
+      refreshToken: 10800000 # 3시간
+    issuer: OrangeVinyl
+
+
+# 로깅 설정
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
+        orm:
+          jdbc:
+            bind: trace

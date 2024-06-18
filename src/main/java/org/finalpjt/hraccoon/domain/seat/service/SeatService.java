@@ -14,6 +14,8 @@ import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@EnableScheduling
 @Service
 @RequiredArgsConstructor
 public class SeatService {
@@ -31,7 +34,6 @@ public class SeatService {
 
 	@Transactional
 	public List<SeatOfficeResponse> getOfficeSeatInfo(String seatOffice) {
-
 		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
 
 		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
@@ -41,13 +43,16 @@ public class SeatService {
 
 	@Transactional
 	public List<SeatOfficeFloorResponse> getOfficeFloorSeatInfo(String seatOffice, String floor) {
-
 		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeAndFloorWithSeat(seatOffice, floor);
 
-		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatStatuses.stream().map(SeatOfficeFloorResponse::new).toList();
+		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatStatuses.stream()
+			.map(SeatOfficeFloorResponse::new)
+			.toList();
+		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
 
 		for (SeatOfficeFloorResponse response : seatOfficeFloorResponses) {
-			Optional<SeatStatus> userSeatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(response.getSeatStatusNo());
+			Optional<SeatStatus> userSeatStatus = seatStatusRepository.findUserBySeatStatusNoWithUser(
+				response.getSeatStatusNo());
 			userSeatStatus.ifPresentOrElse(
 				uss -> response.updateUserId(uss.getUser().getUserId()),
 				() -> response.updateUserId(null)
@@ -59,19 +64,21 @@ public class SeatService {
 
 	@Transactional
 	public UserUsingSeatResponse getUserUsingSeatInfo(String seatLocation) {
-
 		SeatStatus seatStatus = seatStatusRepository.findUserBySeatLocationNoWithUser(seatLocation)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
 		UserUsingSeatResponse response = new UserUsingSeatResponse(seatStatus);
+
 		return response;
 	}
 
 	@Transactional
 	public SeatUsingUserResponse getSeatUsingUserInfo(String userId) {
-
 		SeatStatus seatStatus = seatStatusRepository.findSeatByUserIdWithUserAndSeat(userId)
 			.orElseThrow(() -> new IllegalArgumentException(SeatMessageConstants.SEAT_NOT_FOUND));
+
 		SeatUsingUserResponse response = new SeatUsingUserResponse(seatStatus);
+
 		return response;
 	}
 
@@ -96,9 +103,9 @@ public class SeatService {
 
 	@Transactional
 	public void selectSeat(Long seatNo, Long userNo, String seatOffice) {
-		List<SeatStatus> availabeSeats = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
+		List<SeatStatus> availableSeats = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
 
-		Optional<SeatStatus> seatStatusOptional = availabeSeats.stream()
+		Optional<SeatStatus> seatStatusOptional = availableSeats.stream()
 			.filter(seatStatus -> seatStatus.getSeat().getSeatNo().equals(seatNo) && !seatStatus.isSeatStatusYn())
 			.findFirst();
 
@@ -136,6 +143,11 @@ public class SeatService {
 		Optional<SeatStatus> seatStatusOptional = seatStatusRepository.findByUserUserNo(userNo);
 
 		return seatStatusOptional.isPresent();
+	}
+
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void resetSeatStatusScheduler() {
+		resetSeatStatus();
 	}
 
 	@Transactional

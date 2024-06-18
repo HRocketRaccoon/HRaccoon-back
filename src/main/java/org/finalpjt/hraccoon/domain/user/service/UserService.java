@@ -54,6 +54,13 @@ public class UserService {
 
 	@Transactional
 	public void createUser(UserRequest params) {
+		String userId = params.getUserId();
+
+		// 이미 존재하는 사용자 ID인지 확인
+		if (userRepository.findByUserId(userId).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_ALREADY_EXISTS);
+		}
+
 		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
 		User entity = params.toEntity(encryptedPassword);
 
@@ -150,12 +157,20 @@ public class UserService {
 		User entity = userRepository.findByUserId(userId)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 
+		List<Ability> newAbilities = params.stream()
+			.map(param -> {
+				String abilityCode = param.getAbilityName();
+				// 코드가 유효한지 확인 -> 유효하지 않은 코드일 경우 예외 발생
+				String codeName = codeRepository.findCodeNameByCodeNo(abilityCode);
+				if (codeName == null) {
+					throw new IllegalArgumentException(UserMessageConstants.ABILITY_NOT_FOUND);
+				}
+				return param.toEntity(entity);
+			})
+			.toList();
+
 		List<Ability> abilities = abilityRepository.findByUserId(entity.getUserId());
 		abilityRepository.deleteAllInBatch(abilities);
-
-		List<Ability> newAbilities = params.stream()
-			.map(param -> param.toEntity(entity))
-			.toList();
 
 		abilityRepository.saveAll(newAbilities);
 
@@ -187,6 +202,11 @@ public class UserService {
 
 		Page<User> users = userRepository.findAll(spec,
 			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
+
+		// 검색 결과가 없을 경우 예외 발생
+		if (users.isEmpty()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
+		}
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 

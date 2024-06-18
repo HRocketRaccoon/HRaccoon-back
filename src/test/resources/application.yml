@@ -5,15 +5,6 @@ spring:
   application:
     name: hraccoon
 
-  # DB 설정(local)
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{ url }/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
-    username: { userName }
-    password: { userPassword }
-    hikari:
-      connection-test-query: SELECT NOW() FROM DUAL
-
   # JPA 설정
   jpa:
     hibernate:
@@ -30,10 +21,7 @@ spring:
 
   sql:
     init:
-      mode: always
-      encoding: utf-8
-      platform: mariadb
-      data-locations: classpath:database/init-data.sql
+      mode: never
 
   # Redis 설정
   data:

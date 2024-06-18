@@ -2,6 +2,7 @@ package org.finalpjt.hraccoon.domain.seat.data.dto;
 
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class SeatUsingUserResponse {
 	private String seatFloor;
 	private String seatNum;
 
+	@Builder
 	public SeatUsingUserResponse(SeatStatus seatStatus) {
 		this.seatOffice = seatStatus.getSeat().getSeatOffice();
 		this.seatLocation = seatStatus.getSeat().getSeatLocation();

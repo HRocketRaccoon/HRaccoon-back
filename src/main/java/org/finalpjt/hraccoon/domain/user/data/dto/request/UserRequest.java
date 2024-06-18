@@ -14,6 +14,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -89,5 +91,22 @@ public class UserRequest {
 			.userRank(userRank)
 			.userRole(Role.valueOf(userRole))
 			.build();
+	}
+
+	public UserRequest(User user) {
+		this.userId = user.getUserId();
+		this.userPassword = user.getUserPassword();
+		this.userName = user.getUserName();
+		this.userGender = user.getUserGender().toString();
+		this.userBirth = user.getUserBirth();
+		this.userDepartment = user.getUserDepartment();
+		this.userPosition = user.getUserPosition();
+		this.userTeam = user.getUserTeam();
+		this.userRank = user.getUserRank();
+		this.userRole = user.getUserRole().toString();
+		this.userMobile = user.getUserMobile();
+		this.userAddress = user.getUserAddress();
+		this.userEmail = user.getUserEmail();
+		this.userJoinDate = user.getUserDetail().getUserJoinDate();
 	}
 }

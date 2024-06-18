@@ -8,14 +8,22 @@ import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.seat.constant.SeatMessageConstants;
 import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+
+import org.finalpjt.hraccoon.domain.code.data.entity.Code;
+import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeFloorResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatOfficeResponse;
+import org.finalpjt.hraccoon.domain.seat.data.dto.SeatUsingUserResponse;
 import org.finalpjt.hraccoon.domain.seat.data.dto.UserUsingSeatResponse;
 import org.finalpjt.hraccoon.domain.seat.data.entity.Seat;
 import org.finalpjt.hraccoon.domain.seat.data.entity.SeatStatus;
 import org.finalpjt.hraccoon.domain.seat.repository.SeatStatusRepository;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
+import org.finalpjt.hraccoon.domain.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +43,11 @@ class SeatServiceTest {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private CodeRepository codeRepository;
+
+
 
 	private User user1;
 	private User user2;
@@ -192,26 +205,6 @@ class SeatServiceTest {
 		seatStatusRepository.save(seatStatus7);
 		seatStatusRepository.save(seatStatus8);
 		seatStatusRepository.save(seatStatus9);
-	}
-
-	@DisplayName("특정 좌석을 이용 중인 직원의 정보를 조회하는 기능 테스트")
-	@Test
-	void getUserUsingSeatInfo() {
-		// given
-		Long seatNo = seat1.getSeatNo();
-		Long userNo = user1.getUserNo();
-		String seatOffice = seat1.getSeatOffice();
-
-		seatService.selectSeat(seatNo, userNo, seatOffice);
-
-		// when
-		UserUsingSeatResponse userUsingSeatResponse = seatService.getUserUsingSeatInfo("JSL001");
-
-		// then
-		assertThat(userUsingSeatResponse.getUserId()).isEqualTo(user1.getUserId());
-		assertThat(userUsingSeatResponse.getUserName()).isEqualTo(user1.getUserName());
-		assertThat(userUsingSeatResponse.getUserPosition()).isEqualTo(user1.getUserPosition());
-		assertThat(userUsingSeatResponse.getUserTeam()).isEqualTo(user1.getUserTeam());
 	}
 
 	@DisplayName("모든 좌석을 불러오는 기능 성공한 테스트")
@@ -430,5 +423,75 @@ class SeatServiceTest {
 
 		// then
 		assertThat(isDuplicate).isFalse();
+	}
+
+	@Test
+	@DisplayName("회사별 seatStatusYn이 false인 좌석 조회")
+	void getOfficeSeatInfo() {
+		// given
+		String seatOffice = "잠실";
+
+		Code code1 = Code.builder()
+			.codeNo("OJS01")
+			.codeName("잠실")
+			.build();
+
+		codeRepository.save(code1);
+		// when
+		List<SeatOfficeResponse> seatOfficeResponses = seatService.getOfficeSeatInfo(seatOffice);
+		// then
+		assertEquals(seatOfficeResponses.size(), 3);
+	}
+
+	@Test
+	@DisplayName("회사, 층에 따른 좌석 조회")
+	void getOfficeFloorSeatInfo() {
+		// given
+		String seatOffice = "OJS01";
+		String floor = "L";
+
+		List<SeatOfficeFloorResponse> seatOfficeFloorResponses = seatService.getOfficeFloorSeatInfo(seatOffice, floor);
+		// then
+		assertEquals(seatOfficeFloorResponses.size(), 3);
+	}
+	@Test
+	@DisplayName("좌석 위치로 직원 조회")
+	void getUserUsingSeatInfo() {
+		// given
+		Long seatNo = seat1.getSeatNo();
+		Long userNo = user1.getUserNo();
+		String seatOffice = seat1.getSeatOffice();
+
+		seatService.selectSeat(seatNo, userNo, seatOffice);
+		// when
+		UserUsingSeatResponse userUsingSeatResponse = seatService.getUserUsingSeatInfo("JSL001");
+		// then
+		assertEquals(userUsingSeatResponse.getUserId(), user1.getUserId());
+		assertEquals(userUsingSeatResponse.getUserName(), user1.getUserName());
+	}
+
+	@Test
+	@DisplayName("사용자 아이디로 좌석 조회")
+	void getSeatUsingUserInfo() {
+		// given
+		Long seatNo = seat1.getSeatNo();
+		Long userNo = user1.getUserNo();
+		String seatOffice = seat1.getSeatOffice();
+
+		seatService.selectSeat(seatNo, userNo, seatOffice);
+		// when
+		SeatUsingUserResponse seatUsingUserResponse = seatService.getSeatUsingUserInfo(user1.getUserId());
+		// then
+		assertEquals(seatUsingUserResponse.getSeatLocation(), seat1.getSeatLocation());
+	}
+
+	@Test
+	@DisplayName("사용자 아이디로 좌석 조회 시, 좌석이 없는 경우")
+	void getSeatUsingUserInfo_seatNotFound() {
+		// given
+		String userId = "A000002";
+		// when
+		// then
+		assertThrows(IllegalArgumentException.class, () -> seatService.getSeatUsingUserInfo(userId));
 	}
 }

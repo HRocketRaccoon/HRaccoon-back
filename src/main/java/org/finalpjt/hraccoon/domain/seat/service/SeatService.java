@@ -36,9 +36,9 @@ public class SeatService {
 	public List<SeatOfficeResponse> getOfficeSeatInfo(String seatOffice) {
 		seatOffice = codeRepository.findCodeNoByCodeName(seatOffice);
 
-		List<SeatStatus> approvals = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
+		List<SeatStatus> seatStatuses = seatStatusRepository.findBySeatOfficeWithSeat(seatOffice);
 
-		return approvals.stream().map(SeatOfficeResponse::new).toList();
+		return seatStatuses.stream().map(SeatOfficeResponse::new).toList();
 	}
 
 	@Transactional

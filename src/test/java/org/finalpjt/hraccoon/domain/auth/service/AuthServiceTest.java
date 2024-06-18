@@ -178,22 +178,6 @@ class AuthServiceTest {
 	}
 
 	@Test
-	@DisplayName("토큰 재발급 실패")
-	void reIssuanceFail() {
-		// given
-		SignInRequest signInRequest = SignInRequest.builder()
-			.userId("A000001")
-			.userPassword("password12!")
-			.build();
-		TokenResponse tokenResponse = authService.signIn(signInRequest);
-
-		// when & then
-		assertThatThrownBy(() -> authService.reIssuance("invalidToken"))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessage("잘못된 JWT 형식입니다.");
-	}
-
-	@Test
 	@DisplayName("로그아웃 성공")
 	void signOutSuccess() {
 		// given

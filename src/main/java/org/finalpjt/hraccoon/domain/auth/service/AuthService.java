@@ -69,8 +69,6 @@ public class AuthService {
 	public TokenResponse reIssuance(String refreshToken) {
 		try {
 			return jwtProvider.reIssuanceTokens(refreshToken);
-		} catch (MalformedJwtException e) {
-			throw new RuntimeException("잘못된 JWT 형식입니다.");
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(AuthMessageConstants.AUTH_TOKEN_REFRESH_FAIL);
 		}

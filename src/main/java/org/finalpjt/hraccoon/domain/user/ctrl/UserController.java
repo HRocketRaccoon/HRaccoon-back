@@ -39,14 +39,6 @@ public class UserController {
 
 	private final UserService userService;
 
-	@PostMapping("/user/create")
-	public ApiResponse<Void> createUser(@RequestBody UserRequest params) {
-		log.info("createUserInfo params = {}", params);
-		userService.createUser(params);
-
-		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.USER_CREATE_SUCCESS);
-	}
-
 	@GetMapping("/user/info/{userId}")
 	public ApiResponse<UserResponse> getUserInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);

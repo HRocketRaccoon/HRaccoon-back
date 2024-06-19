@@ -36,12 +36,16 @@ public class UserDetail {
 	@Column(name="user_remain_vacation", columnDefinition = "integer default 15")
 	private Integer userRemainVacation;
 
+	@Column(name = "user_delete_yn", nullable = false, columnDefinition = "boolean default false")
+	private Boolean userDeleteYn;
+
 	@Builder
 	public UserDetail(LocalDateTime userJoinDate, LocalDateTime userLeavingDate, String userLeavingReason, Integer userRemainVacation) {
 		this.userJoinDate = userJoinDate;
 		this.userLeavingDate = userLeavingDate;
 		this.userLeavingReason = userLeavingReason;
 		this.userRemainVacation = userRemainVacation;
+		this.userDeleteYn = false;
 	}
 
 	public void updateJoinDate(LocalDateTime userJoinDate) {
@@ -58,5 +62,9 @@ public class UserDetail {
 
 	public void updateLeavingReason(String userLeavingReason) {
 		this.userLeavingReason = userLeavingReason;
+	}
+
+	public void updateUserDeleteYn() {
+		this.userDeleteYn = !this.userDeleteYn;
 	}
 }

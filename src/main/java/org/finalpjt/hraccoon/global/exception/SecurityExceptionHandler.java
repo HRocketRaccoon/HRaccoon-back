@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 
@@ -37,7 +38,12 @@ public class SecurityExceptionHandler {
 
 	@ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
 	public ResponseEntity<ApiResponse<?>> handleAccessDeniedException(AccessDeniedException exception) {
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.createError(exception.getMessage()));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.createError("접근이 거부되었습니다."));
+	}
+
+	@ExceptionHandler(JwtException.class)
+	public ResponseEntity<ApiResponse<?>> handleJwtException(JwtException exception) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.createError(exception.getMessage()));
 	}
 
 	/**
@@ -46,6 +52,7 @@ public class SecurityExceptionHandler {
 	 */
 	@ExceptionHandler(InsufficientAuthenticationException.class)
 	public ResponseEntity<ApiResponse<?>> handleInsufficientAuthenticationException() {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.createError("로그인이 필요합니다."));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+			.body(ApiResponse.createError("권한이 없습니다. 로그인을 하거나 권한을 부여받아야 합니다."));
 	}
 }

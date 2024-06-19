@@ -32,12 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (jwt != null) {
 				PayLoad payLoad = jwtProvider.getPayLoad(jwt);
 
-				if (payLoad.getType().equals("RTK") && !url.equals("/api/v1/auth/re-issuance")) {
+				if (payLoad.getType().equals("RTK") && !url.equals("/api/v1/auth/re-issuance") && !url.equals(
+					"/api/v1/auth/sign-out")) {
 					throw new JwtException(SecurityMessageConstants.WRONG_TOKEN);
 				}
 
 				String userId = payLoad.getUserId();
-				String authority = payLoad.getAuthority();
+				String authority = "ROLE_" + payLoad.getAuthority();
 
 				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
 					userId, null, AuthorityUtils.commaSeparatedStringToAuthorityList(authority));

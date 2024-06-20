@@ -85,11 +85,10 @@ public class User extends BaseTimeEntity {
 
 	// 240613 - testcode용 userNo 추가
 	@Builder
-	private User(Long userNo, String userId, String userPassword, String userName, String userMobile,
+	private User(String userId, String userPassword, String userName, String userMobile,
 		String userAddress, Gender userGender, String userBirth, String userEmail,
 		String userDepartment, String userPosition, String userTeam, String userRank,
 		Role userRole, UserDetail userDetail) {
-		this.userNo = userNo;
 		this.userId = userId;
 		this.userPassword = userPassword;
 		this.userName = userName;
@@ -115,4 +114,11 @@ public class User extends BaseTimeEntity {
 		this.userMobile = userInfoRequest.getUserMobile();
 		this.userEmail = userInfoRequest.getUserEmail();
 	}
+
+	// test용 
+	@Builder
+	private User(Long userNo) {
+		this.userNo = userNo;
+	}
+
 }

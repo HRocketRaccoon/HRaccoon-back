@@ -7,34 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
-import org.finalpjt.hraccoon.domain.approval.data.entity.ApprovalDetail;
-import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
-import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository; // 추가된 부분
-import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneMonthPercentResponseDTO;
-import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneWeekPercentResponseDTO;
 import org.finalpjt.hraccoon.domain.attendance.data.entity.Attendance;
 import org.finalpjt.hraccoon.domain.attendance.repository.AttendanceRepository;
 import org.finalpjt.hraccoon.domain.todo.data.entity.Todo;
 import org.finalpjt.hraccoon.domain.todo.repository.TodoRepository;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
-import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
-import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
-import org.finalpjt.hraccoon.domain.user.data.enums.Role;
-import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,13 +33,7 @@ import jakarta.persistence.PersistenceContext;
 class AttendanceServiceTest {
 
     @Autowired
-    private AttendanceService attendanceService;
-
-    @Autowired
     private AttendanceRepository attendanceRepository;
-
-    @Autowired
-    private ApprovalRepository approvalRepository;
 
     @Autowired
     private TodoRepository todoRepository;
@@ -62,10 +43,6 @@ class AttendanceServiceTest {
     
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Autowired
-    private UserDetailRepository userDetailRepository;
-
 
 
     @Test
@@ -145,34 +122,9 @@ class AttendanceServiceTest {
     @Test
     @DisplayName("할 일 신규 생성할 수 있음")
     void saveTodo() {
-
         // given
-        UserDetail userDetail = UserDetail.builder()
-            .userJoinDate(LocalDateTime.now())
-            .userRemainVacation(15)
-            .build();
-
-            userDetailRepository.saveAndFlush(userDetail);
-
-        User user = User.builder()
-            .userNo(301L)
-            .userId("A000301")
-            .userPassword("password301")
-            .userName("션")
-            .userMobile("010-5539-2951")
-            .userAddress("울산")
-            .userGender(Gender.FEMALE)
-            .userBirth("1998-09-29")
-            .userEmail("sh@naver.com")
-            .userDepartment("DP004")
-            .userTeam("TM011")
-            .userRank("RK005")
-            .userPosition("PS000")
-            .userRole(Role.USER)
-            .userDetail(userDetail)
-            .build(); 
-
-            userRepository.saveAndFlush(user);
+        Long userNo = 1L;
+        User user = User.builder().userNo(userNo).build();    
 
         Todo todo = Todo.builder()
             .todoNo(1L)
@@ -200,15 +152,10 @@ class AttendanceServiceTest {
     @DisplayName("userNo 이용하여 할 일 전체 목록 조회할 수 있음")
     void findByUserNo() {
         // given
-        User user = User.builder()
-                .userNo(1L)
-                .userId("test_user")
-                .userName("테스트 유저")
-                .build();
-        userRepository.save(user);
+        Optional<User> user = userRepository.findByUserNo(1L);
 
         Todo todo1 = Todo.builder()
-                .user(user)
+                .user(user.get())
                 .todoNo(1L)
                 .todoContent("첫 번째 할 일")
                 .todoCompleteYn(false)
@@ -217,7 +164,7 @@ class AttendanceServiceTest {
         todoRepository.save(todo1);
 
         Todo todo2 = Todo.builder()
-                .user(user)
+                .user(user.get())
                 .todoNo(2L)
                 .todoContent("두 번째 할 일")
                 .todoCompleteYn(true)
@@ -226,7 +173,7 @@ class AttendanceServiceTest {
         todoRepository.save(todo2);
 
         // when
-        List<Todo> todos = todoRepository.findAllByUserNo(user);
+        List<Todo> todos = todoRepository.findAllByUserNo(user.get());
 
         // then
         assertNotNull(todos); // 조회된 할 일 목록이 null이 아님
@@ -245,15 +192,11 @@ class AttendanceServiceTest {
     @DisplayName("userNo 이용하여 할 일 목록 조회, todo 기입된 내역 없을때도 확인 가능함")
     void findNothingByUserNo() {
         // given
-        User user = User.builder()
-                .userNo(1L)
-                .userId("test_user")
-                .userName("테스트 유저")
-                .build();
-        userRepository.save(user);
+        Long userNo = 1L;
+        User user = User.builder().userNo(userNo).build();        
 
         // when
-        List<Todo> todos = todoRepository.findAllByUserNo(user);
+        List<Todo> todos = todoRepository.findAllByUserNo(user); 
 
         // then
         assertEquals(0, todos.size());
@@ -263,27 +206,23 @@ class AttendanceServiceTest {
     @DisplayName("todoNo로 할 일 완료 처리 할 수 있음")
     void completeTodo() {
         // given
-        User user = User.builder()
-                .userNo(1L)
-                .userId("test_user")
-                .userName("테스트 유저")
-                .build();
-        userRepository.save(user);        
-        
-        Todo todo1 = Todo.builder()
+        Long todoNo = 1L;
+        Long userNo = 1L;
+        User user = User.builder().userNo(userNo).build();
+
+        Todo todo = Todo.builder()
             .user(user)
-            .todoNo(1L)
+            .todoNo(todoNo)
             .todoContent("첫 번째 할 일")
             .todoCompleteYn(false)
             .todoDeleteYn(false)
             .build();
-        todoRepository.save(todo1);
+        todoRepository.save(todo);
         
         // when
-        Todo updatedTodo = todoRepository.findByTodoNo(todo1.getTodoNo());
+        Todo updatedTodo = todoRepository.findByTodoNo(todo.getTodoNo());
         updatedTodo.updateTodoCompleteYn();
         todoRepository.save(updatedTodo);
-        // entityManager.flush();
 
         // then
         assertNotNull(updatedTodo, "업데이트 되는 값이 널이 아님");
@@ -291,29 +230,14 @@ class AttendanceServiceTest {
         }
 
     @Test
-    @DisplayName("할 일 삭제 처리 가능")
+    @DisplayName("todoNo로 할 일 삭제 처리 가능")
     void deleteByTodoNo() {
         //given
-        User user = User.builder()
-        .userNo(1L)
-        .userId("test_user")
-        .userName("테스트 유저")
-        .build();
-        userRepository.save(user);
-
-        Todo todo = Todo.builder()
-                .user(user)
-                .todoNo(1L)
-                .todoContent("삭제할 할 일")
-                .todoCompleteYn(false)
-                .todoDeleteYn(false)
-                .build();
-        todoRepository.save(todo);
+        Long todoNo = 1L;
+        Todo todo = Todo.builder().todoNo(todoNo).build();
 
         // when
         Todo savedTodo = todoRepository.findByTodoNo(todo.getTodoNo());
-        // 생성된 todo 저장되었는지 확인하는 코드
-        // assertNotNull(savedTodo, "Todo should exist before deletion");
 
         savedTodo.updateTodoDeleteYn();
         todoRepository.save(savedTodo);

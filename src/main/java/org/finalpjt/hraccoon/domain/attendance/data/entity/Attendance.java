@@ -82,9 +82,8 @@ public class Attendance extends BaseTimeEntity {
 	}
 
 	@Builder
-	public Attendance(Long attendanceNo, LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
+	public Attendance(LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
 		LocalTime attendanceTotalTime, String attendanceStatus, User user, String attendanceDay) {
-		this.attendanceNo = attendanceNo;
 		this.attendanceDate = attendanceDate;
 		this.attendanceStartTime = attendanceStartTime;
 		this.attendanceEndTime = attendanceEndTime;
@@ -98,4 +97,12 @@ public class Attendance extends BaseTimeEntity {
 		this.attendanceTotalTime = LocalTime.of(8, 0, 0);
 		this.attendanceStatus = approval.getApprovalType().toString();
 	}
+
+	// test용
+	@Builder
+	private Attendance(Long attendanceNo) {
+		this.attendanceNo = attendanceNo;
+	}
+
+
 }

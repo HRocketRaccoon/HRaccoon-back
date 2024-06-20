@@ -41,8 +41,7 @@ public class Todo {
 	private User userNo;
 
 	@Builder
-	public Todo(Long todoNo, User user, String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn) {
-		this.todoNo = todoNo;
+	public Todo(User user, String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn) {
 		this.userNo = user;
 		this.todoContent = todoContent;
 		this.todoCompleteYn = todoCompleteYn;
@@ -56,4 +55,11 @@ public class Todo {
 	public void updateTodoDeleteYn() {
 		this.todoDeleteYn = !this.todoDeleteYn;
 	}
+
+	// test용 
+	@Builder
+	private Todo(Long todoNo) {
+		this.todoNo = todoNo;
+	}
+
 }

@@ -15,6 +15,7 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.attendance.service.AttendanceService;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.notification.service.NotificationService;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,14 @@ import lombok.RequiredArgsConstructor;
 public class ApprovalService {
 
 	private final ApprovalRepository approvalRepository;
+
 	private final UserRepository userRepository;
+
 	private final CodeRepository codeRepository;
+
 	private final AttendanceService attendanceService;
+
+	private final NotificationService notificationService;
 
 	@Transactional
 	public void submitApproval(User user, ApprovalRequest params) {
@@ -50,6 +56,11 @@ public class ApprovalService {
 
 			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());
 			approvalRepository.save(approval);
+
+			/* 결재 상신 알림 서비스 */
+			notificationService.send(params.getSelectedApprovalAuthority(), user.getUserId(),
+				user.getUserName() + " " + codeRepository.findCodeNameByCodeNo(user.getUserRank())
+					+ "의 새로운 결재 요청이 등록되었습니다.");
 		}
 	}
 
@@ -259,6 +270,12 @@ public class ApprovalService {
 
 			approvalRepository.save(approval);
 
+			/* 결재 결과 알림 서비스 */
+			notificationService.send(approval.getUser().getUserId(), userId,
+				approval.getApprovalStatus() == ApprovalStatus.APPROVED
+					? transferApprovalType(String.valueOf(approval.getApprovalType())) + "에 관한 결재가 승인되었습니다." :
+					transferApprovalType(String.valueOf(approval.getApprovalType())) + "에 관한 결재가 반려되었습니다.");
+
 			return ApprovalResponse.builder()
 				.approvalNo(approval.getApprovalNo())
 				.userTeam(approval.getUser().getUserTeam())
@@ -277,5 +294,14 @@ public class ApprovalService {
 		} else {
 			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_RESPONSE_NOT_ALLOWED);
 		}
+	}
+
+	public static String transferApprovalType(String type) {
+		return switch (type) {
+			case "BUSINESS_TRIP" -> "출장";
+			case "OUT_ON_BUSINESS" -> "외근";
+			case "VACATION" -> "휴가";
+			default -> throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_TYPE_NOT_FOUND);
+		};
 	}
 }

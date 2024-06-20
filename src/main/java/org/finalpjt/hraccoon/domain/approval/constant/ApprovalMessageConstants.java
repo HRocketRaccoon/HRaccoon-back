@@ -13,4 +13,5 @@ public class ApprovalMessageConstants {
 	public static final String APPROVAL_APPROVED = "결재가 승인되었습니다.";
 	public static final String APPROVAL_APPROVAL_SUCCESS = "결재 승인이 완료되었습니다.";
 	public static final String APPROVAL_REJECTION_SUCCESS = "결재 반려가 완료되었습니다.";
+	public static final String APPROVAL_TYPE_NOT_FOUND = "결재 유형을 찾을 수 없습니다.";
 }

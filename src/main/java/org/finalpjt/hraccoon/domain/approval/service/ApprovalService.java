@@ -20,6 +20,7 @@ import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class ApprovalService {
 	private final AttendanceService attendanceService;
 
 	@Transactional
-	public void submitApproval(User user, String selectedApprovalAuthority, ApprovalRequest params) {
+	public void submitApproval(User user, ApprovalRequest params) {
 		Optional<User> userOptional = userRepository.findById(user.getUserNo());
 
 		if (userOptional.isPresent()) {
@@ -47,7 +48,7 @@ public class ApprovalService {
 				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
-			Approval approval = params.toEntity(user, selectedApprovalAuthority);
+			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());
 			approvalRepository.save(approval);
 		}
 	}
@@ -105,8 +106,13 @@ public class ApprovalService {
 
 	@Transactional
 	public Page<ApprovalResponse> submittedApprovalList(Long userNo, int pageNumber, Pageable pageable) {
+		Sort sort = Sort.by(
+			Sort.Order.asc("approvalStatus"),
+			Sort.Order.desc("approvalSubmitDate")
+		);
+
 		Page<Approval> approvals = approvalRepository.findByUser_UserNo(userNo,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), sort));
 
 		return approvals.map(approval -> {
 			User approvalAuthorityUser = userRepository.findByUserId(approval.getApprovalAuthority()).get();
@@ -161,14 +167,19 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_OTHER_USER_SUBMITTED);
 		}
 	}
 
 	@Transactional
 	public Page<ApprovalResponse> requestedApprovalList(String userId, int pageNumber, Pageable pageable) {
+		Sort sort = Sort.by(
+			Sort.Order.asc("approvalStatus"),
+			Sort.Order.desc("approvalSubmitDate")
+		);
+
 		Page<Approval> approvals = approvalRepository.findByApprovalAuthority(userId,
-			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), sort));
 
 		return approvals.map(approval -> ApprovalResponse.builder()
 			.approvalNo(approval.getApprovalNo())
@@ -218,12 +229,13 @@ public class ApprovalService {
 				.approvalDetailResponseContent(approval.getApprovalDetail().getApprovalDetailResponseContent())
 				.build();
 		} else {
-			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_NOT_FOUND);
+			throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_OTHER_USER_REQUESTED);
 		}
 	}
 
 	@Transactional
-	public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved, String rejectionReason) {
+	public ApprovalResponse responseApproval(Long userNo, Long approvalNo, boolean isApproved,
+		String approvalDetailResponseContent) {
 		Optional<User> userOptional = userRepository.findByUserNo(userNo);
 
 		User user = userOptional.get();
@@ -238,11 +250,11 @@ public class ApprovalService {
 				approval.approveApproval();
 				attendanceService.updateAttendance(approvalNo);
 			} else {
-				if (rejectionReason == null || rejectionReason.isEmpty()) {
+				if (approvalDetailResponseContent == null || approvalDetailResponseContent.isEmpty()) {
 					throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_REJECTION_REASON_NOT_FOUND);
 				}
 
-				approval.rejectApproval(rejectionReason);
+				approval.rejectApproval(approvalDetailResponseContent);
 			}
 
 			approvalRepository.save(approval);

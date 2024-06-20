@@ -5,6 +5,8 @@ import org.finalpjt.hraccoon.domain.user.constant.ValidationConstants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +27,12 @@ public class UserInfoRequest {
 	@NotBlank
 	@Email(message = ValidationConstants.EMAIL_MESSAGE)
 	private String userEmail;
+
+	@Builder
+	public UserInfoRequest(String userId, String userMobile, String userAddress, String userEmail) {
+		this.userId = userId;
+		this.userMobile = userMobile;
+		this.userAddress = userAddress;
+		this.userEmail = userEmail;
+	}
 }

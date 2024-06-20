@@ -24,6 +24,14 @@ public class TodoRequestDTO {
 	@NotNull
 	private Long userNo;
 
+	@Builder
+	public TodoRequestDTO(String todoContent, Boolean todoCompleteYn, Boolean todoDeleteYn, Long userNo) {
+		this.todoContent = todoContent;
+		this.todoCompleteYn = todoCompleteYn;
+		this.todoDeleteYn = todoDeleteYn;
+		this.userNo = userNo;
+	}
+
 	public Todo toEntity(TodoRequestDTO data, User user) {
 		return Todo.builder()
 			.user(user)

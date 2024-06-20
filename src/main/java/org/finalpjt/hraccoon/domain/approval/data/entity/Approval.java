@@ -76,7 +76,7 @@ public class Approval extends BaseTimeEntity {
 
 	public void approveApproval() {
 		this.approvalStatus = ApprovalStatus.APPROVED;
-		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), "승인되었습니다.");
+		this.approvalDetail = this.approvalDetail.updateApprovalDetail(LocalDateTime.now(), "결재가 승인되었습니다.");
 	}
 
 	public void rejectApproval(String rejectionReason) {

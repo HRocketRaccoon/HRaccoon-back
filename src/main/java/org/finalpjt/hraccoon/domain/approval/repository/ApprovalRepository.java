@@ -16,6 +16,8 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
 	Page<Approval> findByApprovalAuthority(String userId, Pageable pageable);
 
+	Approval findByUser_UserNo(Long userNo);
+
 	@Query("select a from Approval a join fetch a.user join fetch a.approvalDetail where a.user.userTeam = :userTeam and a.approvalStatus=:approvalStatus")
 	List<Approval> findByUserTeamWithUserAndApprovalDetail(String userTeam, ApprovalStatus approvalStatus);
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,4 +21,11 @@ public class Code {
 
 	@Column(name = "code_name", nullable = false)
 	private String codeName;
+
+	@Builder
+	public Code(String codeNo, String codeName) {
+		this.codeNo = codeNo;
+		this.codeName = codeName;
+	}
+
 }

@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;

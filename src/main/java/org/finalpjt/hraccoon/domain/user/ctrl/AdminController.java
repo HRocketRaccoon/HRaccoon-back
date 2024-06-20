@@ -35,7 +35,7 @@ public class AdminController {
 
 	private final AdminService adminService;
 
-	@GetMapping("/user/admin/search")
+	@GetMapping("/admin/search")
 	public ApiResponse<Page<UserSearchResponse>> adminSearchUser(
 		@RequestParam(value = "keyword", defaultValue = "") String keyword,
 		@RequestParam(value = "ability", defaultValue = "") String ability,
@@ -48,29 +48,29 @@ public class AdminController {
 		return ApiResponse.createSuccess(users);
 	}
 
-	@PostMapping("/user/admin/create")
-	public ApiResponse<Void> createUser(@RequestBody UserRequest params) {
+	@PostMapping("/admin/create")
+	public ApiResponse<Void> createUser(@Valid @RequestBody UserRequest params) {
 		log.info("createUserInfo params = {}", params);
 		adminService.createUser(params);
 
 		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.USER_CREATE_SUCCESS);
 	}
 
-	@PostMapping("/user/admin/update")
+	@PostMapping("/admin/update")
 	public ApiResponse<UserResponse> updateUserInfo(@RequestBody AdminUserRequest params) {
 		log.info("updateUserInfo params = {}", params);
 
 		return ApiResponse.createSuccessWithMessage(adminService.updateUserInfo(params),
 			UserMessageConstants.USER_UPDATE_SUCCESS);
 	}
-	@PostMapping("/user/admin/delete")
+	@PostMapping("/admin/delete")
 	public ApiResponse<?> deleteUser(@RequestBody UserDeleteRequest params){
 		adminService.deleteUser(params);
 
 		return ApiResponse.createSuccessWithNoContent();
 	}
 
-	@GetMapping("/user/admin/info/{userId}")
+	@GetMapping("/admin/info/{userId}")
 	public ApiResponse<AdminUserResponse> getUserInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);
 

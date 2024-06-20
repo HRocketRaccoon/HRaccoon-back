@@ -1,17 +1,14 @@
 package org.finalpjt.hraccoon.domain.user.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.code.data.entity.Code;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminUserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserDeleteRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AdminUserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
@@ -20,7 +17,6 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
-import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

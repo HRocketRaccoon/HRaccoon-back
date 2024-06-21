@@ -403,7 +403,7 @@ VALUES ('A000001', 'password01', '허수지', '010-1234-5678', '서울특별시 
        ('A000003', 'password03', '서상윤', '010-1234-5680', '서울특별시 종로구 종로 3길 3', 'MALE', '1980-08-22', 'abc1236@naver.com',
         'DP001', 'PS003', 'TM001', 'RK006', 'USER', 3),
        ('A000004', '$2y$10$It5eix3Gn8XRAYSfrFpFpuXSK0CQJ4hVP1UazQCmvUUZw88IcnbJ2', '방규임', '010-1234-5681',
-        '서울특별시 종로구 종로 4길 4', 'FEMALE', '1995-02-04', 'abc1237@naver.com', 'DP004', 'PS002', 'TM001', 'RK005', 'ADMIN',
+        '서울특별시 종로구 종로 4길 4', 'FEMALE', '1995-02-04', '9ou5oo@gmail.com', 'DP004', 'PS002', 'TM001', 'RK005', 'ADMIN',
         4),
        ('A000005', '$2y$10$czw2NTBAxk2VE5O7Karot.7WUXlLvGSL.y/bC5lLJM/De8CCexPWO', '주정효', '010-1234-5682',
         '서울특별시 종로구 종로 5길 5', 'MALE', '2000-02-05', 'abc1238@naver.com', 'DP001', 'PS001', 'TM001', 'RK005', 'USER', 5),

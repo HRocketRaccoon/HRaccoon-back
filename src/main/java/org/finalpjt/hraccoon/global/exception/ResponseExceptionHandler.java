@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.mail.MessagingException;
+
 @RestControllerAdvice(basePackages = "org.finalpjt.hraccoon")
 public class ResponseExceptionHandler {
 
@@ -72,6 +74,17 @@ public class ResponseExceptionHandler {
 	 */
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<ApiResponse<?>> handleException(RuntimeException exception) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.body(ApiResponse.createError(exception.getMessage()));
+	}
+
+	/**
+	 * MessagingException 예외 처리
+	 * @param exception 예외
+	 * @return ApiResponse<?>
+	 */
+	@ExceptionHandler(MessagingException.class)
+	public ResponseEntity<ApiResponse<?>> handleMessagingException(MessagingException exception) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ApiResponse.createError(exception.getMessage()));
 	}

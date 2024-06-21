@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.approval.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.attendance.service.AttendanceService;
 import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
+import org.finalpjt.hraccoon.domain.notification.data.entity.EmailNotification;
+import org.finalpjt.hraccoon.domain.notification.service.MailService;
 import org.finalpjt.hraccoon.domain.notification.service.NotificationService;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
@@ -25,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -40,6 +44,8 @@ public class ApprovalService {
 	private final AttendanceService attendanceService;
 
 	private final NotificationService notificationService;
+
+	private final MailService mailService;
 
 	@Transactional
 	public void submitApproval(User user, ApprovalRequest params) {
@@ -57,10 +63,36 @@ public class ApprovalService {
 			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());
 			approvalRepository.save(approval);
 
-			/* 결재 상신 알림 서비스 */
-			notificationService.send(params.getSelectedApprovalAuthority(), user.getUserId(),
+			sendApprovalNotification(user, params);
+		}
+	}
+
+	public void sendApprovalNotification(User user, ApprovalRequest params) {
+		/* 결재 상신 알림 서비스 */
+		notificationService.send(params.getSelectedApprovalAuthority(), user.getUserId(),
+			user.getUserName() + " " + codeRepository.findCodeNameByCodeNo(user.getUserRank())
+				+ "의 새로운 결재 요청이 등록되었습니다.");
+
+		/* 이메일 알림 서비스 */
+		Optional<User> approvalAuthorityUser = userRepository.findByUserId(params.getSelectedApprovalAuthority());
+
+		EmailNotification email = EmailNotification.builder()
+			.emailNotificationRecipient(params.getSelectedApprovalAuthority())
+			.emailNotificationSender(user.getUserId())
+			.emailNotificationAddress(approvalAuthorityUser.get().getUserEmail())
+			.emailNotificationSubject("결재 요청 알림")
+			.emailNotificationContent(
 				user.getUserName() + " " + codeRepository.findCodeNameByCodeNo(user.getUserRank())
-					+ "의 새로운 결재 요청이 등록되었습니다.");
+					+ "의 새로운 결재 요청이 등록되었습니다.")
+			.emailNotificationSendAt(LocalDateTime.now())
+			.build();
+
+		mailService.saveEmailNotification(email);
+
+		try {
+			mailService.sendNotificationEmail(email);
+		} catch (MessagingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

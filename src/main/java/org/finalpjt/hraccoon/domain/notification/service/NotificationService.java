@@ -128,7 +128,7 @@ public class NotificationService {
 	}
 
 	public List<WebNotification> getUnreadNotifications(String userId) {
-		return webNotificationRepository.findWebNotificationByWebNotificationSenderAndWebNotificationIsReadIsFalse(userId);
+		return webNotificationRepository.findWebNotificationByWebNotificationRecipientAndWebNotificationIsReadIsFalse(userId);
 	}
 
 	public void markAsRead(Long webNotificationNo) {

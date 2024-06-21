@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
@@ -38,14 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
 	private final UserService userService;
-
-	@PostMapping("/user/create")
-	public ApiResponse<Void> createUser(@RequestBody UserRequest params) {
-		log.info("createUserInfo params = {}", params);
-		userService.createUser(params);
-
-		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.USER_CREATE_SUCCESS);
-	}
 
 	@GetMapping("/user/info/{userId}")
 	public ApiResponse<UserResponse> getUserInfo(@PathVariable String userId) {

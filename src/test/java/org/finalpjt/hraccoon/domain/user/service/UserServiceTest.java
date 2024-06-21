@@ -64,19 +64,19 @@ class UserServiceTest {
 			.userJoinDate(LocalDateTime.now())
 			.userLeavingDate(null)
 			.userLeavingReason(null)
-			.userRemainVacation(null)
+			.userRemainVacation(24)
 			.build();
 		UserDetail userDetail2 = UserDetail.builder()
 			.userJoinDate(LocalDateTime.now())
 			.userLeavingDate(null)
 			.userLeavingReason(null)
-			.userRemainVacation(null)
+			.userRemainVacation(24)
 			.build();
 		UserDetail userDetail3 = UserDetail.builder()
 			.userJoinDate(LocalDateTime.now())
 			.userLeavingDate(null)
 			.userLeavingReason(null)
-			.userRemainVacation(null)
+			.userRemainVacation(24)
 			.build();
 
 		User user1 = User.builder()
@@ -128,88 +128,9 @@ class UserServiceTest {
 		user2.updateUserDetail(userDetail2);
 		user3.updateUserDetail(userDetail3);
 
-		userService.createUser(new UserRequest(user1));
-		userService.createUser(new UserRequest(user2));
-		userService.createUser(new UserRequest(user3));
-	}
-
-	@Test
-	@DisplayName("사용자 정보를 생성할 수 있다.")
-	void createUser() {
-		// given
-		UserDetail userDetail = UserDetail.builder()
-			.userJoinDate(LocalDateTime.now())
-			.userLeavingDate(null)
-			.userLeavingReason(null)
-			.userRemainVacation(null)
-			.build();
-		User user = User.builder()
-			.userId("A000004")
-			.userPassword("password15!")
-			.userName("박지훈")
-			.userMobile("010-1234-5670")
-			.userAddress("서울 강남구")
-			.userGender(Gender.valueOf("MALE"))
-			.userBirth("980911")
-			.userEmail("qweer1234@naver.com")
-			.userDepartment("DP002")
-			.userPosition("PS001")
-			.userTeam("TM005")
-			.userRank("RK004")
-			.userRole(Role.valueOf("USER"))
-			.build();
-		// when
-		user.updateUserDetail(userDetail);
-		userService.createUser(new UserRequest(user));
-		// then
-		assertThat(userRepository.findByUserId("A000004").get().getUserId()).isEqualTo("A000004");
-		assertThat(userRepository.findByUserId("A000004").get().getUserName()).isEqualTo("박지훈");
-		assertThat(userRepository.findByUserId("A000004").get().getUserMobile()).isEqualTo("010-1234-5670");
-	}
-
-	@Test
-	@DisplayName("이미 존재하는 사용자 ID로 사용자 정보 생성하는 경우 예외 발생")
-	void createUser_exception() {
-		// given
-		UserDetail userDetail = UserDetail.builder()
-			.userJoinDate(LocalDateTime.now())
-			.userLeavingDate(null)
-			.userLeavingReason(null)
-			.userRemainVacation(null)
-			.build();
-		User user = User.builder()
-			.userId("A000001")
-			.userPassword("password15!")
-			.userName("박지훈")
-			.userMobile("010-1234-5670")
-			.userAddress("서울 강남구")
-			.userGender(Gender.valueOf("MALE"))
-			.userBirth("980911")
-			.userEmail("qweer1234@naver.com")
-			.userDepartment("DP002")
-			.userPosition("PS001")
-			.userTeam("TM005")
-			.userRank("RK004")
-			.userRole(Role.valueOf("USER"))
-			.build();
-		// when
-		user.updateUserDetail(userDetail);
-		// then
-		assertThatThrownBy(() -> userService.createUser(new UserRequest(user)))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("이미 존재하는 사용자 ID입니다.");
-	}
-
-	@Test
-	@DisplayName("사용자 디테일 정보를 생성할 수 있다.")
-	void createUserDetail() {
-		// given
-		LocalDateTime userJoinDate = LocalDateTime.now();
-		// when
-		UserDetail userDetail = userService.createUserDetail(userJoinDate);
-		// then
-		assertThat(userDetail.getUserJoinDate()).isNotNull();
-		assertThat(userDetail.getUserRemainVacation()).isEqualTo(24);
+		userRepository.save(user1);
+		userRepository.save(user2);
+		userRepository.save(user3);
 	}
 
 	@Test

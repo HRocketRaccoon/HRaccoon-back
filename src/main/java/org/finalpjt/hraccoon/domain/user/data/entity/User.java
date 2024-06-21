@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.user.data.entity;
 
+import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminUserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
@@ -17,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -108,5 +110,17 @@ public class User extends BaseTimeEntity {
 		this.userAddress = userInfoRequest.getUserAddress();
 		this.userMobile = userInfoRequest.getUserMobile();
 		this.userEmail = userInfoRequest.getUserEmail();
+	}
+
+	public void updateUserAdmin(AdminUserRequest adminUserRequest) {
+		this.userName = adminUserRequest.getUserName();
+		this.userAddress = adminUserRequest.getUserAddress();
+		this.userMobile = adminUserRequest.getUserMobile();
+		this.userEmail = adminUserRequest.getUserEmail();
+		this.userDepartment = adminUserRequest.getUserDepartment();
+		this.userPosition = adminUserRequest.getUserPosition();
+		this.userTeam = adminUserRequest.getUserTeam();
+		this.userRank = adminUserRequest.getUserRank();
+		this.userRole = Role.valueOf(adminUserRequest.getUserRole());
 	}
 }

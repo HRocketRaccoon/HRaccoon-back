@@ -33,8 +33,6 @@ class TodoServiceTest {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private UserService userService;
-	@Autowired
 	private TodoService todoService;
 
 	@BeforeEach
@@ -86,8 +84,8 @@ class TodoServiceTest {
 		user1.updateUserDetail(userDetail1);
 		user2.updateUserDetail(userDetail2);
 
-		userService.createUser(new UserRequest(user1));
-		userService.createUser(new UserRequest(user2));
+		userRepository.save(user1);
+		userRepository.save(user2);
 
 		Todo todo1 = Todo.builder()
 			.user(userRepository.findByUserId("A000001").get())

@@ -40,51 +40,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserService {
 
-	private final PasswordEncoder passwordEncoder;
-
 	private final UserRepository userRepository;
-
-	private final UserDetailRepository userDetailRepository;
 
 	private final CodeRepository codeRepository;
 
 	private final AbilityRepository abilityRepository;
 
 	private final ApprovalRepository approvalRepository;
-
-	@Transactional
-	public void createUser(UserRequest params) {
-		String userId = params.getUserId();
-
-		// 이미 존재하는 사용자 ID인지 확인
-		if (userRepository.findByUserId(userId).isPresent()) {
-			throw new IllegalArgumentException(UserMessageConstants.USER_ALREADY_EXISTS);
-		}
-
-		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
-		User entity = params.toEntity(encryptedPassword);
-
-		try {
-			UserDetail userDetail = createUserDetail(params.getUserJoinDate());
-			entity.updateUserDetail(userDetail);
-
-			userRepository.saveAndFlush(entity);
-		} catch (Exception e) {
-			log.error("error", e);
-			throw new RuntimeException(UserMessageConstants.USER_CREATE_FAIL);
-		}
-	}
-
-	@Transactional
-	public UserDetail createUserDetail(LocalDateTime userJoinDate) {
-
-		UserDetail userDetail = UserDetail.builder()
-			.userJoinDate(userJoinDate)
-			.userRemainVacation(24)
-			.build();
-
-		return userDetailRepository.save(userDetail);
-	}
 
 	@Transactional
 	public UserResponse getUserInfo(String userId) {
@@ -200,11 +162,11 @@ public class UserService {
 			spec = spec.and(UserSpecification.findByAbility(userNos));
 		}
 
-		Page<User> users = userRepository.findAll(spec,
+		Page<User> users = userRepository.findAll(spec.and(UserSpecification.findByUserDeleteYn()),
 			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
 
 		// 검색 결과가 없을 경우 예외 발생
-		if (users.isEmpty()) {
+		if (users.isEmpty()){
 			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
 		}
 

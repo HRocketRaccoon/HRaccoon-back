@@ -1,6 +1,5 @@
 package org.finalpjt.hraccoon.domain.attendance.data.entity;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -90,8 +89,16 @@ public class Attendance extends BaseTimeEntity {
 		this.user = user;
 	}
 
+	// 결재 승인 시 근태 상태 변경
 	public void updateAttendance(Approval approval) {
 		this.attendanceTotalTime = LocalTime.of(8, 0, 0);
 		this.attendanceStatus = approval.getApprovalType().toString();
+	}
+
+	// 6시 이후 퇴근 시 근태 상태 변경
+	public void updateAttendanceEndTime(LocalDateTime attendanceEndTime) {
+		this.attendanceEndTime = attendanceEndTime;
+		this.attendanceStatus = "퇴근";
+		this.setAttendanceTotalTime();
 	}
 }

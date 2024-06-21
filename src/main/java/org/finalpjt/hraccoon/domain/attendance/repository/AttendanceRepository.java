@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.finalpjt.hraccoon.domain.attendance.data.entity.Attendance;
+import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo")
     Optional<Attendance> findByUserNoAndDate(Long userNo, LocalDate attendanceDate);
 
+    @Query("SELECT a FROM Attendance a WHERE a.user=:user AND a.attendanceDate=:attendanceDate")
+    List<Attendance> findByUserAndAttendanceDate(User user, LocalDate attendanceDate);
+
+    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate=:today")
+    List<Attendance> findByAttendanceDate(LocalDate today);
 }

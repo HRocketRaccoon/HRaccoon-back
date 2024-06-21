@@ -16,16 +16,12 @@ import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneMonth
 import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneWeekPercentResponseDTO;
 import org.finalpjt.hraccoon.domain.attendance.data.entity.Attendance;
 import org.finalpjt.hraccoon.domain.attendance.repository.AttendanceRepository;
+import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Locale;
 import java.time.format.TextStyle;
@@ -170,6 +166,17 @@ public class AttendanceService {
 		}
 
 		return dates;
+	}
+	public List<Attendance> findAttendancesByUserAndDate(User user, LocalDate attendanceDate) {
+		return attendanceRepository.findByUserAndAttendanceDate(user, attendanceDate);
+	}
+
+	public List<Attendance> findByAttendanceDate(LocalDate today) {
+		return attendanceRepository.findByAttendanceDate(today);
+	}
+
+	public void delete(Attendance attendance) {
+		attendanceRepository.delete(attendance);
 	}
 
 }

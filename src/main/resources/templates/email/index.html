@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko-KR">
+<head>
+	<meta charset="UTF-8">
+	<title>Notification Email</title>
+	<style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #696CFF;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .a-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            color: white;
+            background-color: #FFAB00;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: gray;
+            text-align: center;
+        }
+	</style>
+</head>
+<body>
+<div class="header">
+	<img src="cid:logo" alt="email Logo" style="width: 100px;">
+	<h1>확인하지 않은 알림이 있어요!</h1>
+</div>
+<div class="content">
+	<p th:text="${content}"></p>
+	<p>내용을 확인하고 싶다면 아래 버튼을 눌러주세요.</p>
+	<a href="/" class="a-button">Go To HRaccoon</a>
+</div>
+<div class="footer">
+	<p>HRaccoon 서비스에서 제공하는 알림 메일입니다.</p>
+</div>
+</body>
+</html>

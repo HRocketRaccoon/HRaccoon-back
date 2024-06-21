@@ -52,12 +52,16 @@ dependencies {
     // env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
+    //batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    // SMTP
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    //batch
-    implementation 'org.springframework.boot:spring-boot-starter-batch'
 }
 
 tasks.named('test') {

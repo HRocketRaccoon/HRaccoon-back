@@ -7,6 +7,7 @@ import org.finalpjt.hraccoon.global.security.JwtAuthenticationFilter;
 import org.finalpjt.hraccoon.global.security.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -60,6 +62,7 @@ public class SecurityConfig {
 				handler -> handler.authenticationEntryPoint(entryPoint)) // spring security 에서 인증 실패시 예외처리
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers(allowUrls).permitAll()
+				.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 				// .requestMatchers(PathRequest.toH2Console()).permitAll() // H2 Console 접속은 모두에게 허용
 				.anyRequest().authenticated()); // 나머지 요청 인증 필요
 

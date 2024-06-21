@@ -14,6 +14,7 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
 import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
+import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.domain.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,7 @@ class AuthServiceTest {
 	@Autowired
 	private AuthService authService;
 	@Autowired
-	private UserService userService;
+	private UserRepository userRepository;
 
 	@BeforeEach
 	void init() {
@@ -103,9 +104,9 @@ class AuthServiceTest {
 		user2.updateUserDetail(userDetail2);
 		user3.updateUserDetail(userDetail3);
 
-		userService.createUser(new UserRequest(user1));
-		userService.createUser(new UserRequest(user2));
-		userService.createUser(new UserRequest(user3));
+		userRepository.save(user1);
+		userRepository.save(user2);
+		userRepository.save(user3);
 	}
 
 	@Test

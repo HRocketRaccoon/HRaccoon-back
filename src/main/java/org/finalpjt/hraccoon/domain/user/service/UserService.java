@@ -1,6 +1,5 @@
 package org.finalpjt.hraccoon.domain.user.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,6 @@ import org.finalpjt.hraccoon.domain.code.repository.CodeRepository;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
@@ -19,16 +17,13 @@ import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
-import org.finalpjt.hraccoon.domain.user.data.entity.UserDetail;
 import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
-import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.domain.user.sepecification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,6 +138,10 @@ public class UserService {
 	public Page<UserSearchResponse> searchUser(String keyword, String ability, String department, int pageNumber,
 		Pageable pageable) {
 
+		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(keyword).isEmpty()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
+		}
+
 		Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
 			.or(UserSpecification.likeUserName(keyword));
 
@@ -164,11 +163,6 @@ public class UserService {
 
 		Page<User> users = userRepository.findAll(spec.and(UserSpecification.findByUserDeleteYn()),
 			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
-
-		// 검색 결과가 없을 경우 예외 발생
-		if (users.isEmpty()){
-			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
-		}
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 

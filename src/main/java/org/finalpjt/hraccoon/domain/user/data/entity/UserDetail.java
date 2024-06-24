@@ -36,7 +36,7 @@ public class UserDetail {
 	@Column(name="user_leaving_reason")
 	private String userLeavingReason;
 
-	@Column(name="user_remain_vacation", columnDefinition = "integer default 15")
+	@Column(name="user_remain_vacation", columnDefinition = "integer default 24")
 	private Integer userRemainVacation;
 
 	@Column(name = "user_delete_yn", nullable = false, columnDefinition = "boolean default false")

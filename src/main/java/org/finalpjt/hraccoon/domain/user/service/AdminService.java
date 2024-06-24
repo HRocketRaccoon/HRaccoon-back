@@ -48,6 +48,10 @@ public class AdminService {
 	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, int pageNumber,
 		Pageable pageable) {
 
+		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(keyword).isEmpty()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
+		}
+
 			Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
 			.or(UserSpecification.likeUserName(keyword));
 
@@ -69,11 +73,6 @@ public class AdminService {
 
 		Page<User> users = userRepository.findAll(spec,
 			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
-
-		// 검색 결과가 없을 경우 예외 발생
-		if (users.isEmpty()) {
-			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
-		}
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 

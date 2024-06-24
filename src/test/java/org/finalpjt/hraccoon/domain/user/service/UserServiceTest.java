@@ -536,7 +536,7 @@ class UserServiceTest {
 		// then
 		assertThatThrownBy(() -> userService.searchUser(keyword, ability, department, pageNumber, pageable))
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("해당 유저를 찾을 수 없습니다.");
+			.hasMessage("조건에 만족하는 유저를 찾을 수 없습니다.");
 	}
 
 

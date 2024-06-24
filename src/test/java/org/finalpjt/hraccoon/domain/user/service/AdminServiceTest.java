@@ -39,8 +39,6 @@ class AdminServiceTest {
 	private AdminService adminService;
 	@Autowired
 	private CodeRepository codeRepository;
-	@Autowired
-	private UserService userService;
 
 	@BeforeEach
 	void init() {

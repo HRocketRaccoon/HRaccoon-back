@@ -965,19 +965,19 @@ VALUES ('A000001', 'password01', '허수지', '010-1234-5678', '서울특별시 
        ('A000283', 'password283', '허아하', '010-1234-5960', '울산광역시 남구 삼산로 8길 8', 'MALE', '1975-07-20',
         'abc1516@naver.com', 'DP003', 'PS000', 'TM009', 'RK001', 'USER', 283),
        ('A000284', 'password284', '이주린', '010-1234-5961', '울산광역시 남구 삼산로 9길 9', 'FEMALE', '1979-10-10',
-        'abc1517@naver.com', 'DP004', 'PS002', 'TM010', 'RK005', 'USER', 284),
+        'abc1517@naver.com', 'DP004', 'PS002', 'TM010', 'RK005', 'ADMIN', 284),
        ('A000285', 'password285', '지가련', '010-1234-5962', '울산광역시 남구 삼산로 10길 10', 'MALE', '1993-11-11',
-        'abc1518@naver.com', 'DP004', 'PS001', 'TM010', 'RK005', 'USER', 285),
+        'abc1518@naver.com', 'DP004', 'PS001', 'TM010', 'RK005', 'ADMIN', 285),
        ('A000286', 'password286', '석근수', '010-1234-5963', '세종특별자치시 세종로 1길 1', 'FEMALE', '1986-05-28',
-        'abc1519@naver.com', 'DP004', 'PS000', 'TM010', 'RK001', 'USER', 286),
+        'abc1519@naver.com', 'DP004', 'PS000', 'TM010', 'RK001', 'ADMIN', 286),
        ('A000287', 'password287', '송한우', '010-1234-5964', '세종특별자치시 세종로 2길 2', 'MALE', '1977-08-06', 'abc1520@naver.com',
-        'DP004', 'PS000', 'TM010', 'RK001', 'USER', 287),
+        'DP004', 'PS000', 'TM010', 'RK001', 'ADMIN', 287),
        ('A000288', 'password288', '우시준', '010-1234-5965', '세종특별자치시 세종로 3길 3', 'FEMALE', '1986-04-23',
-        'abc1521@naver.com', 'DP004', 'PS000', 'TM010', 'RK002', 'USER', 288),
+        'abc1521@naver.com', 'DP004', 'PS000', 'TM010', 'RK002', 'ADMIN', 288),
        ('A000289', 'password289', '윤병비', '010-1234-5966', '세종특별자치시 세종로 4길 4', 'MALE', '1990-07-11', 'abc1522@naver.com',
-        'DP004', 'PS000', 'TM010', 'RK002', 'USER', 289),
+        'DP004', 'PS000', 'TM010', 'RK002', 'ADMIN', 289),
        ('A000290', 'password290', '백해효', '010-1234-5967', '세종특별자치시 세종로 5길 5', 'FEMALE', '1970-09-03',
-        'abc1523@naver.com', 'DP004', 'PS000', 'TM010', 'RK001', 'USER', 290),
+        'abc1523@naver.com', 'DP004', 'PS000', 'TM010', 'RK001', 'ADMIN', 290),
        ('A000291', 'password291', '편준빈', '010-1234-5968', '세종특별자치시 세종로 6길 6', 'MALE', '1970-10-27', 'abc1524@naver.com',
         'DP004', 'PS001', 'TM011', 'RK005', 'USER', 291),
        ('A000292', 'password292', '유태옥', '010-1234-5969', '세종특별자치시 세종로 7길 7', 'FEMALE', '1973-03-04',
@@ -4772,3 +4772,14 @@ INSERT INTO ability (ability_name, user_no) VALUES
 ('ABP004', 8),
 ('ABP004', 9),
 ('ABP007', 10);
+
+
+-- INSERT INTO todo (todo_no, todo_content, todo_complete_yn, todo_delete_yn, user_no) VALUES
+-- (1, '보고자료 작성', 'true', true, 1),
+-- (2, 'PPT 제작', 'true', false, 1),
+-- (3, '세금계산서 발행', 'true', false, 1),
+-- (4, '출입서류 확인', 'true', false, 1),
+-- (5, '차량 신청 결재 확인', 'true', false, 1);
+
+INSERT INTO todo (todo_content, todo_complete_yn, todo_delete_yn, user_no) VALUES
+('보고자료 작성', true, true, 1)

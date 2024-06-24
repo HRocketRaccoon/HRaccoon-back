@@ -6,6 +6,8 @@ import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
 import org.finalpjt.hraccoon.domain.user.data.enums.Role;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Slf4j
 @Entity
 @Getter
@@ -82,11 +85,12 @@ public class User extends BaseTimeEntity {
 	@JoinColumn(name = "user_detail_no")
 	private UserDetail userDetail;
 
+	// 240613 - testcode용 userNo 추가
 	@Builder
 	private User(String userId, String userPassword, String userName, String userMobile,
 		String userAddress, Gender userGender, String userBirth, String userEmail,
 		String userDepartment, String userPosition, String userTeam, String userRank,
-		Role userRole) {
+		Role userRole, UserDetail userDetail) {
 		this.userId = userId;
 		this.userPassword = userPassword;
 		this.userName = userName;
@@ -100,6 +104,7 @@ public class User extends BaseTimeEntity {
 		this.userTeam = userTeam;
 		this.userRank = userRank;
 		this.userRole = userRole;
+		this.userDetail = userDetail;
 	}
 
 	public void updateUserDetail(UserDetail userDetail) {
@@ -110,6 +115,12 @@ public class User extends BaseTimeEntity {
 		this.userAddress = userInfoRequest.getUserAddress();
 		this.userMobile = userInfoRequest.getUserMobile();
 		this.userEmail = userInfoRequest.getUserEmail();
+	}
+
+	// test용 
+	@Builder
+	private User(Long userNo) {
+		this.userNo = userNo;
 	}
 
 	public void updateUserAdmin(AdminUserRequest adminUserRequest) {

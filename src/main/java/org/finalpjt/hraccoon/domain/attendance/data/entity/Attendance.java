@@ -20,6 +20,7 @@ import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -80,13 +82,14 @@ public class Attendance extends BaseTimeEntity {
 
 	@Builder
 	public Attendance(LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
-		LocalTime attendanceTotalTime, String attendanceStatus, User user) {
+		LocalTime attendanceTotalTime, String attendanceStatus, User user, String attendanceDay) {
 		this.attendanceDate = attendanceDate;
 		this.attendanceStartTime = attendanceStartTime;
 		this.attendanceEndTime = attendanceEndTime;
 		this.attendanceTotalTime = attendanceTotalTime;
 		this.attendanceStatus = attendanceStatus;
 		this.user = user;
+		this.attendanceDay = attendanceDay;
 	}
 
 	// 결재 승인 시 근태 상태 변경
@@ -101,4 +104,12 @@ public class Attendance extends BaseTimeEntity {
 		this.attendanceStatus = "퇴근";
 		this.setAttendanceTotalTime();
 	}
+
+	// test용
+	@Builder
+	private Attendance(Long attendanceNo) {
+		this.attendanceNo = attendanceNo;
+	}
+
+
 }

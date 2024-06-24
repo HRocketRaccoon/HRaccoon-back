@@ -55,4 +55,11 @@ public class Todo {
 	public void updateTodoDeleteYn() {
 		this.todoDeleteYn = !this.todoDeleteYn;
 	}
+
+	// test용 
+	@Builder
+	private Todo(Long todoNo) {
+		this.todoNo = todoNo;
+	}
+
 }

@@ -9,6 +9,7 @@ import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalRequest;
 import org.finalpjt.hraccoon.domain.approval.data.dto.request.ApprovalResponseRequest;
 import org.finalpjt.hraccoon.domain.approval.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.approval.service.ApprovalService;
+import org.finalpjt.hraccoon.domain.notification.service.NotificationService;
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.global.api.ApiResponse;

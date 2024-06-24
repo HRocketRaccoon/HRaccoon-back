@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,14 +39,7 @@ public class UserController {
 
 	private final UserService userService;
 
-	@PostMapping("/user/create")
-	public ApiResponse<Void> createUser(@RequestBody UserRequest params) {
-		log.info("createUserInfo params = {}", params);
-		userService.createUser(params);
-
-		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.USER_CREATE_SUCCESS);
-	}
-
+	@PreAuthorize("#userId == principal")
 	@GetMapping("/user/info/{userId}")
 	public ApiResponse<UserResponse> getUserInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);

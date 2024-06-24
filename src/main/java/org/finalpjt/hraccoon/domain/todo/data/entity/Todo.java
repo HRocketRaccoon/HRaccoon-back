@@ -1,6 +1,7 @@
 package org.finalpjt.hraccoon.domain.todo.data.entity;
 
 import org.finalpjt.hraccoon.domain.user.data.entity.User;
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Todo {
+public class Todo extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

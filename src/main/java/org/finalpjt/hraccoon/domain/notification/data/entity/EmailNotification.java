@@ -2,6 +2,8 @@ package org.finalpjt.hraccoon.domain.notification.data.entity;
 
 import java.time.LocalDateTime;
 
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-public class EmailNotification {
+public class EmailNotification extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

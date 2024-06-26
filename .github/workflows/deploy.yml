@@ -59,7 +59,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }} # pem 키
         # 도커 작업
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/sejongmate:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
           docker stop $(docker ps -a -q)
           docker run -d --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
           docker rm $(docker ps --filter 'status=exited' -a -q)

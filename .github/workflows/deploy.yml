@@ -49,10 +49,10 @@ jobs:
         docker tag app ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
 
-    - name: Add known hosts
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+    # - name: Add known hosts
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
     - name: Deploy
       uses: appleboy/ssh-action@master

@@ -19,4 +19,4 @@ spring:
   data:
     redis:
       host: redis
-      port: {port}
+      port: { REDIS_PORT }

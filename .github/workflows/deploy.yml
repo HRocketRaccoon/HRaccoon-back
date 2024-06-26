@@ -32,7 +32,7 @@ jobs:
       env:
         spring.jwt.secret-key: ${{ secrets.JWT_SECRET_KEY }}
         spring.mail.password: ${{ secrets.GMAIL_PASSWORD }}
-        spinrg.datasource.url: ${{ secrets.RDS_URL }}
+        spring.datasource.url: ${{ secrets.RDS_URL }}
         spring.datasource.username: ${{ secrets.RDS_USERNAME }}
         spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
 
@@ -46,7 +46,7 @@ jobs:
 
     - name: Docker Build
       run: |
-        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         docker build -t app .
         docker tag app ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest

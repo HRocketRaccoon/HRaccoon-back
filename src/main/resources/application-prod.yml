@@ -1,0 +1,22 @@
+spring:
+  # DB 설정(local)
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://{ AWS_RDS_ENDPOINT }:{ AWS_RDS_PORT }/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
+    username: { AWS_RDS_USERNAME }
+    password: { AWS_RDS_PASSWORD }
+
+  # JPA 설정
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+
+  # Redis 설정
+  data:
+    redis:
+      host: host.docker.internal
+      port: 6379

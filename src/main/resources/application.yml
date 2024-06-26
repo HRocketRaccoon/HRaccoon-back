@@ -5,36 +5,44 @@ spring:
   application:
     name: hraccoon
 
-#   DB 설정(local)
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{url}/{databaseName}?characterEncoding=UTF-8&serverTimezone=UTC
-    username: { userName }
-    password: { userPassword }
-    hikari:
-      connection-test-query: SELECT NOW() FROM DUAL
+  # 환경 구분( local, prod )
+  profiles:
+    active: prod
 
-    # JPA 설정
-  jpa:
-    hibernate:
-        # 배포 시 변경 (create -> none)
-      ddl-auto: create
+  # jwt 설정
+  jwt:
+    secret-key: { JWT_SECRET_KEY }
+    life:
+      accessToken: 3600000 # 1시간
+      refreshToken: 10800000 # 3시간
+    issuer: OrangeVinyl
+
+  # Batch
+  batch:
+    job:
+      enabled: false
+      name: checkInJob, checkOutJob, clearAttendanceTableJob
+  main:
+    allow-circular-references: true
+
+  # 이메일 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hraccoon8@gmail.com
+    password: { GMAIL_PASSWORD }
+    default-encoding: utf-8
     properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-        use_sql_comments: true
-        highlight_sql: true
-#        SQL 로깅 설정(더미 데이터)
-      defer-datasource-initialization: true
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true2
+    templates:
+      path: classpath:/templates/email
+      logo-path: classpath:/static/images/logo.png
 
-  sql:
-    init:
-      mode: always
-      encoding: utf-8
-      platform: mariadb
-#      data-locations: classpath:database/2-data.sql
-
+# 로깅 설정
 logging:
   level:
     org:
@@ -46,3 +54,4 @@ logging:
         orm:
           jdbc:
             bind: trace
+

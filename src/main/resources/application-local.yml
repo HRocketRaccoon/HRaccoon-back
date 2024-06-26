@@ -1,0 +1,37 @@
+spring:
+
+  # DB 설정(local)
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 3301
+    hikari:
+      connection-test-query: SELECT NOW() FROM DUAL
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      # 배포 시 변경 (create -> none)
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+    # SQL 로깅 설정(더미 데이터)
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      encoding: utf-8
+      platform: mariadb
+      data-locations: classpath:database/init-data.sql
+
+  # Redis 설정
+  data:
+    redis:
+      host: redis
+      port: 6379

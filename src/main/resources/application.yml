@@ -5,45 +5,13 @@ spring:
   application:
     name: hraccoon
 
-  # DB 설정(local)
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb:///hraccoon?characterEncoding=UTF-8&serverTimezone=UTC
-    username: 
-    password: 
-    hikari:
-      connection-test-query: SELECT NOW() FROM DUAL
-
-  # JPA 설정
-  jpa:
-    hibernate:
-      # 배포 시 변경 (create -> none)
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-        use_sql_comments: true
-        highlight_sql: true
-    # SQL 로깅 설정(더미 데이터)
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-      encoding: utf-8
-      platform: mariadb
-      data-locations: classpath:database/init-data.sql
-
-  # Redis 설정
-  data:
-    redis:
-      host: redis
-      port: 6379
+  # 환경 구분( local, prod )
+  profiles:
+    active: prod
 
   # jwt 설정
   jwt:
-    secret-key: 
+    secret-key: { JWT_SECRET_KEY }
     life:
       accessToken: 3600000 # 1시간
       refreshToken: 10800000 # 3시간
@@ -62,7 +30,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: hraccoon8@gmail.com
-    password: { key }
+    password: { GMAIL_PASSWORD }
     default-encoding: utf-8
     properties:
       mail:
@@ -73,6 +41,7 @@ spring:
     templates:
       path: classpath:/templates/email
       logo-path: classpath:/static/images/logo.png
+
 # 로깅 설정
 logging:
   level:

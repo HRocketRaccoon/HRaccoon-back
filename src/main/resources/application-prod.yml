@@ -18,5 +18,5 @@ spring:
   # Redis 설정
   data:
     redis:
-      host: redis
-      port: { REDIS_PORT }
+      host: host.docker.internal
+      port: 6379

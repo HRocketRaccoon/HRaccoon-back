@@ -36,6 +36,7 @@ public class SecurityConfig {
 	private final String[] allowUrls = {
 		"/api/v1/user/create",
 		"/api/v1/auth/sign-in",
+		"/api/v1/user/health-check",
 	};
 
 

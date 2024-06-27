@@ -92,7 +92,7 @@ public class UserController {
 		@RequestParam(value = "department", defaultValue = "") String department,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		log.info("pageNumber: {}",pageNumber);
+		log.info("pageNumber: {}", pageNumber);
 		Page<UserSearchResponse> users = userService.searchUser(keyword, ability, department, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);
@@ -104,5 +104,10 @@ public class UserController {
 		List<ApprovalResponse> responses = userService.getTeamApprovalInfo(userTeam);
 
 		return ApiResponse.createSuccess(responses);
+	}
+
+	@GetMapping("/user/health-check")
+	public String healthCheck() {
+		return "OK";
 	}
 }

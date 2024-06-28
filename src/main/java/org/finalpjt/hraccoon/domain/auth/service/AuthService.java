@@ -29,13 +29,15 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public TokenResponse signIn(SignInRequest params) {
+		public TokenResponse signIn(SignInRequest params) {
 		User user = userRepository.findByUserId(params.getUserId())
 			.orElseThrow(() -> new BadCredentialsException(AuthMessageConstants.AUTH_FAIL_USER_NOT_FOUND));
 
 		if (!passwordEncoder.matches(params.getUserPassword(), user.getUserPassword())) {
 			throw new BadCredentialsException(AuthMessageConstants.AUTH_FAIL_PASSWORD_NOT_MATCH);
 		}
+
+		log.info(":::: Auth service signIn:::::");
 
 		PayLoad accessTokenPayLoad = PayLoad.builder()
 			.userNo(user.getUserNo())
@@ -50,11 +52,12 @@ public class AuthService {
 			.type("RTK")
 			.authority(user.getUserRole().toString())
 			.build();
-
+		log.info(":::: Payload 생성 :::::");
 		try {
 			String atkToken = jwtProvider.createToken(accessTokenPayLoad);
 			String rtkToken = jwtProvider.createToken(refreshTokenPayLoad);
 
+			log.info("::::: Token 생성 완료 ::::::::");
 			return TokenResponse.builder()
 				.accessToken(atkToken)
 				.refreshToken(rtkToken)

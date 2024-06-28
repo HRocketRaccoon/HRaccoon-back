@@ -59,7 +59,7 @@ public class JwtProvider {
 	 * @return JWT
 	 */
 	public String createToken(PayLoad payLoad) throws JsonProcessingException {
-
+		log.info("::::::::: 토근 생성 페이지: :::::::::");
 		SecretKey secretKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8)); // UTF-8로 인코딩
 		Long lifeTime = payLoad.getType().equals("ATK") ? atkLife : rtkLife;
 		String jwt = Jwts.builder()

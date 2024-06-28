@@ -28,14 +28,18 @@ public class RedisDao {
 	}
 
 	public void setValues(String key, String data, Duration duration) {
-		log.info("::::::: redis dao for refresh ::::::::");
-		log.info("::::::: host :::::::: {}", host);
-		log.info("::::::: key :::::::: {}", key);
-		log.info(":::::::::::: redisTemplate :::::::: {}", redisTemplate);
-		ValueOperations<String, String> values = redisTemplate.opsForValue();
-		log.info(";::::::: values setup :::::::: {}", values);
-		values.set(key, data, duration);
-		log.info("::::: set values ::::::::");
+		try {
+			log.info("::::::: redis dao for refresh ::::::::");
+			log.info("::::::: host :::::::: {}", host);
+			log.info("::::::: key :::::::: {}", key);
+			log.info(":::::::::::: redisTemplate :::::::: {}", redisTemplate);
+			ValueOperations<String, String> values = redisTemplate.opsForValue();
+			log.info(";::::::: values setup :::::::: {}", values);
+			values.set(key, data, duration);
+			log.info("::::: set values ::::::::");
+		} catch (Exception e) {
+			log.error("Error setting value with duration in Redis", e);
+		}
 	}
 
 	public String getValues(String key) {

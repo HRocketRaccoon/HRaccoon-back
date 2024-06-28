@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.PasswordChangeRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
@@ -104,6 +105,15 @@ public class UserController {
 		List<ApprovalResponse> responses = userService.getTeamApprovalInfo(userTeam);
 
 		return ApiResponse.createSuccess(responses);
+	}
+
+	@PostMapping("/user/{userId}/change-password")
+	public ApiResponse<String> changePassword(@PathVariable String userId,
+		@RequestBody PasswordChangeRequest passwordChangeRequest) {
+		userService.changePassword(userId, passwordChangeRequest.getOriginPassword(),
+			passwordChangeRequest.getNewPassword(), passwordChangeRequest.getConfirmPassword());
+
+		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.PASSWORD_CHANGE_SUCCESS);
 	}
 
 	@GetMapping("/user/health-check")

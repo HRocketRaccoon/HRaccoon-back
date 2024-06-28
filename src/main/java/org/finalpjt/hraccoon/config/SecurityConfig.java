@@ -37,6 +37,7 @@ public class SecurityConfig {
 		"/api/v1/user/create",
 		"/api/v1/auth/sign-in",
 		"/api/v1/user/health-check",
+		"/api/v1/code/ability",
 	};
 
 

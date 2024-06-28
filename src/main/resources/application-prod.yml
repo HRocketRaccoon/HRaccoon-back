@@ -18,5 +18,5 @@ spring:
   # Redis 설정
   data:
     redis:
-      host: 172.31.14.150
+      host: { AWS_ELASTICACHE_ENDPOINT }
       port: 6379

@@ -35,6 +35,7 @@ jobs:
         spring.datasource.url: ${{ secrets.RDS_URL }}
         spring.datasource.username: ${{ secrets.RDS_USERNAME }}
         spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
+        spring.data.redis.host: ${{ secrets.AWS_ELASTICACHE_ENDPOINT }}
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -48,11 +49,6 @@ jobs:
         docker build -t app .
         docker tag app ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/hraccoon:latest
-
-    # - name: Add known hosts
-    #   run: |
-    #     mkdir -p ~/.ssh
-    #     echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
     - name: Deploy
       uses: appleboy/ssh-action@master

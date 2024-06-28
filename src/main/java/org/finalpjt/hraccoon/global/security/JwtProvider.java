@@ -60,6 +60,10 @@ public class JwtProvider {
 	 */
 	public String createToken(PayLoad payLoad) throws JsonProcessingException {
 		log.info("::::::::: 토근 생성 페이지: :::::::::");
+		log.info(":::::;::: jwtKey ::::::: {}", jwtKey);
+		log.info(":::::;::: atkLife ::::::: {}", atkLife);
+		log.info(":::::;::: rtkLife ::::::: {}", rtkLife);
+		log.info(":::::;::: issuer ::::::: {}", issuer);
 		SecretKey secretKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8)); // UTF-8로 인코딩
 		Long lifeTime = payLoad.getType().equals("ATK") ? atkLife : rtkLife;
 		String jwt = Jwts.builder()
@@ -71,10 +75,13 @@ public class JwtProvider {
 			.claim("authority", payLoad.getAuthority())
 			.setExpiration(new Date(new Date().getTime() +  lifeTime))
 			.signWith(secretKey).compact();
+		log.info(":::::::: 토큰 생성 ::::::::::");
 
 		if (payLoad.getType().equals("RTK")) {
 			redisDao.setValues(payLoad.getUserId(), jwt, Duration.ofMillis(lifeTime));
 		}
+
+		log.info("::::::::::::: jwt = {}", jwt);
 
 		return jwt;
 	}

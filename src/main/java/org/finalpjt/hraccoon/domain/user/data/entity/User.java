@@ -1,13 +1,5 @@
 package org.finalpjt.hraccoon.domain.user.data.entity;
 
-import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminUserRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
-import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
-import org.finalpjt.hraccoon.domain.user.data.enums.Role;
-import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +12,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
+import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminUserRequest;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
+import org.finalpjt.hraccoon.domain.user.data.enums.Gender;
+import org.finalpjt.hraccoon.domain.user.data.enums.Role;
+import org.finalpjt.hraccoon.global.abstracts.BaseTimeEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -115,6 +115,10 @@ public class User extends BaseTimeEntity {
 		this.userAddress = userInfoRequest.getUserAddress();
 		this.userMobile = userInfoRequest.getUserMobile();
 		this.userEmail = userInfoRequest.getUserEmail();
+	}
+
+	public void updatePassword(String newPassword) {
+		this.userPassword = newPassword;
 	}
 
 	// test용 

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.PasswordChangeRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
@@ -92,7 +93,7 @@ public class UserController {
 		@RequestParam(value = "department", defaultValue = "") String department,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		log.info("pageNumber: {}",pageNumber);
+		log.info("pageNumber: {}", pageNumber);
 		Page<UserSearchResponse> users = userService.searchUser(keyword, ability, department, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);
@@ -104,5 +105,14 @@ public class UserController {
 		List<ApprovalResponse> responses = userService.getTeamApprovalInfo(userTeam);
 
 		return ApiResponse.createSuccess(responses);
+	}
+
+	@PostMapping("/user/{userId}/change-password")
+	public ApiResponse<String> changePassword(@PathVariable String userId,
+		@RequestBody PasswordChangeRequest passwordChangeRequest) {
+		userService.changePassword(userId, passwordChangeRequest.getOriginPassword(),
+			passwordChangeRequest.getNewPassword(), passwordChangeRequest.getConfirmPassword());
+
+		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.PASSWORD_CHANGE_SUCCESS);
 	}
 }

@@ -26,7 +26,6 @@ public class AuthController {
 	public ApiResponse<TokenResponse> signIn(@RequestBody SignInRequest params) {
 		TokenResponse response = authService.signIn(params);
 
-		log.info("::::::: response :::::::: {}", response);
 		return ApiResponse.createSuccessWithMessage(response, AuthMessageConstants.AUTH_SUCCESS);
 	}
 

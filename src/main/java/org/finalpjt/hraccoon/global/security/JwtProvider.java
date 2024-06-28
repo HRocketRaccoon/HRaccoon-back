@@ -59,11 +59,6 @@ public class JwtProvider {
 	 * @return JWT
 	 */
 	public String createToken(PayLoad payLoad) throws JsonProcessingException {
-		log.info("::::::::: 토근 생성 페이지: :::::::::");
-		log.info(":::::;::: jwtKey ::::::: {}", jwtKey);
-		log.info(":::::;::: atkLife ::::::: {}", atkLife);
-		log.info(":::::;::: rtkLife ::::::: {}", rtkLife);
-		log.info(":::::;::: issuer ::::::: {}", issuer);
 		SecretKey secretKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8)); // UTF-8로 인코딩
 		Long lifeTime = payLoad.getType().equals("ATK") ? atkLife : rtkLife;
 		String jwt = Jwts.builder()
@@ -73,15 +68,12 @@ public class JwtProvider {
 			.claim("userId", payLoad.getUserId())
 			.claim("type", payLoad.getType())
 			.claim("authority", payLoad.getAuthority())
-			.setExpiration(new Date(new Date().getTime() +  lifeTime))
+			.setExpiration(new Date(new Date().getTime() + lifeTime))
 			.signWith(secretKey).compact();
-		log.info(":::::::: 토큰 생성 ::::::::::");
 
 		if (payLoad.getType().equals("RTK")) {
 			redisDao.setValues(payLoad.getUserId(), jwt, Duration.ofMillis(lifeTime));
 		}
-
-		log.info("::::::::::::: jwt = {}", jwt);
 
 		return jwt;
 	}
@@ -104,10 +96,10 @@ public class JwtProvider {
 		log.info("JWT claims = {}", claims);
 
 		PayLoad payLoad = PayLoad.builder()
-			.userNo(Long.valueOf((Integer) claims.get("userNo")))
-			.userId((String) claims.get("userId"))
-			.type((String) claims.get("type"))
-			.authority((String) claims.get("authority"))
+			.userNo(Long.valueOf((Integer)claims.get("userNo")))
+			.userId((String)claims.get("userId"))
+			.type((String)claims.get("type"))
+			.authority((String)claims.get("authority"))
 			.build();
 
 		return payLoad;

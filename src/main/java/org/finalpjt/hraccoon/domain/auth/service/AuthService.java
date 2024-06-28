@@ -37,8 +37,6 @@ public class AuthService {
 			throw new BadCredentialsException(AuthMessageConstants.AUTH_FAIL_PASSWORD_NOT_MATCH);
 		}
 
-		log.info(":::: Auth service signIn:::::");
-
 		PayLoad accessTokenPayLoad = PayLoad.builder()
 			.userNo(user.getUserNo())
 			.userId(user.getUserId())
@@ -52,12 +50,11 @@ public class AuthService {
 			.type("RTK")
 			.authority(user.getUserRole().toString())
 			.build();
-		log.info(":::: Payload 생성 :::::");
+
 		try {
 			String atkToken = jwtProvider.createToken(accessTokenPayLoad);
 			String rtkToken = jwtProvider.createToken(refreshTokenPayLoad);
 
-			log.info("::::: Token 생성 완료 ::::::::");
 			return TokenResponse.builder()
 				.accessToken(atkToken)
 				.refreshToken(rtkToken)

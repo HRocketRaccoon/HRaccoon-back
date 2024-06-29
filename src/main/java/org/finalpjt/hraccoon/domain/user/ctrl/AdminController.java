@@ -3,6 +3,7 @@ package org.finalpjt.hraccoon.domain.user.ctrl;
 import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminPasswordChangeRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AdminUserRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserDeleteRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserRequest;
@@ -42,8 +43,9 @@ public class AdminController {
 		@RequestParam(value = "department", defaultValue = "") String department,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		log.info("pageNumber: {}",pageNumber);
-		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, pageNumber, pageable);
+		log.info("pageNumber: {}", pageNumber);
+		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, pageNumber,
+			pageable);
 
 		return ApiResponse.createSuccess(users);
 	}
@@ -63,8 +65,9 @@ public class AdminController {
 		return ApiResponse.createSuccessWithMessage(adminService.updateUserInfo(params),
 			UserMessageConstants.USER_UPDATE_SUCCESS);
 	}
+
 	@PostMapping("/admin/delete")
-	public ApiResponse<?> deleteUser(@RequestBody UserDeleteRequest params){
+	public ApiResponse<?> deleteUser(@RequestBody UserDeleteRequest params) {
 		adminService.deleteUser(params);
 
 		return ApiResponse.createSuccessWithNoContent();
@@ -77,4 +80,12 @@ public class AdminController {
 		return ApiResponse.createSuccess(adminService.getUserInfo(userId));
 	}
 
+	@PostMapping("/admin/{userId}/change-password")
+	public ApiResponse<String> changePassword(@PathVariable String userId,
+		@RequestBody AdminPasswordChangeRequest adminPasswordChangeRequest) {
+		adminService.changePassword(userId, adminPasswordChangeRequest.getNewPassword(),
+			adminPasswordChangeRequest.getConfirmPassword());
+
+		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.PASSWORD_CHANGE_SUCCESS);
+	}
 }

@@ -48,11 +48,12 @@ public class AdminService {
 	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, int pageNumber,
 		Pageable pageable) {
 
-		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(keyword).isEmpty()) {
+		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(
+			keyword).isEmpty()) {
 			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
 		}
 
-			Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
+		Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
 			.or(UserSpecification.likeUserName(keyword));
 
 		if (!department.equals("")) {
@@ -72,11 +73,11 @@ public class AdminService {
 		}
 
 		Page<User> users = userRepository.findAll(spec,
-			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 
-		for(UserSearchResponse response : responses.getContent()) {
+		for (UserSearchResponse response : responses.getContent()) {
 			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getUserDepartment()),
 				codeRepository.findCodeNameByCodeNo(response.getUserTeam()));
 		}
@@ -125,10 +126,10 @@ public class AdminService {
 
 		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
 		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
-		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
-		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
+		String userTeam = codeRepository.findCodeNoByCodeName(params.getUserTeam());
+		String userRank = codeRepository.findCodeNoByCodeName(params.getUserRank());
 
-		if(userDepartment == null || userPosition == null || userTeam == null || userRank == null) {
+		if (userDepartment == null || userPosition == null || userTeam == null || userRank == null) {
 			throw new IllegalArgumentException(UserMessageConstants.CODE_NOT_FOUND);
 		}
 
@@ -165,4 +166,17 @@ public class AdminService {
 		return response;
 	}
 
+	@Transactional
+	public void changePassword(String userId, String newPassword, String confirmPassword) {
+		User user = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		if (!newPassword.equals(confirmPassword)) {
+			throw new IllegalArgumentException(UserMessageConstants.PASSWORD_CHANGE_FAIL_CONFIRM_ERROR);
+		}
+
+		user.updatePassword(passwordEncoder.encode(newPassword));
+
+		userRepository.save(user);
+	}
 }

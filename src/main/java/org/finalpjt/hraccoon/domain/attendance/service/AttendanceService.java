@@ -125,7 +125,9 @@ public class AttendanceService {
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
-			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")) {
+			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")
+				|| attendance.getAttendanceStatus().equals("BUSINESS_TRIP") || attendance.getAttendanceStatus()
+				.equals("OUT_ON_BUSINESS") || attendance.getAttendanceStatus().equals("VACATION")) {
 				whetherIncludingToday = false;
 				break;
 			}

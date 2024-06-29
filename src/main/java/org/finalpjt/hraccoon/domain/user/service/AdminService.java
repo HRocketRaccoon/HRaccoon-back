@@ -18,6 +18,7 @@ import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.domain.user.sepecification.UserSpecification;
+import org.hibernate.persister.entity.mutation.EntityTableMapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,14 +46,15 @@ public class AdminService {
 	private final AbilityRepository abilityRepository;
 
 	@Transactional(readOnly = true)
-	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, int pageNumber,
+	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, String deleteYn, int pageNumber,
 		Pageable pageable) {
 
-		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(keyword).isEmpty()) {
+		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(
+			keyword).isEmpty()) {
 			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
 		}
 
-			Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
+		Specification<User> spec = Specification.where(UserSpecification.likeUserId(keyword))
 			.or(UserSpecification.likeUserName(keyword));
 
 		if (!department.equals("")) {
@@ -70,13 +72,23 @@ public class AdminService {
 
 			spec = spec.and(UserSpecification.findByAbility(userNos));
 		}
+		if (!deleteYn.equals("")) {
+
+			boolean userDeleteYn;
+			if(deleteYn.equals("퇴사")) {
+				userDeleteYn = true;
+			} else {
+				userDeleteYn = false;
+			}
+			spec = spec.and(UserSpecification.findByDeleteYn(userDeleteYn));
+		}
 
 		Page<User> users = userRepository.findAll(spec,
-			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 
-		for(UserSearchResponse response : responses.getContent()) {
+		for (UserSearchResponse response : responses.getContent()) {
 			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getUserDepartment()),
 				codeRepository.findCodeNameByCodeNo(response.getUserTeam()));
 		}
@@ -92,6 +104,20 @@ public class AdminService {
 		if (userRepository.findByUserId(userId).isPresent()) {
 			throw new IllegalArgumentException(UserMessageConstants.USER_ALREADY_EXISTS);
 		}
+		// 이메일, 연락처 중복 확인
+		if (userRepository.findByUserEmail(params.getUserEmail()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_EMAIL_ALREADY_EXISTS);
+		}
+		if (userRepository.findByUserMobile(params.getUserMobile()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_MOBILE_ALREADY_EXISTS);
+		}
+
+		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
+		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
+		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
+		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
+
+		params.transferCode(userDepartment, userPosition, userTeam, userRank);
 
 		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
 		User entity = params.toEntity(encryptedPassword);
@@ -125,10 +151,10 @@ public class AdminService {
 
 		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
 		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
-		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
-		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
+		String userTeam = codeRepository.findCodeNoByCodeName(params.getUserTeam());
+		String userRank = codeRepository.findCodeNoByCodeName(params.getUserRank());
 
-		if(userDepartment == null || userPosition == null || userTeam == null || userRank == null) {
+		if (userDepartment == null || userPosition == null || userTeam == null || userRank == null) {
 			throw new IllegalArgumentException(UserMessageConstants.CODE_NOT_FOUND);
 		}
 
@@ -165,4 +191,17 @@ public class AdminService {
 		return response;
 	}
 
+	@Transactional
+	public void changePassword(String userId, String newPassword, String confirmPassword) {
+		User user = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		if (!newPassword.equals(confirmPassword)) {
+			throw new IllegalArgumentException(UserMessageConstants.PASSWORD_CHANGE_FAIL_CONFIRM_ERROR);
+		}
+
+		user.updatePassword(passwordEncoder.encode(newPassword));
+
+		userRepository.save(user);
+	}
 }

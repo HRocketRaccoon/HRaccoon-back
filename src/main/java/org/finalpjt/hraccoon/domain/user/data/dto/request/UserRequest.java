@@ -109,4 +109,11 @@ public class UserRequest {
 		this.userEmail = user.getUserEmail();
 		this.userJoinDate = user.getUserDetail().getUserJoinDate();
 	}
+
+	public void transferCode(String userDepartment, String userTeam, String userRank, String userPosition) {
+		this.userDepartment = userDepartment;
+		this.userTeam = userTeam;
+		this.userRank = userRank;
+		this.userPosition = userPosition;
+	}
 }

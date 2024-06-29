@@ -6,8 +6,8 @@ import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.AbilityRequest;
-import org.finalpjt.hraccoon.domain.user.data.dto.request.PasswordChangeRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
+import org.finalpjt.hraccoon.domain.user.data.dto.request.UserPasswordChangeRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
@@ -40,7 +40,6 @@ public class UserController {
 
 	private final UserService userService;
 
-	@PreAuthorize("#userId == principal")
 	@GetMapping("/user/info/{userId}")
 	public ApiResponse<UserResponse> getUserInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);
@@ -109,9 +108,9 @@ public class UserController {
 
 	@PostMapping("/user/{userId}/change-password")
 	public ApiResponse<String> changePassword(@PathVariable String userId,
-		@RequestBody PasswordChangeRequest passwordChangeRequest) {
-		userService.changePassword(userId, passwordChangeRequest.getOriginPassword(),
-			passwordChangeRequest.getNewPassword(), passwordChangeRequest.getConfirmPassword());
+		@RequestBody UserPasswordChangeRequest userPasswordChangeRequest) {
+		userService.changePassword(userId, userPasswordChangeRequest.getOriginPassword(),
+			userPasswordChangeRequest.getNewPassword(), userPasswordChangeRequest.getConfirmPassword());
 
 		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.PASSWORD_CHANGE_SUCCESS);
 	}

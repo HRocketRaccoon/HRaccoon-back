@@ -123,6 +123,7 @@ class AdminServiceTest {
 		String keyword = "A000001";
 		String ability = "";
 		String department = "IT 사업부";
+		String deleteYn = "";
 		int pageNumber = 1;
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("userNo")));
 
@@ -140,7 +141,7 @@ class AdminServiceTest {
 
 		userRepository.findByUserId("A000001").get().getUserDetail().updateUserDeleteYn();
 		// when
-		Page<UserSearchResponse> userSearchResponses = adminService.adminSearchUser(keyword, ability, department, pageNumber, pageable);
+		Page<UserSearchResponse> userSearchResponses = adminService.adminSearchUser(keyword, ability, department, deleteYn, pageNumber, pageable);
 		List<UserSearchResponse> users = userSearchResponses.getContent();
 
 		// then

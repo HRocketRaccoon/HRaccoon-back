@@ -18,6 +18,7 @@ import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.domain.user.sepecification.UserSpecification;
+import org.hibernate.persister.entity.mutation.EntityTableMapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +46,7 @@ public class AdminService {
 	private final AbilityRepository abilityRepository;
 
 	@Transactional(readOnly = true)
-	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, int pageNumber,
+	public Page<UserSearchResponse> adminSearchUser(String keyword, String ability, String department, String deleteYn, int pageNumber,
 		Pageable pageable) {
 
 		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(
@@ -71,6 +72,16 @@ public class AdminService {
 
 			spec = spec.and(UserSpecification.findByAbility(userNos));
 		}
+		if (!deleteYn.equals("")) {
+
+			boolean userDeleteYn;
+			if(deleteYn.equals("퇴사")) {
+				userDeleteYn = true;
+			} else {
+				userDeleteYn = false;
+			}
+			spec = spec.and(UserSpecification.findByDeleteYn(userDeleteYn));
+		}
 
 		Page<User> users = userRepository.findAll(spec,
 			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
@@ -93,6 +104,20 @@ public class AdminService {
 		if (userRepository.findByUserId(userId).isPresent()) {
 			throw new IllegalArgumentException(UserMessageConstants.USER_ALREADY_EXISTS);
 		}
+		// 이메일, 연락처 중복 확인
+		if (userRepository.findByUserEmail(params.getUserEmail()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_EMAIL_ALREADY_EXISTS);
+		}
+		if (userRepository.findByUserMobile(params.getUserMobile()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_MOBILE_ALREADY_EXISTS);
+		}
+
+		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
+		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
+		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
+		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
+
+		params.transferCode(userDepartment, userPosition, userTeam, userRank);
 
 		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
 		User entity = params.toEntity(encryptedPassword);

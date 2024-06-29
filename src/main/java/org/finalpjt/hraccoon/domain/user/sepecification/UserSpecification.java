@@ -50,6 +50,15 @@ public class UserSpecification {
 		};
 	}
 
+	public static Specification<User> findByDeleteYn(boolean deleteYn) {
+		return new Specification<User>() {
+			@Override
+			public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				return criteriaBuilder.equal(root.get("userDetail").get("userDeleteYn"), deleteYn);
+			}
+		};
+	}
+
 	public static Specification<User> findByAbility(List<Long> userNos) {
 		return new Specification<User>() {
 			@Override

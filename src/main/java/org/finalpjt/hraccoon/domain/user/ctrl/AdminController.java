@@ -41,17 +41,17 @@ public class AdminController {
 		@RequestParam(value = "keyword", defaultValue = "") String keyword,
 		@RequestParam(value = "ability", defaultValue = "") String ability,
 		@RequestParam(value = "department", defaultValue = "") String department,
+		@RequestParam(value = "deleteYn", defaultValue = "") String deleteYn,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		log.info("pageNumber: {}", pageNumber);
-		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, pageNumber,
-			pageable);
+		log.info("pageNumber: {}",pageNumber);
+		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, deleteYn, pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);
 	}
 
 	@PostMapping("/admin/create")
-	public ApiResponse<Void> createUser(@Valid @RequestBody UserRequest params) {
+	public ApiResponse<Void> createUser(@RequestBody UserRequest params) {
 		log.info("createUserInfo params = {}", params);
 		adminService.createUser(params);
 

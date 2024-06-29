@@ -40,7 +40,6 @@ public class UserController {
 
 	private final UserService userService;
 
-	@PreAuthorize("#userId == principal")
 	@GetMapping("/user/info/{userId}")
 	public ApiResponse<UserResponse> getUserInfo(@PathVariable String userId) {
 		log.info("getUserInfo userId = {}", userId);

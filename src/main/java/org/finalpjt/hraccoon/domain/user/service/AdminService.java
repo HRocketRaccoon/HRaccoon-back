@@ -149,6 +149,14 @@ public class AdminService {
 		User entity = userRepository.findByUserId(params.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 
+		// 이메일, 연락처 중복 확인
+		if (userRepository.findByUserEmailAndUserIdNot(params.getUserEmail(), params.getUserId()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_EMAIL_ALREADY_EXISTS);
+		}
+		if (userRepository.findByUserMobileAndUserIdNot(params.getUserMobile(), params.getUserId()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_MOBILE_ALREADY_EXISTS);
+		}
+
 		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
 		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
 		String userTeam = codeRepository.findCodeNoByCodeName(params.getUserTeam());

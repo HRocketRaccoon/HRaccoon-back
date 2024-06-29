@@ -1,9 +1,9 @@
 package org.finalpjt.hraccoon.domain.attendance.data.entity;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Duration;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,9 +63,9 @@ public class Attendance extends BaseTimeEntity {
 	@JsonIgnore
 	private User user;
 
-    public void setAttendanceDay(String attendanceDay) {
-        this.attendanceDay = attendanceDay;
-    }
+	public void setAttendanceDay(String attendanceDay) {
+		this.attendanceDay = attendanceDay;
+	}
 
 	public void setAttendanceTotalTime() {
 		if (attendanceStartTime != null && attendanceEndTime != null) {
@@ -74,22 +74,24 @@ public class Attendance extends BaseTimeEntity {
 			long hours = seconds / 3600;
 			long minutes = (seconds % 3600) / 60;
 			long remainingSeconds = seconds % 60;
-			this.attendanceTotalTime = LocalTime.of((int) hours, (int) minutes, (int) remainingSeconds);
+			this.attendanceTotalTime = LocalTime.of((int)hours, (int)minutes, (int)remainingSeconds);
 		} else {
 			this.attendanceTotalTime = null;
 		}
 	}
 
 	@Builder
-	public Attendance(LocalDate attendanceDate, LocalDateTime attendanceStartTime, LocalDateTime attendanceEndTime,
-		LocalTime attendanceTotalTime, String attendanceStatus, User user, String attendanceDay) {
+	public Attendance(Long attendanceNo, LocalDate attendanceDate, LocalDateTime attendanceStartTime,
+		LocalDateTime attendanceEndTime,
+		LocalTime attendanceTotalTime, String attendanceStatus, String attendanceDay, User user) {
+		this.attendanceNo = attendanceNo;
 		this.attendanceDate = attendanceDate;
 		this.attendanceStartTime = attendanceStartTime;
 		this.attendanceEndTime = attendanceEndTime;
 		this.attendanceTotalTime = attendanceTotalTime;
 		this.attendanceStatus = attendanceStatus;
-		this.user = user;
 		this.attendanceDay = attendanceDay;
+		this.user = user;
 	}
 
 	// 결재 승인 시 근태 상태 변경
@@ -110,6 +112,5 @@ public class Attendance extends BaseTimeEntity {
 	private Attendance(Long attendanceNo) {
 		this.attendanceNo = attendanceNo;
 	}
-
 
 }

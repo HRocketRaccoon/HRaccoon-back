@@ -15,6 +15,7 @@ public class UserSearchResponse {
 	private String userDepartment;
 	private String userTeam;
 	private String userRole;
+	private boolean userDeleteYn;
 
 	public UserSearchResponse(User user) {
 		this.userId = user.getUserId();
@@ -22,6 +23,7 @@ public class UserSearchResponse {
 		this.userDepartment = user.getUserDepartment();
 		this.userTeam = user.getUserTeam();
 		this.userRole = user.getUserRole().toString();
+		this.userDeleteYn = user.getUserDetail().getUserDeleteYn();
 	}
 
 	public void transferCode(String userDepartment, String userTeam) {

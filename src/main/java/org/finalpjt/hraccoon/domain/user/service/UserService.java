@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+	private final PasswordEncoder passwordEncoder;
 
 	private final UserRepository userRepository;
 
@@ -138,7 +141,8 @@ public class UserService {
 	public Page<UserSearchResponse> searchUser(String keyword, String ability, String department, int pageNumber,
 		Pageable pageable) {
 
-		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(keyword).isEmpty()) {
+		if (!keyword.equals("") && userRepository.findByUserId(keyword).isEmpty() && userRepository.findByUserName(
+			keyword).isEmpty()) {
 			throw new IllegalArgumentException(UserMessageConstants.USER_SEARCH_FAIL);
 		}
 
@@ -162,11 +166,11 @@ public class UserService {
 		}
 
 		Page<User> users = userRepository.findAll(spec.and(UserSpecification.findByUserDeleteYn()),
-			PageRequest.of(pageNumber-1, pageable.getPageSize(), pageable.getSort()));
+			PageRequest.of(pageNumber - 1, pageable.getPageSize(), pageable.getSort()));
 
 		Page<UserSearchResponse> responses = users.map(UserSearchResponse::new);
 
-		for(UserSearchResponse response : responses.getContent()) {
+		for (UserSearchResponse response : responses.getContent()) {
 			response.transferCode(codeRepository.findCodeNameByCodeNo(response.getUserDepartment()),
 				codeRepository.findCodeNameByCodeNo(response.getUserTeam()));
 		}
@@ -184,6 +188,22 @@ public class UserService {
 
 		return approvals.stream().map(ApprovalResponse::new).toList();
 	}
+	
+	@Transactional
+	public void changePassword(String userId, String originPassword, String newPassword, String confirmPassword) {
+		User user = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
 
-	// TODO: 비밀번호 변경
+		if (!passwordEncoder.matches(originPassword, user.getUserPassword())) {
+			throw new IllegalArgumentException(UserMessageConstants.PASSWORD_CHANGE_FAIL_WRONG_ORIGIN_PASSWORD);
+		}
+
+		if (!newPassword.equals(confirmPassword)) {
+			throw new IllegalArgumentException(UserMessageConstants.PASSWORD_CHANGE_FAIL_CONFIRM_ERROR);
+		}
+
+		user.updatePassword(passwordEncoder.encode(newPassword));
+
+		userRepository.save(user);
+	}
 }

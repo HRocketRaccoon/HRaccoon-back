@@ -212,4 +212,15 @@ public class AdminService {
 
 		userRepository.save(user);
 	}
+
+	@Transactional
+	public String updateUserImage(Long userId, String imageUrl) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		user.updateUserImage(imageUrl);
+		userRepository.save(user);
+
+		return imageUrl;
+	}
 }

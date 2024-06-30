@@ -1,5 +1,7 @@
 package org.finalpjt.hraccoon.domain.user.ctrl;
 
+import java.util.Map;
+
 import jakarta.validation.Valid;
 
 import org.finalpjt.hraccoon.domain.user.constant.UserMessageConstants;
@@ -44,8 +46,9 @@ public class AdminController {
 		@RequestParam(value = "deleteYn", defaultValue = "") String deleteYn,
 		@RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
 		@PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-		log.info("pageNumber: {}",pageNumber);
-		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, deleteYn, pageNumber, pageable);
+		log.info("pageNumber: {}", pageNumber);
+		Page<UserSearchResponse> users = adminService.adminSearchUser(keyword, ability, department, deleteYn,
+			pageNumber, pageable);
 
 		return ApiResponse.createSuccess(users);
 	}
@@ -87,5 +90,13 @@ public class AdminController {
 			adminPasswordChangeRequest.getConfirmPassword());
 
 		return ApiResponse.createSuccessWithMessage(null, UserMessageConstants.PASSWORD_CHANGE_SUCCESS);
+	}
+
+	@PostMapping("/admin/{userId}/image-upload")
+	public ApiResponse<String> uploadUserImage(@PathVariable Long userId, @RequestBody Map<String, String> payload) {
+		String imageUrl = payload.get("imageUrl");
+
+		String responseUrl = adminService.updateUserImage(userId, imageUrl);
+		return ApiResponse.createSuccess(responseUrl);
 	}
 }

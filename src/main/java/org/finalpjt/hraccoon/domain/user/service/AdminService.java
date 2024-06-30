@@ -117,10 +117,12 @@ public class AdminService {
 		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
 		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
 
-		params.transferCode(userDepartment, userPosition, userTeam, userRank);
+		params.transferCode(userDepartment, userTeam, userRank, userPosition);
 
 		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
 		User entity = params.toEntity(encryptedPassword);
+
+		entity.updateUserImage(params.getUserImageUrl());
 
 		try {
 			UserDetail userDetail = createUserDetail(params.getUserJoinDate());
@@ -148,6 +150,14 @@ public class AdminService {
 	public UserResponse updateUserInfo(AdminUserRequest params) {
 		User entity = userRepository.findByUserId(params.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		// 이메일, 연락처 중복 확인
+		if (userRepository.findByUserEmailAndUserIdNot(params.getUserEmail(), params.getUserId()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_EMAIL_ALREADY_EXISTS);
+		}
+		if (userRepository.findByUserMobileAndUserIdNot(params.getUserMobile(), params.getUserId()).isPresent()) {
+			throw new IllegalArgumentException(UserMessageConstants.USER_MOBILE_ALREADY_EXISTS);
+		}
 
 		String userDepartment = codeRepository.findCodeNoByCodeName(params.getUserDepartment());
 		String userPosition = codeRepository.findCodeNoByCodeName(params.getUserPosition());
@@ -203,5 +213,16 @@ public class AdminService {
 		user.updatePassword(passwordEncoder.encode(newPassword));
 
 		userRepository.save(user);
+	}
+
+	@Transactional
+	public String updateUserImage(Long userId, String imageUrl) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		user.updateUserImage(imageUrl);
+		userRepository.save(user);
+
+		return imageUrl;
 	}
 }

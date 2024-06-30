@@ -81,6 +81,9 @@ public class User extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	private Role userRole;
 
+	@Column(name = "user_image_url")
+	private String userImageUrl;
+
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "user_detail_no")
 	private UserDetail userDetail;
@@ -119,6 +122,10 @@ public class User extends BaseTimeEntity {
 
 	public void updatePassword(String newPassword) {
 		this.userPassword = newPassword;
+	}
+
+	public void updateUserImage(String userImage) {
+		this.userImageUrl = userImage;
 	}
 
 	// test용 

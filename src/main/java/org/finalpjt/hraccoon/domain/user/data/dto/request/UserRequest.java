@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,9 +22,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequest {
 
-	// TODO: user_image 관련 처리
-
-	/*TODO: 사원번호 제약조건 걸기*/
 	@NotBlank
 	private String userId;
 
@@ -74,6 +70,9 @@ public class UserRequest {
 	@NotNull
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime userJoinDate;
+
+	@NotBlank
+	private String userImageUrl;
 
 	public User toEntity(String encryptedPassword) {
 		return User.builder()

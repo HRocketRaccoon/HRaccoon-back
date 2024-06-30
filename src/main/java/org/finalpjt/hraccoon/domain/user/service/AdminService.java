@@ -117,10 +117,12 @@ public class AdminService {
 		String userTeam	= codeRepository.findCodeNoByCodeName(params.getUserTeam());
 		String userRank	= codeRepository.findCodeNoByCodeName(params.getUserRank());
 
-		params.transferCode(userDepartment, userTeam, userRank,userPosition);
+		params.transferCode(userDepartment, userTeam, userRank, userPosition);
 
 		String encryptedPassword = passwordEncoder.encode(params.getUserPassword());
 		User entity = params.toEntity(encryptedPassword);
+
+		entity.updateUserImage(params.getUserImageUrl());
 
 		try {
 			UserDetail userDetail = createUserDetail(params.getUserJoinDate());

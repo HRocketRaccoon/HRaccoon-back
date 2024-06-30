@@ -20,6 +20,7 @@ public class UserResponse {
 	private String userTeam;
 	private String userRank;
 	private String userRole;
+	private String userImageUrl;
 
 	/* 변경 가능한 값 */
 	private String userMobile;
@@ -43,6 +44,7 @@ public class UserResponse {
 		this.userMobile = user.getUserMobile();
 		this.userAddress = user.getUserAddress();
 		this.userEmail = user.getUserEmail();
+		this.userImageUrl = user.getUserImageUrl();
 	}
 
 	public void insertUserDetail(Integer userRemainVacation, LocalDateTime userJoinDate) {

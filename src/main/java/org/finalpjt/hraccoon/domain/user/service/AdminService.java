@@ -18,7 +18,7 @@ import org.finalpjt.hraccoon.domain.user.repository.AbilityRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserDetailRepository;
 import org.finalpjt.hraccoon.domain.user.repository.UserRepository;
 import org.finalpjt.hraccoon.domain.user.sepecification.UserSpecification;
-import org.hibernate.persister.entity.mutation.EntityTableMapping;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

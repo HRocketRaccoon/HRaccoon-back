@@ -23,6 +23,7 @@ public class AdminUserResponse {
 	private String userMobile;
 	private String userAddress;
 	private String userEmail;
+	private String userImageUrl;
 
 	/* UserDetail */
 	private Integer userRemainVacation;
@@ -45,6 +46,7 @@ public class AdminUserResponse {
 		this.userMobile = user.getUserMobile();
 		this.userAddress = user.getUserAddress();
 		this.userEmail = user.getUserEmail();
+		this.userImageUrl = user.getUserImageUrl();
 
 		this.userRemainVacation = user.getUserDetail().getUserRemainVacation();
 		this.userJoinDate = user.getUserDetail().getUserJoinDate();

@@ -51,7 +51,7 @@ public class AttendanceService {
 
 		Integer totalHours = 0;
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				Duration duration = Duration.between(attendance.getAttendanceStartTime(),
 					attendance.getAttendanceEndTime());
 				totalHours += duration.toHoursPart();
@@ -72,37 +72,39 @@ public class AttendanceService {
 		Set<LocalDate> workedDays = new HashSet<>();
 
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				workedDays.add(attendance.getAttendanceDate());
 			}
 		}
 		workedDaysCount = workedDays.size();
 
 		return workedDaysCount;
-	}
+	} // 직원이 근무한 날짜 수
 
 	// 해당 월 근무시간, 달성률 조회
 	public AttendacneMonthPercentResponseDTO calculateMonthlyHours(Long userNo, LocalDate date) {
 		LocalDate startOfMonth = date.withDayOfMonth(1);
-		LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
+		LocalDate endOfMonth = date;
+		// LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
 
 		List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth,
 			endOfMonth);
 
-		Integer totalHours = 0;
+		Integer totalWorkHours = 0;
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				Duration duration = Duration.between(attendance.getAttendanceStartTime(),
 					attendance.getAttendanceEndTime());
-				totalHours += duration.toHoursPart();
+				totalWorkHours += duration.toHoursPart();
 			}
 		}
-		// workedDaysCount-> 휴일관리 따로 빼고, 달 총 근무일자 기준(ex-20일) 정해서 계산
+		// workedDaysCount-> 내가 근무한 날짜 수(주말 제외, 출석 제외), 달 총 근무일자 기준(ex-20일) 정해서 계산
 		Integer workedDaysCount = calculateWorkedDays(attendances);
-		double percent = workedDaysCount > 0 ? ((double)totalHours / (8 * workedDaysCount)) * 100 : 0;
+		Integer totalHours = 8 * workedDaysCount;
+		double percent = workedDaysCount > 0 ? ((double)totalWorkHours / totalHours) * 100 : 0;
 
 		AttendacneMonthPercentResponseDTO response = new AttendacneMonthPercentResponseDTO();
-		response.of(totalHours, percent);
+		response.of(totalHours, totalWorkHours, percent);
 
 		return response;
 	}
@@ -125,7 +127,7 @@ public class AttendanceService {
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
-			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")
+			if (attendance.getAttendanceDate().isEqual(today) && !attendance.getAttendanceStatus().equals("출근")
 				|| attendance.getAttendanceStatus().equals("BUSINESS_TRIP") || attendance.getAttendanceStatus()
 				.equals("OUT_ON_BUSINESS") || attendance.getAttendanceStatus().equals("VACATION")) {
 				whetherIncludingToday = false;

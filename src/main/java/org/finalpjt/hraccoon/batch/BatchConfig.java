@@ -85,7 +85,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 		return new JpaCursorItemReaderBuilder<User>()
 			.name("userReader")
 			.entityManagerFactory(entityManagerFactory)
-			.queryString("SELECT u FROM User u")
+			.queryString("select u from User u where u.userDetail.userDeleteYn = false")
 			.build();
 	}
 

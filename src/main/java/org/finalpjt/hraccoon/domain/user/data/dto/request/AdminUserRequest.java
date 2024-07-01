@@ -46,9 +46,12 @@ public class AdminUserRequest {
 	@Pattern(regexp = ValidationConstants.ROLE_PATTERN, message = ValidationConstants.ROLE_MESSAGE)
 	private String userRole;
 
+	@NotBlank
+	private String userImageUrl;
+
 	@Builder
 	public AdminUserRequest(String userId, String userName, String userMobile, String userAddress, String userEmail,
-			String userDepartment, String userPosition, String userTeam, String userRank, String userRole) {
+		String userDepartment, String userPosition, String userTeam, String userRank, String userRole) {
 		this.userId = userId;
 		this.userName = userName;
 		this.userMobile = userMobile;

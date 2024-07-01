@@ -32,6 +32,7 @@ public class AttendanceController {
 
     @GetMapping("/attendance/monthtotalpercent/{userNo}")
     public ApiResponse<AttendacneMonthPercentResponseDTO> getMonthlyTotal(@PathVariable Long userNo) {
+        // LocalDate specificDate = LocalDate.of(2024, 6, 10);
         AttendacneMonthPercentResponseDTO response = attendanceService.calculateMonthlyHours(userNo, LocalDate.now());
 
         return ApiResponse.createSuccess(response);

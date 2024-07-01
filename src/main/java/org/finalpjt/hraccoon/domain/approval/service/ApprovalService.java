@@ -67,8 +67,6 @@ public class ApprovalService {
 		}
 	}
 
-
-
 	public List<Map<String, String>> getApprovalAuthority(String userPosition) {
 		List<String> positions;
 

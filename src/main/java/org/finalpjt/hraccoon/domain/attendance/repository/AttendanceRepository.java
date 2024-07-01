@@ -11,23 +11,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
-    
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo ")
-    public Attendance startend(LocalDate attendanceDate, String userNo);
-    
-    @Query("SELECT a FROM Attendance a WHERE a.user.userNo = :userNo")
-    Optional<Attendance> findByUserNo(Long userNo);
+public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate BETWEEN :startDate AND :endDate AND a.user.userNo = :userNo")
-    List<Attendance> findByUserNoAndDateBetween(Long userNo, LocalDate startDate, LocalDate endDate);
+	@Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo ")
+	public Attendance startend(LocalDate attendanceDate, String userNo);
 
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo")
-    Optional<Attendance> findByUserNoAndDate(Long userNo, LocalDate attendanceDate);
+	@Query("SELECT a FROM Attendance a WHERE a.user.userNo = :userNo")
+	Optional<Attendance> findByUserNo(Long userNo);
 
-    @Query("SELECT a FROM Attendance a WHERE a.user=:user AND a.attendanceDate=:attendanceDate")
-    List<Attendance> findByUserAndAttendanceDate(User user, LocalDate attendanceDate);
+	@Query("SELECT a FROM Attendance a WHERE a.attendanceDate BETWEEN :startDate AND :endDate AND a.user.userNo = :userNo")
+	List<Attendance> findByUserNoAndDateBetween(Long userNo, LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT a FROM Attendance a WHERE a.attendanceDate=:today")
-    List<Attendance> findByAttendanceDate(LocalDate today);
+	@Query("SELECT a FROM Attendance a WHERE a.attendanceDate = :attendanceDate AND a.user.userNo = :userNo")
+	Optional<Attendance> findByUserNoAndDate(Long userNo, LocalDate attendanceDate);
+
+	@Query("SELECT a FROM Attendance a WHERE a.user=:user AND a.attendanceDate=:attendanceDate")
+	List<Attendance> findByUserAndAttendanceDate(User user, LocalDate attendanceDate);
+
+	@Query("SELECT a FROM Attendance a WHERE a.attendanceDate=:today")
+	List<Attendance> findByAttendanceDate(LocalDate today);
 }

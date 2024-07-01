@@ -37,7 +37,7 @@ public class ApprovalRequest {
 	@NotBlank
 	private String selectedApprovalAuthority;
 
-	@NotBlank
+	// @NotBlank
 	private String approvalDetailContent;
 
 	@Builder

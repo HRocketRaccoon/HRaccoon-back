@@ -3,17 +3,21 @@ package org.finalpjt.hraccoon.domain.attendance.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
 import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalStatus;
+import org.finalpjt.hraccoon.domain.approval.data.enums.ApprovalType;
 import org.finalpjt.hraccoon.domain.approval.repository.ApprovalRepository;
 import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneMonthPercentResponseDTO;
 import org.finalpjt.hraccoon.domain.attendance.data.dto.response.AttendacneWeekPercentResponseDTO;
@@ -51,7 +55,7 @@ public class AttendanceService {
 
 		Integer totalHours = 0;
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				Duration duration = Duration.between(attendance.getAttendanceStartTime(),
 					attendance.getAttendanceEndTime());
 				totalHours += duration.toHoursPart();
@@ -72,37 +76,39 @@ public class AttendanceService {
 		Set<LocalDate> workedDays = new HashSet<>();
 
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				workedDays.add(attendance.getAttendanceDate());
 			}
 		}
 		workedDaysCount = workedDays.size();
 
 		return workedDaysCount;
-	}
+	} // 직원이 근무한 날짜 수
 
 	// 해당 월 근무시간, 달성률 조회
 	public AttendacneMonthPercentResponseDTO calculateMonthlyHours(Long userNo, LocalDate date) {
 		LocalDate startOfMonth = date.withDayOfMonth(1);
-		LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
+		LocalDate endOfMonth = date;
+		// LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
 
 		List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfMonth,
 			endOfMonth);
 
-		Integer totalHours = 0;
+		Integer totalWorkHours = 0;
 		for (Attendance attendance : attendances) {
-			if ("퇴근".equals(attendance.getAttendanceStatus())) {
+			if (!attendance.getAttendanceStatus().equals("출근")) {
 				Duration duration = Duration.between(attendance.getAttendanceStartTime(),
 					attendance.getAttendanceEndTime());
-				totalHours += duration.toHoursPart();
+				totalWorkHours += duration.toHoursPart();
 			}
 		}
-		// workedDaysCount-> 휴일관리 따로 빼고, 달 총 근무일자 기준(ex-20일) 정해서 계산
+		// workedDaysCount-> 내가 근무한 날짜 수(주말 제외, 출석 제외), 달 총 근무일자 기준(ex-20일) 정해서 계산
 		Integer workedDaysCount = calculateWorkedDays(attendances);
-		double percent = workedDaysCount > 0 ? ((double)totalHours / (8 * workedDaysCount)) * 100 : 0;
+		Integer totalHours = 8 * workedDaysCount;
+		double percent = workedDaysCount > 0 ? ((double)totalWorkHours / totalHours) * 100 : 0;
 
 		AttendacneMonthPercentResponseDTO response = new AttendacneMonthPercentResponseDTO();
-		response.of(totalHours, percent);
+		response.of(totalHours, totalWorkHours, percent);
 
 		return response;
 	}
@@ -125,7 +131,7 @@ public class AttendanceService {
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
-			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")
+			if (attendance.getAttendanceDate().isEqual(today) && !attendance.getAttendanceStatus().equals("출근")
 				|| attendance.getAttendanceStatus().equals("BUSINESS_TRIP") || attendance.getAttendanceStatus()
 				.equals("OUT_ON_BUSINESS") || attendance.getAttendanceStatus().equals("VACATION")) {
 				whetherIncludingToday = false;
@@ -244,4 +250,184 @@ public class AttendanceService {
 		attendanceRepository.delete(attendance);
 	}
 
+	@Transactional
+	public Map<String, Double> calculateBusinessTripPercentage() {
+		List<User> users = userRepository.findAll();
+
+		LocalDate now = LocalDate.now();
+		LocalDateTime startOfThisMonth = now.withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfThisMonth = now.withDayOfMonth(now.lengthOfMonth()).atTime(LocalTime.MAX);
+
+		LocalDateTime startOfLastMonth = now.minusMonths(1).withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfLastMonth = now.minusMonths(1)
+			.withDayOfMonth(now.minusMonths(1).lengthOfMonth())
+			.atTime(LocalTime.MAX);
+
+		int totalDaysInThisMonth = now.lengthOfMonth();
+		int totalDaysInLastMonth = now.minusMonths(1).lengthOfMonth();
+		int totalWorkingDaysThisMonth = totalDaysInThisMonth * users.size();
+		int totalWorkingDaysLastMonth = totalDaysInLastMonth * users.size();
+
+		int totalBusinessTripDaysThisMonth = 0;
+		int totalBusinessTripDaysLastMonth = 0;
+
+		for (User user : users) {
+			List<Approval> approvedBusinessTripThisMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfThisMonth, endOfThisMonth);
+
+			for (Approval approval : approvedBusinessTripThisMonth) {
+				if (approval.getApprovalType() == ApprovalType.BUSINESS_TRIP) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalBusinessTripDaysThisMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+
+			List<Approval> approvedBusinessTripLastMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfLastMonth, endOfLastMonth);
+
+			for (Approval approval : approvedBusinessTripLastMonth) {
+				if (approval.getApprovalType() == ApprovalType.BUSINESS_TRIP) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalBusinessTripDaysLastMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+		}
+
+		double businessTripPercentageThisMonth =
+			(double)totalBusinessTripDaysThisMonth / totalWorkingDaysThisMonth * 100;
+		double businessTripPercentageLastMonth =
+			(double)totalBusinessTripDaysLastMonth / totalWorkingDaysLastMonth * 100;
+		double difference =
+			((businessTripPercentageThisMonth - businessTripPercentageLastMonth) / businessTripPercentageLastMonth)
+				* 100;
+
+		Map<String, Double> percentages = new HashMap<>();
+		percentages.put("thisMonth", businessTripPercentageThisMonth);
+		percentages.put("lastMonth", businessTripPercentageLastMonth);
+		percentages.put("difference", difference);
+
+		return percentages;
+	}
+
+	@Transactional
+	public Map<String, Double> calculateOutOnBusinessPercentage() {
+		List<User> users = userRepository.findAll();
+
+		LocalDate now = LocalDate.now();
+		LocalDateTime startOfThisMonth = now.withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfThisMonth = now.withDayOfMonth(now.lengthOfMonth()).atTime(LocalTime.MAX);
+
+		LocalDateTime startOfLastMonth = now.minusMonths(1).withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfLastMonth = now.minusMonths(1)
+			.withDayOfMonth(now.minusMonths(1).lengthOfMonth())
+			.atTime(LocalTime.MAX);
+
+		int totalDaysInThisMonth = now.lengthOfMonth();
+		int totalDaysInLastMonth = now.minusMonths(1).lengthOfMonth();
+		int totalWorkingDaysThisMonth = totalDaysInThisMonth * users.size();
+		int totalWorkingDaysLastMonth = totalDaysInLastMonth * users.size();
+
+		int totalOutOnBusinessDaysThisMonth = 0;
+		int totalOutOnBusinessDaysLastMonth = 0;
+
+		for (User user : users) {
+			List<Approval> approvedOutOnBusinessThisMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfThisMonth, endOfThisMonth);
+
+			for (Approval approval : approvedOutOnBusinessThisMonth) {
+				if (approval.getApprovalType() == ApprovalType.OUT_ON_BUSINESS) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalOutOnBusinessDaysThisMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+
+			List<Approval> approvedOutOnBusinessLastMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfLastMonth, endOfLastMonth);
+
+			for (Approval approval : approvedOutOnBusinessLastMonth) {
+				if (approval.getApprovalType() == ApprovalType.OUT_ON_BUSINESS) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalOutOnBusinessDaysLastMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+		}
+
+		double outOnBusinessPercentageThisMonth =
+			(double)totalOutOnBusinessDaysThisMonth / totalWorkingDaysThisMonth * 100;
+		double outOnBusinessPercentageLastMonth =
+			(double)totalOutOnBusinessDaysLastMonth / totalWorkingDaysLastMonth * 100;
+		double difference =
+			((outOnBusinessPercentageThisMonth - outOnBusinessPercentageLastMonth) / outOnBusinessPercentageLastMonth)
+				* 100;
+
+		Map<String, Double> percentages = new HashMap<>();
+		percentages.put("thisMonth", outOnBusinessPercentageThisMonth);
+		percentages.put("lastMonth", outOnBusinessPercentageLastMonth);
+		percentages.put("difference", difference);
+
+		return percentages;
+	}
+
+	@Transactional
+	public Map<String, Double> calculateVacationPercentage() {
+		List<User> users = userRepository.findAll();
+
+		LocalDate now = LocalDate.now();
+		LocalDateTime startOfThisMonth = now.withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfThisMonth = now.withDayOfMonth(now.lengthOfMonth()).atTime(LocalTime.MAX);
+
+		LocalDateTime startOfLastMonth = now.minusMonths(1).withDayOfMonth(1).atStartOfDay();
+		LocalDateTime endOfLastMonth = now.minusMonths(1)
+			.withDayOfMonth(now.minusMonths(1).lengthOfMonth())
+			.atTime(LocalTime.MAX);
+
+		int totalDaysInThisMonth = now.lengthOfMonth();
+		int totalDaysInLastMonth = now.minusMonths(1).lengthOfMonth();
+		int totalWorkingDaysThisMonth = totalDaysInThisMonth * users.size();
+		int totalWorkingDaysLastMonth = totalDaysInLastMonth * users.size();
+
+		int totalVacationDaysThisMonth = 0;
+		int totalVacationDaysLastMonth = 0;
+
+		for (User user : users) {
+			List<Approval> approvedVacationsThisMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfThisMonth, endOfThisMonth);
+
+			for (Approval approval : approvedVacationsThisMonth) {
+				if (approval.getApprovalType() == ApprovalType.VACATION) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalVacationDaysThisMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+
+			List<Approval> approvedVacationsLastMonth = approvalRepository.findByUserNoAndApprovalStatusAndDateBetween(
+				user.getUserNo(), ApprovalStatus.APPROVED, startOfLastMonth, endOfLastMonth);
+
+			for (Approval approval : approvedVacationsLastMonth) {
+				if (approval.getApprovalType() == ApprovalType.VACATION) {
+					LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+					LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+					totalVacationDaysLastMonth += getDatesBetween(startDate, endDate).size();
+				}
+			}
+		}
+
+		double vacationPercentageThisMonth = (double)totalVacationDaysThisMonth / totalWorkingDaysThisMonth * 100;
+		double vacationPercentageLastMonth = (double)totalVacationDaysLastMonth / totalWorkingDaysLastMonth * 100;
+		double difference =
+			((vacationPercentageThisMonth - vacationPercentageLastMonth) / vacationPercentageLastMonth)
+				* 100;
+
+		Map<String, Double> percentages = new HashMap<>();
+		percentages.put("thisMonth", vacationPercentageThisMonth);
+		percentages.put("lastMonth", vacationPercentageLastMonth);
+		percentages.put("difference", difference);
+
+		return percentages;
+	}
 }

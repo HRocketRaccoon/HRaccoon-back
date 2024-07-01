@@ -1,5 +1,6 @@
 package org.finalpjt.hraccoon.domain.approval.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.finalpjt.hraccoon.domain.approval.data.entity.Approval;
@@ -20,4 +21,13 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
 	@Query("select a from Approval a join fetch a.user join fetch a.approvalDetail where a.user.userTeam = :userTeam and a.approvalStatus=:approvalStatus")
 	List<Approval> findByUserTeamWithUserAndApprovalDetail(String userTeam, ApprovalStatus approvalStatus);
+
+	@Query("SELECT a FROM Approval a WHERE a.user.userNo = :userNo " +
+		"AND a.approvalStatus = :approvalStatus " +
+		"AND a.approvalDetail.approvalDetailStartDate >= :startOfMonth " +
+		"AND a.approvalDetail.approvalDetailEndDate <= :endOfMonth")
+	List<Approval> findByUserNoAndApprovalStatusAndDateBetween(Long userNo,
+		ApprovalStatus approvalStatus,
+		LocalDateTime startOfMonth,
+		LocalDateTime endOfMonth);
 }

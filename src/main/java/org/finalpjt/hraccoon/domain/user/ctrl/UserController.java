@@ -11,6 +11,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserPasswordChangeRequ
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserRemainVacationResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.service.UserService;
@@ -118,5 +119,10 @@ public class UserController {
 	@GetMapping("/user/health-check")
 	public String healthCheck() {
 		return "OK";
+	}
+
+	@GetMapping("/user/remain-vacation/{userId}")
+	public ApiResponse<UserRemainVacationResponse> getRemainVacation(@PathVariable String userId) {
+		return ApiResponse.createSuccess(userService.getRemainVacation(userId));
 	}
 }

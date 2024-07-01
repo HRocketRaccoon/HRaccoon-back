@@ -88,7 +88,6 @@ public class User extends BaseTimeEntity {
 	@JoinColumn(name = "user_detail_no")
 	private UserDetail userDetail;
 
-	// 240613 - testcode용 userNo 추가
 	@Builder
 	private User(String userId, String userPassword, String userName, String userMobile,
 		String userAddress, Gender userGender, String userBirth, String userEmail,
@@ -128,7 +127,6 @@ public class User extends BaseTimeEntity {
 		this.userImageUrl = userImage;
 	}
 
-	// test용 
 	@Builder
 	private User(Long userNo) {
 		this.userNo = userNo;
@@ -144,5 +142,6 @@ public class User extends BaseTimeEntity {
 		this.userTeam = adminUserRequest.getUserTeam();
 		this.userRank = adminUserRequest.getUserRank();
 		this.userRole = Role.valueOf(adminUserRequest.getUserRole());
+		this.userImageUrl = adminUserRequest.getUserImageUrl();
 	}
 }

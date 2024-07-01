@@ -1,6 +1,5 @@
 package org.finalpjt.hraccoon.domain.approval.service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,33 +54,7 @@ public class ApprovalService {
 			}
 
 			if (params.getApprovalDetailContent().isEmpty()) {
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-
-				String startDate = params.getApprovalDetailStartDate().format(dateTimeFormatter);
-				String endDate = params.getApprovalDetailEndDate().format(dateTimeFormatter);
-
-				String approvalTypeKorean = transferApprovalType(params.getApprovalType().toString());
-
-				String userTeamCodeNo = user.getUserTeam();
-				String userTeam = codeRepository.findCodeNameByCodeNo(userTeamCodeNo);
-				String userName = user.getUserName();
-
-				String approvalDetailContent = String.format("%s %s %s부터 %s까지 %s 신청합니다.",
-					userTeam,
-					userName,
-					startDate,
-					endDate,
-					approvalTypeKorean);
-
-				params = ApprovalRequest.builder()
-					.userNo(params.getUserNo())
-					.approvalType(params.getApprovalType())
-					.approvalDetailStartDate(params.getApprovalDetailStartDate())
-					.approvalDetailEndDate(params.getApprovalDetailEndDate())
-					.selectedApprovalAuthority(params.getSelectedApprovalAuthority())
-					.approvalDetailContent(approvalDetailContent)
-					.build();
-				// throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
+				throw new IllegalArgumentException(ApprovalMessageConstants.APPROVAL_DETAIL_CONTENT_MISSING);
 			}
 
 			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());

@@ -163,22 +163,30 @@ public class AttendanceService {
 		List<Attendance> fakeAttendances = new ArrayList<>();
 
 		for (LocalDate date = startOfWeek; date.isBefore(endOfWeek.plusDays(1)); date = date.plusDays(1)) {
-			if (!approvedDays.contains(date)) {
-				if (whetherIncludingToday || !date.isEqual(today)) {
-					Attendance fakeAttendance = Attendance.builder()
-						.attendanceNo(++fakeAttendanceNo)
-						.user(user)
-						.attendanceDate(date)
-						.attendanceStartTime(null)
-						.attendanceEndTime(null)
-						.attendanceTotalTime(null)
-						.attendanceStatus("proxy")
-						.attendanceDay(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN))
-						.build();
+			boolean shouldCreateFakeAttendance = !approvedDays.contains(date) &&
+				(whetherIncludingToday || !date.isEqual(today));
 
-					fakeAttendances.add(fakeAttendance);
-					log.info("fakeAttendanceDays: {}", fakeAttendance.getAttendanceDate());
+			for (Attendance attendance : response) {
+				if (attendance.getAttendanceDate().isEqual(date) && attendance.getAttendanceStartTime() != null) {
+					shouldCreateFakeAttendance = false;
+					break;
 				}
+			}
+
+			if (shouldCreateFakeAttendance) {
+				Attendance fakeAttendance = Attendance.builder()
+					.attendanceNo(++fakeAttendanceNo)
+					.user(user)
+					.attendanceDate(date)
+					.attendanceStartTime(null)
+					.attendanceEndTime(null)
+					.attendanceTotalTime(null)
+					.attendanceStatus("proxy")
+					.attendanceDay(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN))
+					.build();
+
+				fakeAttendances.add(fakeAttendance);
+				log.info("fakeAttendanceDays: {}", fakeAttendance.getAttendanceDate());
 			}
 		}
 		log.info("fakeAttendances: {}", fakeAttendances);
@@ -189,7 +197,11 @@ public class AttendanceService {
 				if (!attendance.getAttendanceStatus().equals("proxy")) {
 					attendance.setAttendanceDay(
 						attendance.getAttendanceDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN));
-					attendance.setAttendanceTotalTime();
+					try {
+						attendance.setAttendanceTotalTime();
+					} catch (Exception e) {
+						log.error("error: {}", e.getMessage());
+					}
 				}
 			})
 			.collect(Collectors.toList());

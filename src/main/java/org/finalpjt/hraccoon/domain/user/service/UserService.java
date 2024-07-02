@@ -13,6 +13,7 @@ import org.finalpjt.hraccoon.domain.user.data.dto.request.UserInfoRequest;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.AbilityResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.ApprovalResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserBelongInfoResponse;
+import org.finalpjt.hraccoon.domain.user.data.dto.response.UserRemainVacationResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserResponse;
 import org.finalpjt.hraccoon.domain.user.data.dto.response.UserSearchResponse;
 import org.finalpjt.hraccoon.domain.user.data.entity.Ability;
@@ -205,5 +206,13 @@ public class UserService {
 		user.updatePassword(passwordEncoder.encode(newPassword));
 
 		userRepository.save(user);
+	}
+
+	@Transactional
+	public UserRemainVacationResponse getRemainVacation(String userId) {
+		User user = userRepository.findByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
+
+		return new UserRemainVacationResponse(user.getUserDetail().getUserRemainVacation());
 	}
 }

@@ -46,15 +46,14 @@ public class AttendanceService {
 	public AttendacneWeekPercentResponseDTO calculateWeeklyHours(Long userNo) {
 		LocalDate today = LocalDate.now();
 		LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-		LocalDate endOfWeek = startOfWeek.plusDays(6);
 
-		List<Attendance> attendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
-		attendances.forEach(System.out::print);
+		List<Attendance> beforeAttendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, today);
+		beforeAttendances.forEach(System.out::print);
 
-		Integer workedDaysCount = calculateWorkedDays(attendances);
+		Integer workedDaysCount = calculateWorkedDays(beforeAttendances);
 
 		Integer totalHours = 0;
-		for (Attendance attendance : attendances) {
+		for (Attendance attendance : beforeAttendances) {
 			if (!attendance.getAttendanceStatus().equals("출근")) {
 				Duration duration = Duration.between(attendance.getAttendanceStartTime(),
 					attendance.getAttendanceEndTime());
@@ -131,7 +130,7 @@ public class AttendanceService {
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
-			if (attendance.getAttendanceDate().isEqual(today) && !attendance.getAttendanceStatus().equals("출근")
+			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")
 				|| attendance.getAttendanceStatus().equals("BUSINESS_TRIP") || attendance.getAttendanceStatus()
 				.equals("OUT_ON_BUSINESS") || attendance.getAttendanceStatus().equals("VACATION")) {
 				whetherIncludingToday = false;

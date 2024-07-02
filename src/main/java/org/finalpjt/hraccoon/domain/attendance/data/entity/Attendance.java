@@ -1,5 +1,7 @@
 package org.finalpjt.hraccoon.domain.attendance.data.entity;
 
+import static org.finalpjt.hraccoon.domain.approval.service.ApprovalService.*;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -97,7 +99,7 @@ public class Attendance extends BaseTimeEntity {
 	// 결재 승인 시 근태 상태 변경
 	public void updateAttendance(Approval approval) {
 		this.attendanceTotalTime = LocalTime.of(8, 0, 0);
-		this.attendanceStatus = approval.getApprovalType().toString();
+		this.attendanceStatus = transferApprovalType(approval.getApprovalType().toString());
 	}
 
 	// 6시 이후 퇴근 시 근태 상태 변경

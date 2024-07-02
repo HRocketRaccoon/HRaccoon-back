@@ -116,8 +116,11 @@ public class AttendanceService {
 	// 해당 주 요일별 근무 시간 조회
 	public List<Attendance> getDailyAttendance(Long userNo) {
 		LocalDate today = LocalDate.now();
+		log.info("today: {}", today);
 		LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
+		log.info("startOfWeek: {}", startOfWeek);
 		LocalDate endOfWeek = startOfWeek.plusDays(6);
+		log.info("endOfWeek: {}", endOfWeek);
 
 		User user = userRepository.findByUserNo(userNo)
 			.orElseThrow(() -> new IllegalArgumentException(UserMessageConstants.USER_NOT_FOUND));
@@ -138,6 +141,7 @@ public class AttendanceService {
 				}
 			}
 		}
+		log.info("approvedDays: {}", approvedDays);
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
@@ -149,6 +153,7 @@ public class AttendanceService {
 				break;
 			}
 		}
+		log.info("whetherIncludingToday: {}", whetherIncludingToday);
 
 		long fakeAttendanceNo = response.stream()
 			.mapToLong(Attendance::getAttendanceNo)
@@ -172,9 +177,11 @@ public class AttendanceService {
 						.build();
 
 					fakeAttendances.add(fakeAttendance);
+					log.info("fakeAttendanceDays: {}", fakeAttendance.getAttendanceDate());
 				}
 			}
 		}
+		log.info("fakeAttendances: {}", fakeAttendances);
 
 		// 요일 설정
 		List<Attendance> responseWithDetails = response.stream()
@@ -186,12 +193,10 @@ public class AttendanceService {
 				}
 			})
 			.collect(Collectors.toList());
+		log.info("responseWithDetails: {}", responseWithDetails);
 
 		responseWithDetails.addAll(fakeAttendances);
-
-		attendanceRepository.saveAllAndFlush(responseWithDetails.stream()
-			.filter(attendance -> !attendance.getAttendanceStatus().equals("proxy"))
-			.collect(Collectors.toList()));
+		log.info("responseWithDetails: {}", responseWithDetails);
 
 		return responseWithDetails;
 	}

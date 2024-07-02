@@ -58,6 +58,7 @@ public class ApprovalService {
 			}
 
 			Approval approval = params.toEntity(user, params.getSelectedApprovalAuthority());
+
 			approvalRepository.save(approval);
 
 			/* 결재 상신 알림 서비스 */

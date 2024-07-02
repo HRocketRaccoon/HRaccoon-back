@@ -47,7 +47,8 @@ public class AttendanceService {
 		LocalDate today = LocalDate.now();
 		LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
 
-		List<Attendance> beforeAttendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, today);
+		List<Attendance> beforeAttendances = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek,
+			today);
 		beforeAttendances.forEach(System.out::print);
 
 		Integer workedDaysCount = calculateWorkedDays(beforeAttendances);
@@ -123,52 +124,55 @@ public class AttendanceService {
 
 		List<Attendance> response = attendanceRepository.findByUserNoAndDateBetween(userNo, startOfWeek, endOfWeek);
 
-		long fakeAttendanceNo = response.stream()
-			.mapToLong(Attendance::getAttendanceNo)
-			.max()
-			.orElse(0L);
+		List<Approval> approvedApprovals = approvalRepository.findByUserAndApprovalStatus(user,
+			ApprovalStatus.APPROVED);
+
+		Set<LocalDate> approvedDays = new HashSet<>();
+		for (Approval approval : approvedApprovals) {
+			LocalDate startDate = approval.getApprovalDetail().getApprovalDetailStartDate().toLocalDate();
+			LocalDate endDate = approval.getApprovalDetail().getApprovalDetailEndDate().toLocalDate();
+			List<LocalDate> dates = getDatesBetween(startDate, endDate);
+			for (LocalDate date : dates) {
+				if (!date.isBefore(startOfWeek) && !date.isAfter(endOfWeek)) {
+					approvedDays.add(date);
+				}
+			}
+		}
 
 		boolean whetherIncludingToday = true;
 		for (Attendance attendance : response) {
-			if (attendance.getAttendanceDate().isEqual(today) && attendance.getAttendanceStatus().equals("퇴근")
-				|| attendance.getAttendanceStatus().equals("BUSINESS_TRIP") || attendance.getAttendanceStatus()
-				.equals("OUT_ON_BUSINESS") || attendance.getAttendanceStatus().equals("VACATION")) {
+			if (attendance.getAttendanceDate().isEqual(today) && (attendance.getAttendanceStatus().equals("출장")
+				|| attendance.getAttendanceStatus()
+				.equals("외근") || attendance.getAttendanceStatus().equals("휴가") || !attendance.getAttendanceStatus()
+				.equals("출근"))) {
 				whetherIncludingToday = false;
 				break;
 			}
 		}
 
+		long fakeAttendanceNo = response.stream()
+			.mapToLong(Attendance::getAttendanceNo)
+			.max()
+			.orElse(0L);
+
 		List<Attendance> fakeAttendances = new ArrayList<>();
 
-		if (whetherIncludingToday) {
-			for (LocalDate date = today; date.isBefore(endOfWeek.plusDays(1)); date = date.plusDays(1)) {
-				Attendance fakeAttendance = Attendance.builder()
-					.attendanceNo(++fakeAttendanceNo)
-					.user(user)
-					.attendanceDate(date)
-					.attendanceStartTime(null)
-					.attendanceEndTime(null)
-					.attendanceTotalTime(null)
-					.attendanceStatus("proxy")
-					.attendanceDay(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN))
-					.build();
+		for (LocalDate date = startOfWeek; date.isBefore(endOfWeek.plusDays(1)); date = date.plusDays(1)) {
+			if (!approvedDays.contains(date)) {
+				if (whetherIncludingToday || !date.isEqual(today)) {
+					Attendance fakeAttendance = Attendance.builder()
+						.attendanceNo(++fakeAttendanceNo)
+						.user(user)
+						.attendanceDate(date)
+						.attendanceStartTime(null)
+						.attendanceEndTime(null)
+						.attendanceTotalTime(null)
+						.attendanceStatus("proxy")
+						.attendanceDay(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN))
+						.build();
 
-				fakeAttendances.add(fakeAttendance);
-			}
-		} else {
-			for (LocalDate date = today.plusDays(1); date.isBefore(endOfWeek.plusDays(1)); date = date.plusDays(1)) {
-				Attendance fakeAttendance = Attendance.builder()
-					.attendanceNo(++fakeAttendanceNo)
-					.user(user)
-					.attendanceDate(date)
-					.attendanceStartTime(null)
-					.attendanceEndTime(null)
-					.attendanceTotalTime(null)
-					.attendanceStatus("proxy")
-					.attendanceDay(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN))
-					.build();
-
-				fakeAttendances.add(fakeAttendance);
+					fakeAttendances.add(fakeAttendance);
+				}
 			}
 		}
 
